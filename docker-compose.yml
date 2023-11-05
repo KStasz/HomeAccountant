@@ -1,0 +1,39 @@
+version: '3.4'
+networks:
+    dev:
+        driver: bridge
+services:
+    homeaccountant.gateway:
+        image: krz123/homeaccountant.gateway
+        container_name: gateway
+        ports:
+            - '8080:80'
+        build:
+            context: .
+            dockerfile: Dockerfile
+        environment:
+            - ASPNETCORE_URLS=http://+:80
+        networks:
+            - dev
+
+    identity_platform:
+        image: krz123/homeaccountant.identityplatform
+        container_name: identity_platform
+        build:
+            context: .
+            dockerfile: Dockerfile
+        environment:
+            - ASPNETCORE_URLS=http://+:80
+            - ConnectionStrings__SqlServer=Server=ItentityPlatform_SQLServer;Database=IdentityPlatform;User Id=sa;Password=1qazXSW@3edc;TrustServerCertificate=True;
+        networks:
+            - dev
+    
+    ItentityPlatform_SQLServer:
+        image: mcr.microsoft.com/mssql/server
+        container_name: ItentityPlatform_SQLServer
+        environment:
+            - ACCEPT_EULA=Y
+            - MSSQL_SA_PASSWORD=1qazXSW@3edc
+            - MSSQL_PID=Express
+        networks:
+            - dev

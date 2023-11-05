@@ -1,0 +1,9 @@
+{
+  "ConnectionStrings": {
+    "SqlServer": "Server=localhost;Database=IdentityPlatform;User Id=sa;Password=1qazXSW@3edc;TrustServerCertificate=True;"
+  },
+  "JwtConfig": {
+    "Secret": "cNPvogXf5QyPbQAFosf8p3wzZ3b0LcJl",
+    "ExpiresMinutes": 1
+  }
+}

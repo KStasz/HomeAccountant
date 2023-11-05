@@ -1,0 +1,60 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeAccountant.Gateway", "APIGateway\HomeAccountant.Gateway\HomeAccountant.Gateway.csproj", "{C2A139F7-59EA-47A1-977F-A7F8613E76BE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeAccountant.IdentityPlatform", "Services\HomeAccountant.IdentityPlatform\HomeAccountant.IdentityPlatform.csproj", "{B28F2390-FA3B-4D34-B057-32D4F5D996F5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeAccountant.CategoriesService", "Services\HomeAccountant.CategoriesService\HomeAccountant.CategoriesService.csproj", "{1BDE83BA-A495-4D38-8EFE-4F0912F2CCC8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeAccountant.FriendsService", "Services\HomeAccountant.FriendsService\HomeAccountant.FriendsService.csproj", "{8FFA705F-52B4-4900-A6B8-414BEC0EAA8D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "APIGateway", "APIGateway", "{CC24775C-7F6A-4345-BB32-C1F747F27D0A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{772449BE-9283-4EFA-80C5-58DD84C9867D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JwtAuthenticationManager", "Services\JwtAuthenticationManager\JwtAuthenticationManager.csproj", "{298B764D-0EB8-4D5C-91B7-1E553DC21AEB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C2A139F7-59EA-47A1-977F-A7F8613E76BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2A139F7-59EA-47A1-977F-A7F8613E76BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2A139F7-59EA-47A1-977F-A7F8613E76BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2A139F7-59EA-47A1-977F-A7F8613E76BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B28F2390-FA3B-4D34-B057-32D4F5D996F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B28F2390-FA3B-4D34-B057-32D4F5D996F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B28F2390-FA3B-4D34-B057-32D4F5D996F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B28F2390-FA3B-4D34-B057-32D4F5D996F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1BDE83BA-A495-4D38-8EFE-4F0912F2CCC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1BDE83BA-A495-4D38-8EFE-4F0912F2CCC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1BDE83BA-A495-4D38-8EFE-4F0912F2CCC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1BDE83BA-A495-4D38-8EFE-4F0912F2CCC8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8FFA705F-52B4-4900-A6B8-414BEC0EAA8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8FFA705F-52B4-4900-A6B8-414BEC0EAA8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8FFA705F-52B4-4900-A6B8-414BEC0EAA8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8FFA705F-52B4-4900-A6B8-414BEC0EAA8D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{298B764D-0EB8-4D5C-91B7-1E553DC21AEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{298B764D-0EB8-4D5C-91B7-1E553DC21AEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{298B764D-0EB8-4D5C-91B7-1E553DC21AEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{298B764D-0EB8-4D5C-91B7-1E553DC21AEB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C2A139F7-59EA-47A1-977F-A7F8613E76BE} = {CC24775C-7F6A-4345-BB32-C1F747F27D0A}
+		{B28F2390-FA3B-4D34-B057-32D4F5D996F5} = {772449BE-9283-4EFA-80C5-58DD84C9867D}
+		{1BDE83BA-A495-4D38-8EFE-4F0912F2CCC8} = {772449BE-9283-4EFA-80C5-58DD84C9867D}
+		{8FFA705F-52B4-4900-A6B8-414BEC0EAA8D} = {772449BE-9283-4EFA-80C5-58DD84C9867D}
+		{298B764D-0EB8-4D5C-91B7-1E553DC21AEB} = {772449BE-9283-4EFA-80C5-58DD84C9867D}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {118C3AF7-265F-41B3-919B-D06F020ED43B}
+	EndGlobalSection
+EndGlobal

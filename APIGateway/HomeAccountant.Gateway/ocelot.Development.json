@@ -1,0 +1,46 @@
+{
+  "Routes": [
+    {
+      "UpstreamPathTemplate": "/api/Categories",
+      "UpstreamHttpMethod": [ "Put", "Post" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5168
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Categories"
+    },
+    {
+      "UpstreamPathTemplate": "/api/Categories/{id}",
+      "UpstreamHttpMethod": [ "Get", "Delete" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5167
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Categories/{id}"
+    },
+    {
+      "UpstreamPathTemplate": "/api/Categories/{userId}",
+      "UpstreamHttpMethod": [ "Get" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5168
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Categories/{userId}"
+    }
+  ],
+  "GlobalConfiguration": {
+    "BaseUrl": "http://localhost:5062"
+  }
+}
