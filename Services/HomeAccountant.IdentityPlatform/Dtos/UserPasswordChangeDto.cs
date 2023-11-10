@@ -5,9 +5,6 @@ namespace HomeAccountant.IdentityPlatform.Dtos
     public class UserPasswordChangeDto
     {
         [Required]
-        public required string UserId { get; set; }
-
-        [Required]
         public required string CurrentPassword { get; set; }
         
         [Required]

@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace JwtAuthenticationManager.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class JwtAuthenticationManagerDbContext : DbContext
     {
         public DbSet<RefreshToken> RefreshTokens { get; set; }
 
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+        public JwtAuthenticationManagerDbContext(DbContextOptions<JwtAuthenticationManagerDbContext> options) : base(options)
         { }
 
         protected override void OnModelCreating(ModelBuilder builder)

@@ -1,14 +1,13 @@
 {
   "Routes": [
-    //Categories API
     {
       "UpstreamPathTemplate": "/api/Categories",
-      "UpstreamHttpMethod": [ "Put", "Post" ],
+      "UpstreamHttpMethod": [ "Get", "Put", "Post" ],
 
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
+          "Host": "homeaccountant_categoriesservice",
           "Port": 80
         }
       ],
@@ -21,26 +20,129 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
+          "Host": "homeaccountant_categoriesservice",
           "Port": 80
         }
       ],
       "DownstreamPathTemplate": "/api/Categories/{id}"
     },
     {
-      "UpstreamPathTemplate": "/api/Categories/{userId}",
+      "UpstreamPathTemplate": "/api/FriendRequests/CreatedRequests",
       "UpstreamHttpMethod": [ "Get" ],
 
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
+          "Host": "homeaccountant_friendsservice",
           "Port": 80
         }
       ],
-      "DownstreamPathTemplate": "/api/Categories/{userId}"
+      "DownstreamPathTemplate": "/api/FriendRequests/CreatedRequests"
     },
-    //IdentityPlatform API
+    {
+      "UpstreamPathTemplate": "/api/FriendRequests",
+      "UpstreamHttpMethod": [ "Get" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "homeaccountant_friendsservice",
+          "Port": 80
+        }
+      ],
+      "DownstreamPathTemplate": "/api/FriendRequests"
+    },
+    {
+      "UpstreamPathTemplate": "/api/FriendRequests/{requestId}/Accept",
+      "UpstreamHttpMethod": [ "Put" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "homeaccountant_friendsservice",
+          "Port": 80
+        }
+      ],
+      "DownstreamPathTemplate": "/api/FriendRequests/{requestId}/Accept"
+    },
+    {
+      "UpstreamPathTemplate": "/api/FriendRequests/{requestId}/Reject",
+      "UpstreamHttpMethod": [ "Put" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "homeaccountant_friendsservice",
+          "Port": 80
+        }
+      ],
+      "DownstreamPathTemplate": "/api/FriendRequests/{requestId}/Reject"
+    },
+    {
+      "UpstreamPathTemplate": "/api/FriendRequests/{requestId}",
+      "UpstreamHttpMethod": [ "Get" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "homeaccountant_friendsservice",
+          "Port": 80
+        }
+      ],
+      "DownstreamPathTemplate": "/api/FriendRequests/{requestId}"
+    },
+    {
+      "UpstreamPathTemplate": "/api/FriendRequests/CreateRequest",
+      "UpstreamHttpMethod": [ "Get" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "homeaccountant_friendsservice",
+          "Port": 80
+        }
+      ],
+      "DownstreamPathTemplate": "/api/FriendRequests/CreateRequest"
+    },
+    {
+      "UpstreamPathTemplate": "/api/Friends",
+      "UpstreamHttpMethod": [ "Post", "Get" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "homeaccountant_friendsservice",
+          "Port": 80
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Friends"
+    },
+    {
+      "UpstreamPathTemplate": "/api/Friends/{id}",
+      "UpstreamHttpMethod": [ "Delete" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "homeaccountant_friendsservice",
+          "Port": 80
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Friends/{id}"
+    },
+    {
+      "UpstreamPathTemplate": "/api/Account/ChangePassword",
+      "UpstreamHttpMethod": [ "Put" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "identity_platform",
+          "Port": 80
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Account/ChangePassword"
+    },
     {
       "UpstreamPathTemplate": "/api/Authentication/Register",
       "UpstreamHttpMethod": [ "Post" ],

@@ -7,6 +7,7 @@ namespace HomeAccountant.FriendsService.Service
     {
         void CreateRequest(FriendRequest friendRequest);
         void UpdateRequest(FriendRequest friendRequest);
+        void DeleteRequest(FriendRequest friendRequest);
         FriendRequest? GetRequest(int requestId);
         IEnumerable<FriendRequest> GetRequests(Expression<Func<FriendRequest, bool>> predicate);
         FriendRequest? SearchRequest(Func<FriendRequest, bool> search);

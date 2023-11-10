@@ -6,7 +6,6 @@ using JwtAuthenticationManager.Config;
 using System.Text;
 using JwtAuthenticationManager.Data;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection;
 
 namespace JwtAuthenticationManager
 {
@@ -18,7 +17,7 @@ namespace JwtAuthenticationManager
 
             services.Configure<JwtConfig>(config.GetSection("JwtConfig"));
 
-            services.AddDbContext<ApplicationDbContext>(options =>
+            services.AddDbContext<JwtAuthenticationManagerDbContext>(options =>
             {
                 options.UseSqlServer(config.GetConnectionString("SqlServer"));
             });

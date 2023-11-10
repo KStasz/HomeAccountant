@@ -1,4 +1,5 @@
 version: '3.4'
+name: homeaccountant
 networks:
     dev:
         driver: bridge
@@ -24,16 +25,66 @@ services:
             dockerfile: Dockerfile
         environment:
             - ASPNETCORE_URLS=http://+:80
-            - ConnectionStrings__SqlServer=Server=ItentityPlatform_SQLServer;Database=IdentityPlatform;User Id=sa;Password=1qazXSW@3edc;TrustServerCertificate=True;
+            - ConnectionStrings__SqlServer=Server=ItentityPlatform_SqlServer;Database=IdentityPlatform;User Id=sa;Password=1qazXSW@3edc;TrustServerCertificate=True;
+        networks:
+            - dev
+
+    homeaccountant_categoriesservice:
+        image: krz123/homeaccountant.categoriesservice
+        container_name: CategoriesService
+        build:
+            context: .
+            dockerfile: Dockerfile
+        environment:
+            - ASPNETCORE_URLS=http://+:80
+            - ConnectionStrings__DefaultConnection=Server=CategoriesService_SqlServer;Database=IdentityPlatform;User Id=sa;Password=1qazXSW@3edc;TrustServerCertificate=True;
+        networks:
+            - dev
+
+    homeaccountant_friendsservice:
+        image: krz123/homeaccountant.friendsservice
+        container_name: FriendsService
+        build:
+            context: .
+            dockerfile: Dockerfile
+        environment:
+            - ASPNETCORE_URLS=http://+:80
+            - ConnectionStrings__DefaultConnection=Server=FriendsService_SqlServer;Database=IdentityPlatform;User Id=sa;Password=1qazXSW@3edc;TrustServerCertificate=True;
         networks:
             - dev
     
-    ItentityPlatform_SQLServer:
+    ItentityPlatform_SqlServer:
         image: mcr.microsoft.com/mssql/server
-        container_name: ItentityPlatform_SQLServer
+        container_name: ItentityPlatformDb
         environment:
             - ACCEPT_EULA=Y
             - MSSQL_SA_PASSWORD=1qazXSW@3edc
             - MSSQL_PID=Express
+        volumes:
+            - .\HomeAccountantDb\IdentityPlatformDb:/var/opt/mssql/data
+        networks:
+            - dev
+
+    CategoriesService_SqlServer:
+        image: mcr.microsoft.com/mssql/server
+        container_name: CategoriesServiceDb
+        environment:
+            - ACCEPT_EULA=Y
+            - MSSQL_SA_PASSWORD=1qazXSW@3edc
+            - MSSQL_PID=Express
+        volumes:
+            - .\HomeAccountantDb\CategoriesServiceDb:/var/opt/mssql/data
+        networks:
+            - dev
+
+    FriendsService_SqlServer:
+        image: mcr.microsoft.com/mssql/server
+        container_name: FriendsServiceDb
+        environment:
+            - ACCEPT_EULA=Y
+            - MSSQL_SA_PASSWORD=1qazXSW@3edc
+            - MSSQL_PID=Express
+        volumes:
+            - .\HomeAccountantDb\FriendsServiceDb:/var/opt/mssql/data
         networks:
             - dev

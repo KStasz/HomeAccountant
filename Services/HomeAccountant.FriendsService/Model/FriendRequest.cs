@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HomeAccountant.FriendsService.Model
 {
-    [Index(nameof(CreatorId),nameof(RecipientId), IsUnique = true)]
     public class FriendRequest
     {
         [Key]

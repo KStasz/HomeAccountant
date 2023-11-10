@@ -2,7 +2,7 @@
   "Routes": [
     {
       "UpstreamPathTemplate": "/api/Categories",
-      "UpstreamHttpMethod": [ "Put", "Post" ],
+      "UpstreamHttpMethod": [ "Get", "Put", "Post" ],
 
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -21,23 +21,166 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 5167
+          "Port": 5168
         }
       ],
       "DownstreamPathTemplate": "/api/Categories/{id}"
     },
     {
-      "UpstreamPathTemplate": "/api/Categories/{userId}",
+      "UpstreamPathTemplate": "/api/FriendRequests/CreatedRequests",
       "UpstreamHttpMethod": [ "Get" ],
 
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 5168
+          "Port": 5095
         }
       ],
-      "DownstreamPathTemplate": "/api/Categories/{userId}"
+      "DownstreamPathTemplate": "/api/FriendRequests/CreatedRequests"
+    },
+    {
+      "UpstreamPathTemplate": "/api/FriendRequests",
+      "UpstreamHttpMethod": [ "Get" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5095
+        }
+      ],
+      "DownstreamPathTemplate": "/api/FriendRequests"
+    },
+    {
+      "UpstreamPathTemplate": "/api/FriendRequests/{requestId}/Accept",
+      "UpstreamHttpMethod": [ "Put" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5095
+        }
+      ],
+      "DownstreamPathTemplate": "/api/FriendRequests/{requestId}/Accept"
+    },
+    {
+      "UpstreamPathTemplate": "/api/FriendRequests/{requestId}/Reject",
+      "UpstreamHttpMethod": [ "Put" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5095
+        }
+      ],
+      "DownstreamPathTemplate": "/api/FriendRequests/{requestId}/Reject"
+    },
+    {
+      "UpstreamPathTemplate": "/api/FriendRequests/{requestId}",
+      "UpstreamHttpMethod": [ "Get" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5095
+        }
+      ],
+      "DownstreamPathTemplate": "/api/FriendRequests/{requestId}"
+    },
+    {
+      "UpstreamPathTemplate": "/api/FriendRequests/CreateRequest",
+      "UpstreamHttpMethod": [ "Get" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5095
+        }
+      ],
+      "DownstreamPathTemplate": "/api/FriendRequests/CreateRequest"
+    },
+    {
+      "UpstreamPathTemplate": "/api/Friends",
+      "UpstreamHttpMethod": [ "Post", "Get" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5095
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Friends"
+    },
+    {
+      "UpstreamPathTemplate": "/api/Friends/{id}",
+      "UpstreamHttpMethod": [ "Delete" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5095
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Friends/{id}"
+    },
+    {
+      "UpstreamPathTemplate": "/api/Account/ChangePassword",
+      "UpstreamHttpMethod": [ "Put" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5118
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Account/ChangePassword"
+    },
+    {
+      "UpstreamPathTemplate": "/api/Authentication/Register",
+      "UpstreamHttpMethod": [ "Post" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5118
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Authentication/Register"
+    },
+    {
+      "UpstreamPathTemplate": "/api/Authentication/Login",
+      "UpstreamHttpMethod": [ "Post" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5118
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Authentication/Login"
+    },
+    {
+      "UpstreamPathTemplate": "/api/Authentication/RefreshToken",
+      "UpstreamHttpMethod": [ "Post" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5118
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Authentication/RefreshToken"
     }
   ],
   "GlobalConfiguration": {

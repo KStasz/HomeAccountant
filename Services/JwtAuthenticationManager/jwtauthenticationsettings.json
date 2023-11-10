@@ -4,6 +4,6 @@
   },
   "JwtConfig": {
     "Secret": "cNPvogXf5QyPbQAFosf8p3wzZ3b0LcJl",
-    "ExpiresMinutes": 1
+    "ExpiresMinutes": 1440
   }
 }

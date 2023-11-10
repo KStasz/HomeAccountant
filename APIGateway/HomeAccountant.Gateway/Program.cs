@@ -12,15 +12,25 @@ builder.Services.AddOcelot(builder.Configuration);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+app.Map("/swagger/v1/swagger.json", b =>
+{
+    b.Run(async x =>
+    {
+        var json = File.ReadAllText("swagger.json");
+        await x.Response.WriteAsync(json);
+    });
+});
+
+
+//Configure the HTTP request pipeline.
 //if (app.Environment.IsDevelopment())
 //{
-//app.UseSwagger();
-//app.UseSwaggerUI();
+    app.UseSwagger();
+    app.UseSwaggerUI(opt => opt.SupportedSubmitMethods());
 //}
 
 app.UseHttpsRedirection();

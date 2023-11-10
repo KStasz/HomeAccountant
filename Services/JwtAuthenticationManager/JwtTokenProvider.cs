@@ -20,12 +20,12 @@ namespace JwtAuthenticationManager
     public class JwtTokenProvider : IJwtTokenProvider
     {
         private readonly TokenValidationParameters _tokenValidationParameters;
-        private readonly ApplicationDbContext _applicationDbContext;
+        private readonly JwtAuthenticationManagerDbContext _applicationDbContext;
         private readonly JwtConfig _jwtConfig;
         private const string JwtUserIdClaimType = "UserId";
 
         public JwtTokenProvider(TokenValidationParameters tokenValidationParameters,
-            ApplicationDbContext applicationDbContext,
+            JwtAuthenticationManagerDbContext applicationDbContext,
             IOptions<JwtConfig> options)
         {
             _tokenValidationParameters = tokenValidationParameters;

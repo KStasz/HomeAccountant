@@ -17,6 +17,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(opt =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddJwtAuthentication();
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddDefaultIdentity<IdentityUser>(opt =>
 {
@@ -49,6 +50,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.PrepareDatabase();
+if (builder.Environment.IsProduction())
+    app.PrepareDatabase();
 
 app.Run();

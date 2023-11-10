@@ -17,7 +17,8 @@ namespace HomeAccountant.CategoriesService.Controllers
         private readonly ICategoriesService _categoriesService;
         private readonly IMapper _mapper;
 
-        public CategoriesController(ICategoriesService categoriesService, IMapper mapper)
+        public CategoriesController(ICategoriesService categoriesService,
+            IMapper mapper)
         {
             _categoriesService = categoriesService;
             _mapper = mapper;
@@ -38,9 +39,13 @@ namespace HomeAccountant.CategoriesService.Controllers
             return Ok(categoryRead);
         }
 
-        [HttpGet("{userId}", Name = "GetAll")]
-        public IActionResult GetAll(string userId)
+        [HttpGet]
+        public IActionResult GetAll()
         {
+            var userId = GetUserId();
+            if (userId is null)
+                return BadRequest("Invalid payload");
+
             var categories = _categoriesService.GetAll().Where(x => x.CreatedBy == userId);
 
             return Ok(_mapper.Map<IEnumerable<CategoryReadDto>>(categories));
@@ -67,6 +72,15 @@ namespace HomeAccountant.CategoriesService.Controllers
         {
             var categoryModel = _mapper.Map<CategoryModel>(categoryCreateDto);
 
+            var userId = GetUserId();
+
+            if (userId is null)
+            {
+                return BadRequest("Invalid payload");
+            }
+
+            categoryModel.CreatedBy = userId;
+
             _categoriesService.Add(categoryModel);
             await _categoriesService.SaveChangesAsync();
 
@@ -87,6 +101,11 @@ namespace HomeAccountant.CategoriesService.Controllers
             await _categoriesService.SaveChangesAsync();
 
             return Ok();
+        }
+
+        private string? GetUserId()
+        {
+            return this.User.Claims.FirstOrDefault(x => x.Type == "UserId")?.Value;
         }
     }
 }

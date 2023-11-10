@@ -44,5 +44,10 @@ namespace HomeAccountant.FriendsService.Service
         {
             await _applicationDbContext.SaveChangesAsync();
         }
+
+        public void DeleteRequest(FriendRequest friendRequest)
+        {
+            _applicationDbContext.FriendRequests.Remove(friendRequest);
+        }
     }
 }

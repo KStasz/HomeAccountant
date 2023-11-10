@@ -1,9 +1,11 @@
-﻿using HomeAccountant.IdentityPlatform.Dtos;
+﻿using AutoMapper;
+using HomeAccountant.IdentityPlatform.Dtos;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace HomeAccountant.IdentityPlatform.Controllers
 {
@@ -13,15 +15,23 @@ namespace HomeAccountant.IdentityPlatform.Controllers
     public class AccountController : ControllerBase
     {
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly IMapper _mapper;
 
-        public AccountController(UserManager<IdentityUser> userManager)
+        public AccountController(UserManager<IdentityUser> userManager,
+            IMapper mapper)
         {
             _userManager = userManager;
+            _mapper = mapper;
         }
 
         [HttpPut("ChangePassword")]
         public async Task<IActionResult> ChangePassword([FromBody] UserPasswordChangeDto userPasswordChangeDto)
         {
+            string? userId = GetUserId();
+
+            if (userId is null)
+                return BadRequest("Invalid payload");
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(new
@@ -46,7 +56,7 @@ namespace HomeAccountant.IdentityPlatform.Controllers
                 });
             }
 
-            var user = await _userManager.FindByIdAsync(userPasswordChangeDto.UserId);
+            var user = await _userManager.FindByIdAsync(userId);
 
             if (user is null)
             {
@@ -73,5 +83,41 @@ namespace HomeAccountant.IdentityPlatform.Controllers
 
             return Ok();
         }
+
+        [HttpGet("[action]/{email}")]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public async Task<IActionResult> GetUserId(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if (user is null)
+            {
+                return NotFound();
+            }
+
+            if (user.Email is null)
+            {
+                return BadRequest("The user didn't provide the email address");
+            }
+
+            return Ok(user.Id);
+        }
+
+        [HttpPost("[action]")]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public async Task<IActionResult> GetUsers([Required] string[] userIds)
+        {
+            List<IdentityUser?> users = new List<IdentityUser?>();
+            
+            foreach (var userId in userIds)
+            {
+                var user = await _userManager.FindByIdAsync(userId);
+                users.Add(user);
+            }
+
+            return Ok(_mapper.Map<UserModelDto[]>(users.Where(x => x is not null).ToArray()));
+        }
+
+        private string? GetUserId() => this.User.Claims.FirstOrDefault(x => x.Type == "UserId")?.Value;
     }
 }

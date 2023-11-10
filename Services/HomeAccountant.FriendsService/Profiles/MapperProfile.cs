@@ -8,8 +8,11 @@ namespace HomeAccountant.FriendsService.Profiles
     {
         public MapperProfile()
         {
-            CreateMap<CreateFriendRequestDto, FriendRequest>();
             CreateMap<FriendRequest, FriendResponseDto>();
+            CreateMap<FriendRequest, Friend>()
+                .ForMember(x => x.UserId, x => x.MapFrom(y => y.CreatorId))
+                .ForMember(x => x.Id, x => x.Ignore())
+                .ForMember(x => x.FriendId, x => x.MapFrom(y => y.RecipientId));
         }
     }
 }
