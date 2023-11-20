@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using HomeAccountant.IdentityPlatform.Dtos;
+using Domain.Dtos.IdentityPlatform;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;

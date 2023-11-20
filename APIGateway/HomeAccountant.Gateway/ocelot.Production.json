@@ -181,6 +181,58 @@
         }
       ],
       "DownstreamPathTemplate": "/api/Authentication/RefreshToken"
+    },
+    {
+      "UpstreamPathTemplate": "/api/Register",
+      "UpstreamHttpMethod": [ "Post", "Put", "Get" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "homeaccountant_accountingservice",
+          "Port": 80
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Register"
+    },
+    {
+      "UpstreamPathTemplate": "/api/Register/{id}",
+      "UpstreamHttpMethod": [ "Delete", "Get" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "homeaccountant_accountingservice",
+          "Port": 80
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Register/{id}"
+    },
+    {
+      "UpstreamPathTemplate": "/api/Register/{registerId}/Entry",
+      "UpstreamHttpMethod": [ "Post", "Put", "Get" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "homeaccountant_accountingservice",
+          "Port": 80
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Register/{registerId}/Entry"
+    },
+    {
+      "UpstreamPathTemplate": "/api/Register/{registerId}/Entry/{entryId}",
+      "UpstreamHttpMethod": [ "Delete", "Get" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "homeaccountant_accountingservice",
+          "Port": 80
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Register/{registerId}/Entry/{entryId}"
     }
   ],
   "GlobalConfiguration": {

@@ -1,11 +1,10 @@
 ﻿using AutoMapper;
-using HomeAccountant.CategoriesService.Dtos;
+using Domain.Dtos.CategoryService;
 using HomeAccountant.CategoriesService.Model;
 using HomeAccountant.CategoriesService.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.IdentityModel.Tokens.Jwt;
 
 namespace HomeAccountant.CategoriesService.Controllers
 {

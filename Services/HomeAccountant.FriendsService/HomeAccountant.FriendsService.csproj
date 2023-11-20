@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Domain\Domain.csproj" />
     <ProjectReference Include="..\JwtAuthenticationManager\JwtAuthenticationManager.csproj" />
   </ItemGroup>
 

@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
-using HomeAccountant.IdentityPlatform.Dtos;
+using Domain.Dtos.IdentityPlatform;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Logging;
 
 namespace HomeAccountant.IdentityPlatform.MapperProfiles
 {

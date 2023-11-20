@@ -1,4 +1,5 @@
-﻿using HomeAccountant.FriendsService.Dtos;
+﻿using Domain.Dtos.FriendsService;
+using Domain.Dtos.IdentityPlatform;
 
 namespace HomeAccountant.FriendsService.Service
 {

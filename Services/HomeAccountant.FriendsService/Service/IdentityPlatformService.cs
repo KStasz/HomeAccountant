@@ -1,4 +1,5 @@
-﻿using HomeAccountant.FriendsService.Dtos;
+﻿using Domain.Dtos.FriendsService;
+using Domain.Dtos.IdentityPlatform;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;

@@ -1,4 +1,4 @@
-﻿namespace HomeAccountant.IdentityPlatform.Dtos
+﻿namespace Domain.Dtos.IdentityPlatform
 {
     public class UserModelDto
     {

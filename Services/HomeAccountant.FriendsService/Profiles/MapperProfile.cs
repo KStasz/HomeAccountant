@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using HomeAccountant.FriendsService.Dtos;
+using Domain.Dtos.FriendsService;
 using HomeAccountant.FriendsService.Model;
 
 namespace HomeAccountant.FriendsService.Profiles

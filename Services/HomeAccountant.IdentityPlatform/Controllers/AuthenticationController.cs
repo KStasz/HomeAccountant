@@ -2,6 +2,7 @@
 using System.Reflection.Metadata.Ecma335;
 using System.Security.Claims;
 using System.Text;
+using Domain.Dtos.IdentityPlatform;
 using JwtAuthenticationManager;
 using JwtAuthenticationManager.Config;
 using JwtAuthenticationManager.Extensions;

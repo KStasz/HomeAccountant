@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace HomeAccountant.FriendsService.Dtos
+namespace Domain.Dtos.FriendsService
 {
     public class CreateFriendRequestDto
     {

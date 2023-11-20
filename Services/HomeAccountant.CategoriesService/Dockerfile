@@ -7,6 +7,7 @@ EXPOSE 80
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
 COPY ["Services/HomeAccountant.CategoriesService/HomeAccountant.CategoriesService.csproj", "Services/HomeAccountant.CategoriesService/"]
+COPY ["Domain/Domain.csproj", "Domain/"]
 COPY ["Services/JwtAuthenticationManager/JwtAuthenticationManager.csproj", "Services/JwtAuthenticationManager/"]
 RUN dotnet restore "Services/HomeAccountant.CategoriesService/HomeAccountant.CategoriesService.csproj"
 COPY . .

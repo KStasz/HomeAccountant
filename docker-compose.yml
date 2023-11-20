@@ -37,7 +37,7 @@ services:
             dockerfile: Dockerfile
         environment:
             - ASPNETCORE_URLS=http://+:80
-            - ConnectionStrings__DefaultConnection=Server=CategoriesService_SqlServer;Database=IdentityPlatform;User Id=sa;Password=1qazXSW@3edc;TrustServerCertificate=True;
+            - ConnectionStrings__DefaultConnection=Server=CategoriesService_SqlServer;Database=CategoriesDb;User Id=sa;Password=1qazXSW@3edc;TrustServerCertificate=True;
         networks:
             - dev
 
@@ -49,7 +49,20 @@ services:
             dockerfile: Dockerfile
         environment:
             - ASPNETCORE_URLS=http://+:80
-            - ConnectionStrings__DefaultConnection=Server=FriendsService_SqlServer;Database=IdentityPlatform;User Id=sa;Password=1qazXSW@3edc;TrustServerCertificate=True;
+            - ConnectionStrings__DefaultConnection=Server=FriendsService_SqlServer;Database=FriendsDb;User Id=sa;Password=1qazXSW@3edc;TrustServerCertificate=True;
+        networks:
+            - dev
+
+    homeaccountant_accountingservice:
+        image: krz123/homeaccountant.accountingservice
+        container_name: AccountingService
+        build:
+            context: .
+            dockerfile: Dockerfile
+        environment:
+            - ASPNETCORE_URLS=http://+:80
+            - ConnectionStrings__DefaultConnection=Server=AccountingService_SqlServer;Database=AccountingDb;User Id=sa;Password=1qazXSW@3edc;TrustServerCertificate=True;
+            - CategoriesServiceBaseUri=http://homeaccountant_categoriesservice:80
         networks:
             - dev
     
@@ -61,7 +74,7 @@ services:
             - MSSQL_SA_PASSWORD=1qazXSW@3edc
             - MSSQL_PID=Express
         volumes:
-            - .\HomeAccountantDb\IdentityPlatformDb:/var/opt/mssql/data
+            - .\IdentityPlatformDb:/var/opt/mssql/data
         networks:
             - dev
 
@@ -73,7 +86,7 @@ services:
             - MSSQL_SA_PASSWORD=1qazXSW@3edc
             - MSSQL_PID=Express
         volumes:
-            - .\HomeAccountantDb\CategoriesServiceDb:/var/opt/mssql/data
+            - .\CategoriesServiceDb:/var/opt/mssql/data
         networks:
             - dev
 
@@ -85,6 +98,18 @@ services:
             - MSSQL_SA_PASSWORD=1qazXSW@3edc
             - MSSQL_PID=Express
         volumes:
-            - .\HomeAccountantDb\FriendsServiceDb:/var/opt/mssql/data
+            - .\FriendsServiceDb:/var/opt/mssql/data
+        networks:
+            - dev
+
+    AccountingService_SqlServer:
+        image: mcr.microsoft.com/mssql/server
+        container_name: AccountingServiceDb
+        environment:
+            - ACCEPT_EULA=Y
+            - MSSQL_SA_PASSWORD=1qazXSW@3edc
+            - MSSQL_PID=Express
+        volumes:
+            - .\AccountingServiceDb:/var/opt/mssql/data
         networks:
             - dev

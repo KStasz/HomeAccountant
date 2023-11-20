@@ -1,4 +1,4 @@
-﻿namespace HomeAccountant.CategoriesService.Dtos
+﻿namespace Domain.Dtos.CategoryService
 {
     public class CategoryCreateDto
     {

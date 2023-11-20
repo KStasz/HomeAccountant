@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using HomeAccountant.CategoriesService.Dtos;
+using Domain.Dtos.CategoryService;
 using HomeAccountant.CategoriesService.Model;
 
 namespace HomeAccountant.CategoriesService.Profles

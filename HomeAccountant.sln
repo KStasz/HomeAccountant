@@ -15,7 +15,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "APIGateway", "APIGateway", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{772449BE-9283-4EFA-80C5-58DD84C9867D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JwtAuthenticationManager", "Services\JwtAuthenticationManager\JwtAuthenticationManager.csproj", "{298B764D-0EB8-4D5C-91B7-1E553DC21AEB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JwtAuthenticationManager", "Services\JwtAuthenticationManager\JwtAuthenticationManager.csproj", "{298B764D-0EB8-4D5C-91B7-1E553DC21AEB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeAccountant.AccountingService", "Services\HomeAccountant.AccountingService\HomeAccountant.AccountingService.csproj", "{23ED5AD6-AFA8-4173-918E-F6A4BE3C87D4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{0867F75C-A0CD-403C-BE4E-6C5F7943B490}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,6 +47,14 @@ Global
 		{298B764D-0EB8-4D5C-91B7-1E553DC21AEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{298B764D-0EB8-4D5C-91B7-1E553DC21AEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{298B764D-0EB8-4D5C-91B7-1E553DC21AEB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{23ED5AD6-AFA8-4173-918E-F6A4BE3C87D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23ED5AD6-AFA8-4173-918E-F6A4BE3C87D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23ED5AD6-AFA8-4173-918E-F6A4BE3C87D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23ED5AD6-AFA8-4173-918E-F6A4BE3C87D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0867F75C-A0CD-403C-BE4E-6C5F7943B490}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0867F75C-A0CD-403C-BE4E-6C5F7943B490}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0867F75C-A0CD-403C-BE4E-6C5F7943B490}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0867F75C-A0CD-403C-BE4E-6C5F7943B490}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -53,6 +65,8 @@ Global
 		{1BDE83BA-A495-4D38-8EFE-4F0912F2CCC8} = {772449BE-9283-4EFA-80C5-58DD84C9867D}
 		{8FFA705F-52B4-4900-A6B8-414BEC0EAA8D} = {772449BE-9283-4EFA-80C5-58DD84C9867D}
 		{298B764D-0EB8-4D5C-91B7-1E553DC21AEB} = {772449BE-9283-4EFA-80C5-58DD84C9867D}
+		{23ED5AD6-AFA8-4173-918E-F6A4BE3C87D4} = {772449BE-9283-4EFA-80C5-58DD84C9867D}
+		{0867F75C-A0CD-403C-BE4E-6C5F7943B490} = {772449BE-9283-4EFA-80C5-58DD84C9867D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {118C3AF7-265F-41B3-919B-D06F020ED43B}

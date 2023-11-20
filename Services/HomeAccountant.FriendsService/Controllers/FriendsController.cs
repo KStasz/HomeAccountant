@@ -1,12 +1,9 @@
 ﻿using AutoMapper;
-using HomeAccountant.FriendsService.Dtos;
-using HomeAccountant.FriendsService.Model;
+using Domain.Dtos.FriendsService;
 using HomeAccountant.FriendsService.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
 
 namespace HomeAccountant.FriendsService.Controllers
 {

@@ -8,6 +8,7 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
 COPY ["Services/HomeAccountant.FriendsService/HomeAccountant.FriendsService.csproj", "Services/HomeAccountant.FriendsService/"]
+COPY ["Domain/Domain.csproj", "Domain/"]
 COPY ["Services/JwtAuthenticationManager/JwtAuthenticationManager.csproj", "Services/JwtAuthenticationManager/"]
 RUN dotnet restore "Services/HomeAccountant.FriendsService/HomeAccountant.FriendsService.csproj"
 COPY . .

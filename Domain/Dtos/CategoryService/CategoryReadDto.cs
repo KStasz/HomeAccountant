@@ -1,6 +1,6 @@
-﻿namespace HomeAccountant.CategoriesService.Dtos
+﻿namespace Domain.Dtos.CategoryService
 {
-    public class CategoryUpdateDto
+    public class CategoryReadDto
     {
         public int Id { get; set; }
         public required string Name { get; set; }
