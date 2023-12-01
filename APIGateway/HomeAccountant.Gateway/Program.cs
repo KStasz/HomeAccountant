@@ -1,5 +1,6 @@
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
+using Ocelot.Values;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,14 @@ builder.Configuration.SetBasePath(builder.Environment.ContentRootPath)
     .AddJsonFile($"ocelot.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy",
+        builder => builder.WithOrigins("http://localhost:5062", "http://localhost:5225")
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+});
+
 builder.Services.AddOcelot(builder.Configuration);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -15,6 +24,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+app.UseCors("CorsPolicy");
 
 app.Map("/swagger/v1/swagger.json", b =>
 {
@@ -29,8 +40,8 @@ app.Map("/swagger/v1/swagger.json", b =>
 //Configure the HTTP request pipeline.
 //if (app.Environment.IsDevelopment())
 //{
-    app.UseSwagger();
-    app.UseSwaggerUI(opt => opt.SupportedSubmitMethods());
+app.UseSwagger();
+app.UseSwaggerUI(opt => opt.SupportedSubmitMethods());
 //}
 
 app.UseHttpsRedirection();
