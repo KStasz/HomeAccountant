@@ -1,0 +1,20 @@
+﻿<Modal @ref="_modal">
+    <ModalContent>
+            <EditForm EditContext="_editContext"
+                      OnSubmit="Submit">
+                <DataAnnotationsValidator />
+                <ModalHeader ModalTitle="Utwórz nową księgę: " />
+                <ModalBody>
+                    <div class="col">
+                        <label for="registerName">Nazwa księgi:</label>
+                        <InputText type="text" class="form-control" @bind-Value="_registerModel.Name" />
+                        <ValidationMessage For="() => _registerModel.Name" />
+                    </div>
+                </ModalBody>
+                <ModalFooter>
+                    <button type="button" class="btn btn-secondary" @onclick="Cancel">Anuluj</button>
+                    <button type="submit" class="btn btn-success">Utwórz</button>
+                </ModalFooter>
+            </EditForm>
+    </ModalContent>
+</Modal>

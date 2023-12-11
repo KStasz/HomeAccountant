@@ -1,0 +1,56 @@
+﻿@page "/books/{RegisterId:int}"
+
+<h3>Utworzone pozycje</h3>
+
+
+
+<div class="table-responsive mt-3">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Nazwa</th>
+                <th scope="col">Kategoria</th>
+                <th scope="col">Cena (zł)</th>
+                <th scope="col">Utworzone przez</th>
+                <th scope="col">Data utworzenia</th>
+            </tr>
+        </thead>
+        @{
+            int counter = 1;
+        }
+        <tbody>
+            @foreach (var item in ViewModel.Entries ?? new List<HomeAccountant.Core.DTOs.EntryReadDto>())
+            {
+                <tr>
+                    <th scope="row">@(counter++)</th>
+                    <td>@item.Name</td>
+                    <td>@item.Category.Name</td>
+                    <td>@item.Price</td>
+                    <td>-</td>
+                    <td>@item.CreatedDate.ToString("dd-MM-yyyy")</td>
+                </tr>
+            }
+            <tr>
+                <td colspan="100" class="text-center">
+                    <button type="button" class="btn btn-success" @onclick="ViewModel.CreateEntry">
+                        Dodaj
+                    </button>
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    Suma:
+                </td>
+                <td>@(ViewModel?.Entries?.Sum(x => x.Price) ?? 0)</td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<EntryCreateModal @ref="ViewModel!.EntryCreateDialog"
+                  Categories="ViewModel?.AvailableCategories" />

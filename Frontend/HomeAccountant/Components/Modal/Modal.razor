@@ -1,0 +1,10 @@
+﻿<div class="modal fade @AdditionalModalCssClass" id="@ModalIdentifier" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog @_positionsDictionary[Position]">
+        @if (_isVisible)
+        {
+            <CascadingValue Name="HideModal" Value="HideModalAsync">
+                @ChildContent
+            </CascadingValue>
+        }
+    </div>
+</div>
