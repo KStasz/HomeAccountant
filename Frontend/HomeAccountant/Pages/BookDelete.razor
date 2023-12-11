@@ -1,0 +1,19 @@
+﻿<Modal @ref="_modalReference">
+    <ModalContent>
+        <ModalHeader ModalTitle="@(_registerModel?.Name)" />
+        <ModalBody>
+            <p>Czy na pewno chcesz usunąć wybraną pozycję?</p>
+            
+            <div class="row mb-3">
+                <label for="bookName" class="col-auto col-form-label">Nazwa: </label>
+                <div class="col-auto">
+                    <input type="text" class="form-control" id="bookName" readonly value="@_registerModel?.Name">
+                </div>
+            </div>
+        </ModalBody>
+        <ModalFooter>
+            <button type="button" class="btn btn-secondary" @onclick="Cancel">Anuluj</button>
+            <button type="button" class="btn btn-danger" @onclick="DeleteBook">Usuń</button>
+        </ModalFooter>
+    </ModalContent>
+</Modal>

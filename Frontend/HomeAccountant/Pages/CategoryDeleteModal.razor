@@ -1,0 +1,18 @@
+﻿<Modal @ref="_modal">
+    <ModalContent>
+        <ModalHeader ModalTitle="_model.Name" />
+        <ModalBody>
+            <p>Czy na pewno chcesz usunąć wybraną kategorię?</p>
+            <div class="row mb-3">
+                <label for="categoryName" class="col-auto col-form-label">Nazwa</label>
+                <div class="col-auto">
+                    <input type="email" class="form-control" id="categoryName" value="@_model.Name" readonly>
+                </div>
+            </div>
+        </ModalBody>
+        <ModalFooter>
+            <button type="button" class="btn btn-secondary" @onclick="Cancel">Anuluj</button>
+            <button type="button" class="btn btn-danger" @onclick="Delete">Usuń</button>
+        </ModalFooter>
+    </ModalContent>
+</Modal>

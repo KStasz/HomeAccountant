@@ -19,7 +19,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JwtAuthenticationManager", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeAccountant.AccountingService", "Services\HomeAccountant.AccountingService\HomeAccountant.AccountingService.csproj", "{23ED5AD6-AFA8-4173-918E-F6A4BE3C87D4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{0867F75C-A0CD-403C-BE4E-6C5F7943B490}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "Domain\Domain.csproj", "{0867F75C-A0CD-403C-BE4E-6C5F7943B490}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Frontend", "Frontend", "{954411B9-BC4F-4209-B649-3C674F320C25}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeAccountant", "Frontend\HomeAccountant\HomeAccountant.csproj", "{0C193301-BF55-4766-8BB9-FF8745B3DA87}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeAccountant.Core", "Frontend\HomeAccountant.Core\HomeAccountant.Core.csproj", "{D5AD830D-23BD-4D3F-BC41-10888C5F842A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -55,6 +61,14 @@ Global
 		{0867F75C-A0CD-403C-BE4E-6C5F7943B490}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0867F75C-A0CD-403C-BE4E-6C5F7943B490}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0867F75C-A0CD-403C-BE4E-6C5F7943B490}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C193301-BF55-4766-8BB9-FF8745B3DA87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C193301-BF55-4766-8BB9-FF8745B3DA87}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C193301-BF55-4766-8BB9-FF8745B3DA87}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C193301-BF55-4766-8BB9-FF8745B3DA87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5AD830D-23BD-4D3F-BC41-10888C5F842A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5AD830D-23BD-4D3F-BC41-10888C5F842A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5AD830D-23BD-4D3F-BC41-10888C5F842A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5AD830D-23BD-4D3F-BC41-10888C5F842A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -67,6 +81,8 @@ Global
 		{298B764D-0EB8-4D5C-91B7-1E553DC21AEB} = {772449BE-9283-4EFA-80C5-58DD84C9867D}
 		{23ED5AD6-AFA8-4173-918E-F6A4BE3C87D4} = {772449BE-9283-4EFA-80C5-58DD84C9867D}
 		{0867F75C-A0CD-403C-BE4E-6C5F7943B490} = {772449BE-9283-4EFA-80C5-58DD84C9867D}
+		{0C193301-BF55-4766-8BB9-FF8745B3DA87} = {954411B9-BC4F-4209-B649-3C674F320C25}
+		{D5AD830D-23BD-4D3F-BC41-10888C5F842A} = {954411B9-BC4F-4209-B649-3C674F320C25}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {118C3AF7-265F-41B3-919B-D06F020ED43B}

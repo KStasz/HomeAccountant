@@ -1,0 +1,40 @@
+﻿<Modal @ref="_modal" Position="ModalPosition.Centered">
+    <ModalContent>
+        <EditForm EditContext="_editContext" OnValidSubmit="SaveChanges">
+            <DataAnnotationsValidator />
+            <ModalHeader ModalTitle="Dodaj nową pozycję" />
+            <ModalBody>
+                <div class="row">
+                    <div class="mb-3">
+                        <label for="entryName" class="form-label">Nazwa</label>
+                        <InputText type="text" class="form-control" id="entryName" @bind-Value="_model.Name" />
+                        <ValidationMessage For="() => _model.Name" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="entryCategory" class="form-label">Kategoria</label>
+                        <InputSelect @bind-Value="_model.CategoryId" class="form-select" id="entryCategory" aria-label="Default select example">
+                            <option value="0" hidden>Wybierz kategorię</option>
+                            @if (Categories?.Any() ?? false)
+                            {
+                                @foreach (var item in Categories)
+                                {
+                                    <option value="@item.Id">@item.Name</option>
+                                }
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="() => _model.CategoryId" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="entryPrice" class="form-label">Cena</label>
+                        <InputNumber @bind-Value="_model.Price" type="number" class="form-control" id="entryPrice" />
+                        <ValidationMessage For="() => _model.Price" />
+                    </div>
+                </div>
+            </ModalBody>
+            <ModalFooter>
+                <button type="button" class="btn btn-secondary" @onclick="Cancel">Anuluj</button>
+                <button type="submit" class="btn btn-success">Utwórz</button>
+            </ModalFooter>
+        </EditForm>
+    </ModalContent>
+</Modal>
