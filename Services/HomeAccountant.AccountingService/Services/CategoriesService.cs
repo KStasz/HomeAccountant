@@ -21,7 +21,7 @@ namespace HomeAccountant.AccountingService.Services
             return response.IsSuccessStatusCode;
         }
 
-        public async Task<CategoryReadDto?> GetCategory(int id)
+        public async Task<CategoryReadDto?> GetCategoryAsync(int id)
         {
             var url = $"/api/Categories/{id}";
 

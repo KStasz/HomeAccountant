@@ -5,6 +5,8 @@ using HomeAccountant.CategoriesService.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Concurrent;
+using System.Reflection.Metadata.Ecma335;
 
 namespace HomeAccountant.CategoriesService.Controllers
 {
@@ -15,12 +17,15 @@ namespace HomeAccountant.CategoriesService.Controllers
     {
         private readonly ICategoriesService _categoriesService;
         private readonly IMapper _mapper;
+        private readonly IAccountingService _registerService;
 
         public CategoriesController(ICategoriesService categoriesService,
-            IMapper mapper)
+            IMapper mapper,
+            IAccountingService registerService)
         {
             _categoriesService = categoriesService;
             _mapper = mapper;
+            _registerService = registerService;
         }
 
         [HttpGet("{id:int}", Name = "GetById")]
@@ -92,9 +97,11 @@ namespace HomeAccountant.CategoriesService.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var categoryModel = _categoriesService.Get(id);
-            
+
             if (categoryModel is null)
                 return NotFound();
+
+            await _registerService.DeleteEntriesByCategoryId(categoryModel.Id);
 
             _categoriesService.Delete(categoryModel);
             await _categoriesService.SaveChangesAsync();

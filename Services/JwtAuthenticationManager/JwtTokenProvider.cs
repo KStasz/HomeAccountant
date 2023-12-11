@@ -79,7 +79,7 @@ namespace JwtAuthenticationManager
                 if (jti is null || storedToken.JwtId != jti)
                     throw new TokenVerificationException("Invalid tokens");
 
-                if (storedToken.ExpiryDate >= DateTime.UtcNow)
+                if (storedToken.ExpiryDate <= DateTime.UtcNow)
                     throw new TokenVerificationException("Expired token");
 
                 storedToken.IsUsed = true;

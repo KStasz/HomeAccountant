@@ -24,7 +24,7 @@ namespace HomeAccountant.AccountingService.Services
             return _applicationDbContext.Set<T>().FirstOrDefault(predicate);
         }
 
-        public T? Get(Func<T, bool> predicate, Expression<Func<T, object>>[] includeExpressions)
+        public T? Get(Func<T, bool> predicate, params Expression<Func<T, object>>[] includeExpressions)
         {
             IQueryable<T> dbSet = _applicationDbContext.Set<T>();
 
@@ -38,7 +38,7 @@ namespace HomeAccountant.AccountingService.Services
             return _applicationDbContext.Set<T>().Where(predicate);
         }
 
-        public IEnumerable<T> GetAll(Func<T, bool> predicate, Expression<Func<T, object>>[] includeExpressions)
+        public IEnumerable<T> GetAll(Func<T, bool> predicate, params Expression<Func<T, object>>[] includeExpressions)
         {
             IQueryable<T> query = _applicationDbContext.Set<T>();
 
@@ -50,6 +50,11 @@ namespace HomeAccountant.AccountingService.Services
         public void Remove(T entity)
         {
             _applicationDbContext.Set<T>().Remove(entity);
+        }
+
+        public void RemoveMany(IEnumerable<T> entities)
+        {
+            _applicationDbContext.Set<T>().RemoveRange(entities);
         }
 
         public async Task SaveChangesAsync()

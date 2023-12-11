@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace JwtAuthenticationManager.Data
 {
-    public class JwtAuthenticationManagerDbContext : DbContext
+    public class JwtAuthenticationManagerDbContext : IdentityDbContext<ApplicationUser>
     {
         public DbSet<RefreshToken> RefreshTokens { get; set; }
 

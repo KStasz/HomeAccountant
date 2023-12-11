@@ -40,7 +40,7 @@ namespace HomeAccountant.AccountingService.Controllers
             if (entryModel is null)
                 return NotFound();
 
-            var categoryModel = await _categoriesService.GetCategory(entryModel.CategoryId);
+            var categoryModel = await _categoriesService.GetCategoryAsync(entryModel.CategoryId);
             var registerModel = _registerRepository.Get(x => x.Id == entryModel.RegisterId);
 
             if (categoryModel is null)
@@ -61,28 +61,37 @@ namespace HomeAccountant.AccountingService.Controllers
         [HttpGet]
         public async Task<IActionResult> Get(int registerId)
         {
-            var entryModels = _repository.GetAll(x => x.RegisterId == registerId).ToList();
-
-            List<EntryReadDto> result = new List<EntryReadDto>();
-
-            foreach (var item in entryModels)
+            try
             {
-                var model = _mapper.Map<EntryReadDto>(item);
-                var categoryModel = await _categoriesService.GetCategory(item.CategoryId);
-                var registerModel = _registerRepository.Get(x => x.Id == item.RegisterId);
-                
-                if (categoryModel is null)
-                    continue;
 
-                if (registerModel is null)
-                    continue;
+                var entryModels = _repository.GetAll(x => x.RegisterId == registerId).ToList();
 
-                model.Category = _mapper.Map<CategoryReadDto>(categoryModel);
-                model.Register = _mapper.Map<RegisterReadDto>(registerModel);
-                result.Add(model);
+                List<EntryReadDto> result = new List<EntryReadDto>();
+
+                foreach (var item in entryModels)
+                {
+                    var model = _mapper.Map<EntryReadDto>(item);
+                    var categoryModel = await _categoriesService.GetCategoryAsync(item.CategoryId);
+                    var registerModel = _registerRepository.Get(x => x.Id == item.RegisterId);
+
+                    if (categoryModel is null)
+                        continue;
+
+                    if (registerModel is null)
+                        continue;
+
+                    model.Category = _mapper.Map<CategoryReadDto>(categoryModel);
+                    model.Register = _mapper.Map<RegisterReadDto>(registerModel);
+                    result.Add(model);
+                }
+
+                return Ok(result);
             }
+            catch (Exception ex)
+            {
 
-            return Ok(result);
+                throw;
+            }
         }
 
         [HttpPost]
@@ -108,7 +117,7 @@ namespace HomeAccountant.AccountingService.Controllers
             _repository.Add(entryModel);
             await _repository.SaveChangesAsync();
 
-            var categoryModel = await _categoriesService.GetCategory(entryModel.CategoryId);
+            var categoryModel = await _categoriesService.GetCategoryAsync(entryModel.CategoryId);
 
             var entryModelRead = _mapper.Map<EntryReadDto>(entryModel);
             entryModelRead.Category = _mapper.Map<CategoryReadDto>(categoryModel);

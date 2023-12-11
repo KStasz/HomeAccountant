@@ -2,6 +2,7 @@ using HomeAccountant.CategoriesService.Data;
 using HomeAccountant.CategoriesService.Service;
 using Microsoft.EntityFrameworkCore;
 using JwtAuthenticationManager;
+using Microsoft.OpenApi.Models;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,9 +17,40 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo()
+    {
+        Title = "Accounting Service",
+        Version = "v1"
+    });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "JWT Authorization header using the Bearer scheme"
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement {
+        {
+            new OpenApiSecurityScheme {
+                Reference = new OpenApiReference {
+                    Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
 builder.Services.AddScoped<ICategoriesService, CategoryService>();
+builder.Services.AddScoped<IAccountingService, AccountingService>();
 builder.Services.AddJwtAuthentication();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddHttpClient<AuthorizedHttpClient>(
+    c => c.BaseAddress = new Uri(builder.Configuration["AccountingServiceBaseAdress"] ?? throw new ArgumentNullException("AccountingServiceBaseAdress")));
 
 var app = builder.Build();
 

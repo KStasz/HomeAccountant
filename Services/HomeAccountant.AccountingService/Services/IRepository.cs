@@ -9,10 +9,11 @@ namespace HomeAccountant.AccountingService.Services
         void Add(T entity);
         EntityEntry Update(T entity);
         T? Get(Func<T, bool> predicate);
-        public T? Get(Func<T, bool> predicate, Expression<Func<T, object>>[] includeExpressions);
+        public T? Get(Func<T, bool> predicate, params Expression<Func<T, object>>[] includeExpressions);
         IEnumerable<T> GetAll(Func<T, bool> predicate);
-        IEnumerable<T> GetAll(Func<T, bool> predicate, Expression<Func<T, object>>[] includeExpressions);
+        IEnumerable<T> GetAll(Func<T, bool> predicate, params Expression<Func<T, object>>[] includeExpressions);
         void Remove(T entity);
+        void RemoveMany(IEnumerable<T> entities);
         Task SaveChangesAsync();
     }
 }

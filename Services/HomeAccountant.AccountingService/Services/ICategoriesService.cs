@@ -5,6 +5,6 @@ namespace HomeAccountant.AccountingService.Services
     public interface ICategoriesService
     {
         Task<bool> CategoryExists(int id);
-        Task<CategoryReadDto?> GetCategory(int id);
+        Task<CategoryReadDto?> GetCategoryAsync(int id);
     }
 }

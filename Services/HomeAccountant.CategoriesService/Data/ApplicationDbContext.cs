@@ -19,6 +19,16 @@ namespace HomeAccountant.CategoriesService.Data
             modelBuilder.Entity<CategoryModel>()
                 .HasIndex(x => x.Name)
                 .IsUnique();
+
+            modelBuilder
+                .Entity<CategoryModel>()
+                .Property(x => x.IsActive)
+                .HasDefaultValueSql("1");
+
+            modelBuilder
+                .Entity<CategoryModel>()
+                .Property(x => x.CreationDate)
+                .HasDefaultValueSql("GETDATE()");
         }
     }
 }

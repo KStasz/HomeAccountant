@@ -12,7 +12,7 @@ builder.Configuration.SetBasePath(builder.Environment.ContentRootPath)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy",
-        builder => builder.WithOrigins("http://localhost:5062", "http://localhost:5225")
+        builder => builder.WithOrigins("http://localhost:5225")
             .AllowAnyMethod()
             .AllowAnyHeader());
 });

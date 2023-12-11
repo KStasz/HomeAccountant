@@ -6,6 +6,7 @@ using JwtAuthenticationManager.Config;
 using System.Text;
 using JwtAuthenticationManager.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Logging;
 
 namespace JwtAuthenticationManager
 {
@@ -45,7 +46,7 @@ namespace JwtAuthenticationManager
                 jwt.SaveToken = true;
                 jwt.TokenValidationParameters = tokenValidationParameters;
             });
-
+            //IdentityModelEventSource.ShowPII = true;
             services.AddSingleton(tokenValidationParameters);
             services.AddScoped<IJwtTokenProvider, JwtTokenProvider>();
         }

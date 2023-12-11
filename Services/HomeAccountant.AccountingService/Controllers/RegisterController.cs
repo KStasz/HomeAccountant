@@ -5,6 +5,7 @@ using HomeAccountant.AccountingService.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System.Linq.Expressions;
 
 namespace HomeAccountant.AccountingService.Controllers
 {
@@ -15,12 +16,18 @@ namespace HomeAccountant.AccountingService.Controllers
     {
         private readonly IRepository<Register> _repository;
         private readonly IMapper _mapper;
+        private readonly ICategoriesService _categoriesService;
+        private readonly IRepository<Entry> _entryRepository;
 
         public RegisterController(IRepository<Register> repository,
-            IMapper mapper)
+            IMapper mapper,
+            ICategoriesService categoriesService,
+            IRepository<Entry> entryRepository)
         {
             _repository = repository;
             _mapper = mapper;
+            _categoriesService = categoriesService;
+            _entryRepository = entryRepository;
         }
 
         [HttpPost]
@@ -69,9 +76,30 @@ namespace HomeAccountant.AccountingService.Controllers
             registerModel.CreatorId = userId;
 
             EntityEntry entity = _repository.Update(registerModel);
-            entity.Property( nameof(Register.CreatedDate)).IsModified = false;
+            entity.Property(nameof(Register.CreatedDate)).IsModified = false;
             await _repository.SaveChangesAsync();
-            
+
+            return Ok();
+        }
+
+        [HttpDelete("Entries/{categoryId}")]
+        public async Task<IActionResult> DeleteEntriesByCategoryId(int categoryId)
+        {
+            var userId = GetUserId();
+
+            if (userId is null)
+                return BadRequest("Invalid payload");
+
+            var entries = _entryRepository.GetAll(x => x.CategoryId == categoryId);
+
+            if (!entries.Any())
+            {
+                return NotFound();
+            }
+
+            _entryRepository.RemoveMany(entries);
+            await _entryRepository.SaveChangesAsync();
+
             return Ok();
         }
 
@@ -103,8 +131,8 @@ namespace HomeAccountant.AccountingService.Controllers
             if (userId is null)
                 return BadRequest("Invalid payload");
 
-            var registers = _repository.GetAll(x => x.CreatorId == userId);
-            
+            var registers = _repository.GetAll(x => x.CreatorId == userId).OrderByDescending(x => x.CreatedDate);
+
             return Ok(_mapper.Map<IEnumerable<RegisterReadDto>>(registers));
         }
     }
