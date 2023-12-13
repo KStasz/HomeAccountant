@@ -209,8 +209,8 @@
       "DownstreamPathTemplate": "/api/Register/{id}"
     },
     {
-      "UpstreamPathTemplate": "/api/Register/{registerId}/Entry",
-      "UpstreamHttpMethod": [ "Post", "Put", "Get" ],
+      "UpstreamPathTemplate": "/api/Register/Entries/{categoryId}",
+      "UpstreamHttpMethod": [ "Delete" ],
 
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -219,11 +219,11 @@
           "Port": 5091
         }
       ],
-      "DownstreamPathTemplate": "/api/Register/{registerId}/Entry"
+      "DownstreamPathTemplate": "/api/Register/Entries/{categoryId}"
     },
     {
-      "UpstreamPathTemplate": "/api/Register/{registerId}/Entry/{entryId}",
-      "UpstreamHttpMethod": [ "Delete", "Get" ],
+      "UpstreamPathTemplate": "/api/Register/{registerId}/BillingPeriod/{billingPeriodId}/Entry/{entryId}",
+      "UpstreamHttpMethod": [ "Get", "Delete" ],
 
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -232,7 +232,72 @@
           "Port": 5091
         }
       ],
-      "DownstreamPathTemplate": "/api/Register/{registerId}/Entry/{entryId}"
+      "DownstreamPathTemplate": "/api/Register/{registerId}/BillingPeriod/{billingPeriodId}/Entry/{entryId}"
+    },
+    {
+      "UpstreamPathTemplate": "/api/Register/{registerId}/BillingPeriod/{billingPeriodId}/Entry",
+      "UpstreamHttpMethod": [ "Get", "Post", "Put" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5091
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Register/{registerId}/BillingPeriod/{billingPeriodId}/Entry"
+    },
+    {
+      "UpstreamPathTemplate": "/api/Register/{registerId}/BillingPeriod",
+      "UpstreamHttpMethod": [ "Get", "Post" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5091
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Register/{registerId}/BillingPeriod"
+    },
+    {
+      "UpstreamPathTemplate": "/api/Register/{registerId}/BillingPeriod/{billingPeriodId}",
+      "UpstreamHttpMethod": [ "Get", "Put", "Delete" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5091
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Register/{registerId}/BillingPeriod/{billingPeriodId}"
+    },
+    {
+      "UpstreamPathTemplate": "/api/Register/{registerId}/BillingPeriod/{billingPeriodId}/Open",
+      "UpstreamHttpMethod": [ "Put" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5091
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Register/{registerId}/BillingPeriod/{billingPeriodId}/Open"
+    },
+    {
+      "UpstreamPathTemplate": "/api/Register/{registerId}/BillingPeriod/{billingPeriodId}/Close",
+      "UpstreamHttpMethod": [ "Put" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5091
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Register/{registerId}/BillingPeriod/{billingPeriodId}/Close"
     }
   ],
   "GlobalConfiguration": {

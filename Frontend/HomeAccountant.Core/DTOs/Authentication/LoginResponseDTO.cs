@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HomeAccountant.Core.DTOs
+namespace HomeAccountant.Core.DTOs.Authentication
 {
     public class LoginResponseDTO
     {

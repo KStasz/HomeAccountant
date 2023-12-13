@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using HomeAccountant.Core.DTOs;
+using HomeAccountant.Core.DTOs.Authentication;
 using HomeAccountant.Core.Model;
 using HomeAccountant.Core.Services;
 using System;

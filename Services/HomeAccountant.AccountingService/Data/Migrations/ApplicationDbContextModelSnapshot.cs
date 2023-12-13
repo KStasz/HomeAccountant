@@ -22,6 +22,38 @@ namespace HomeAccountant.AccountingService.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("HomeAccountant.AccountingService.Models.BillingPeriod", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreationDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("IsOpen")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValueSql("1");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("RegisterId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RegisterId");
+
+                    b.ToTable("BillingPeriod");
+                });
+
             modelBuilder.Entity("HomeAccountant.AccountingService.Models.Entry", b =>
                 {
                     b.Property<int>("Id")
@@ -29,6 +61,9 @@ namespace HomeAccountant.AccountingService.Data.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BillingPeriodId")
+                        .HasColumnType("int");
 
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
@@ -49,12 +84,9 @@ namespace HomeAccountant.AccountingService.Data.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("RegisterId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("RegisterId");
+                    b.HasIndex("BillingPeriodId");
 
                     b.ToTable("Entries");
                 });
@@ -117,15 +149,26 @@ namespace HomeAccountant.AccountingService.Data.Migrations
                     b.ToTable("RegisterSharings");
                 });
 
-            modelBuilder.Entity("HomeAccountant.AccountingService.Models.Entry", b =>
+            modelBuilder.Entity("HomeAccountant.AccountingService.Models.BillingPeriod", b =>
                 {
                     b.HasOne("HomeAccountant.AccountingService.Models.Register", "Register")
-                        .WithMany("Entries")
+                        .WithMany("BillingPeriods")
                         .HasForeignKey("RegisterId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Register");
+                });
+
+            modelBuilder.Entity("HomeAccountant.AccountingService.Models.Entry", b =>
+                {
+                    b.HasOne("HomeAccountant.AccountingService.Models.BillingPeriod", "BillingPeriod")
+                        .WithMany("Entries")
+                        .HasForeignKey("BillingPeriodId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BillingPeriod");
                 });
 
             modelBuilder.Entity("HomeAccountant.AccountingService.Models.RegisterSharing", b =>
@@ -139,9 +182,14 @@ namespace HomeAccountant.AccountingService.Data.Migrations
                     b.Navigation("Register");
                 });
 
-            modelBuilder.Entity("HomeAccountant.AccountingService.Models.Register", b =>
+            modelBuilder.Entity("HomeAccountant.AccountingService.Models.BillingPeriod", b =>
                 {
                     b.Navigation("Entries");
+                });
+
+            modelBuilder.Entity("HomeAccountant.AccountingService.Models.Register", b =>
+                {
+                    b.Navigation("BillingPeriods");
 
                     b.Navigation("Sharings");
                 });

@@ -7,7 +7,7 @@
                 <ModalBody>
                     <div class="col">
                         <label for="registerName">Nazwa księgi:</label>
-                        <InputText type="text" class="form-control" @bind-Value="_registerModel.Name" />
+                        <InputText type="text" class="form-control" @bind-Value="_registerModel!.Name" />
                         <ValidationMessage For="() => _registerModel.Name" />
                     </div>
                 </ModalBody>

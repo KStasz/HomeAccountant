@@ -14,7 +14,7 @@ namespace HomeAccountant.AccountingService.Models
         public int CategoryId { get; set; }
 
         [Required]
-        public int RegisterId { get; set; }
+        public int BillingPeriodId { get; set; }
 
         [Required]
         public decimal Price { get; set; }
@@ -25,6 +25,6 @@ namespace HomeAccountant.AccountingService.Models
         [Required]
         public DateTime CreatedDate { get; set; }
 
-        public required Register Register { get; set; }
+        public required BillingPeriod BillingPeriod { get; set; }
     }
 }

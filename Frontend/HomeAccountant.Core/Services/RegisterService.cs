@@ -1,9 +1,11 @@
-﻿using HomeAccountant.Core.DTOs;
+﻿using HomeAccountant.Core.DTOs.Register;
 using HomeAccountant.Core.Model;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace HomeAccountant.Core.Services
 {
@@ -24,19 +26,20 @@ namespace HomeAccountant.Core.Services
             try
             {
                 var response = await _httpClient.PostAsJsonAsync("/api/Register", registerCreateDto);
+                var responseContent = await response.Content.ReadFromJsonAsync<ServiceResponse>();
 
-                if (!response.IsSuccessStatusCode)
-                {
-                    return new ServiceResponse(false);
-                }
-
-                return new ServiceResponse(true);
+                return responseContent.Protect();
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
 
-                return new ServiceResponse(false);
+                return new ServiceResponse<ServiceResponse>(
+                    false,
+                    new List<string>()
+                    {
+                        ex.Message
+                    });
             }
         }
 
@@ -44,38 +47,47 @@ namespace HomeAccountant.Core.Services
         {
             try
             {
-                var response = await _httpClient.GetAsync("/api/Register");
+                var url = "/api/Register";
+                var response = await _httpClient.GetAsync(url);
+                ServiceResponse<IEnumerable<RegisterReadDto>> ? responseContent = await response.Content
+                    .ReadFromJsonAsync<ServiceResponse<IEnumerable<RegisterReadDto>>>();
 
-                if (!response.IsSuccessStatusCode)
-                {
-                    return new ServiceResponse<IEnumerable<RegisterReadDto>>(false);
-                }
-
-                var result = await response.Content.ReadFromJsonAsync<IEnumerable<RegisterReadDto>>();
-
-                return new ServiceResponse<IEnumerable<RegisterReadDto>>(result ?? throw new ArgumentNullException(nameof(result)));
+                return responseContent.Protect();
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
 
-                return new ServiceResponse<IEnumerable<RegisterReadDto>>(false);
+                return new ServiceResponse<IEnumerable<RegisterReadDto>>(
+                    false,
+                    new List<string>()
+                    {
+                        ex.Message
+                    });
             }
-
         }
 
         public async Task<ServiceResponse> DeleteRegisterAsync(RegisterReadDto registerReadDto)
         {
-            var url = $"/api/Register/{registerReadDto.Id}";
-
-            var response = await _httpClient.DeleteAsync(url);
-
-            if (!response.IsSuccessStatusCode)
+            try
             {
-                return new ServiceResponse(false);
-            }
+                var url = $"/api/Register/{registerReadDto.Id}";
+                var response = await _httpClient.DeleteAsync(url);
+                var responseContent = await response.Content.ReadFromJsonAsync<ServiceResponse>();
 
-            return new ServiceResponse(true);
+                return responseContent.Protect();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+
+                return new ServiceResponse(
+                    false,
+                    new List<string>()
+                    {
+                        ex.Message
+                    });
+            }
         }
     }
 }

@@ -31,37 +31,44 @@ namespace HomeAccountant.Core.Services
             _jwtAuthenticationStateProvider = jwtAuthenticationStateProvider;
         }
 
-        public async Task<HttpResponseMessage> PostAsJsonAsync<T>(string uri, T value)
+        public async Task<HttpResponseMessage> PostAsJsonAsync<T>(string uri, T value, CancellationToken cancellationToken = default)
         {
-            await TrySetAuthorizationToken();
+            await TrySetAuthorizationToken(cancellationToken);
 
-            return await _client.PostAsJsonAsync(uri, value);
+            return await _client.PostAsJsonAsync(uri, value, cancellationToken);
         }
 
-        public async Task<HttpResponseMessage> PutAsJsonAsync<T>(string uri, T value)
+        public async Task<HttpResponseMessage> PutAsJsonAsync<T>(string uri, T value, CancellationToken cancellationToken = default)
         {
-            await TrySetAuthorizationToken();
+            await TrySetAuthorizationToken(cancellationToken);
 
-            return await _client.PutAsJsonAsync(uri, value);
+            return await _client.PutAsJsonAsync(uri, value, cancellationToken);
         }
 
-        public async Task<HttpResponseMessage> DeleteAsync(string uri)
+        public async Task<HttpResponseMessage> PutAsync(string uri, CancellationToken cancellationToken = default)
         {
-            await TrySetAuthorizationToken();
+            await TrySetAuthorizationToken(cancellationToken);
 
-            return await _client.DeleteAsync(uri);
+            return await _client.PutAsync(uri, null, cancellationToken);
         }
 
-        public async Task<HttpResponseMessage> GetAsync(string uri)
+        public async Task<HttpResponseMessage> DeleteAsync(string uri, CancellationToken cancellationToken = default)
         {
-            await TrySetAuthorizationToken();
+            await TrySetAuthorizationToken(cancellationToken);
 
-            return await _client.GetAsync(uri);
+            return await _client.DeleteAsync(uri, cancellationToken);
         }
 
-        private async Task TrySetAuthorizationToken()
+        public async Task<HttpResponseMessage> GetAsync(string uri, CancellationToken cancellationToken = default)
         {
-            var token = await _tokenStorageAccessor.GetTokenAsync();
+            await TrySetAuthorizationToken(cancellationToken);
+
+            return await _client.GetAsync(uri, cancellationToken);
+        }
+
+        private async Task TrySetAuthorizationToken(CancellationToken cancellationToken = default)
+        {
+            var token = await _tokenStorageAccessor.GetTokenAsync(cancellationToken);
 
             if (token is null)
             {
@@ -77,12 +84,12 @@ namespace HomeAccountant.Core.Services
 
             if (expirationDate < DateTime.UtcNow)
             {
-                var refreshingResult = await RefreshToken(token);
+                var refreshingResult = await RefreshToken(token, cancellationToken);
 
                 if (!refreshingResult)
                     return;
 
-                await TrySetAuthorizationToken();
+                await TrySetAuthorizationToken(cancellationToken);
 
                 return;
             }
@@ -90,19 +97,19 @@ namespace HomeAccountant.Core.Services
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(AUTHORIZATION_SCHEMA, token.Token);
         }
 
-        private async Task<bool> RefreshToken(TokenAuthenticationModel token)
+        private async Task<bool> RefreshToken(TokenAuthenticationModel token, CancellationToken cancellationToken = default)
         {
-            var result = await _authenticationService.RefreshTokenAsync(token.Token, token.RefreshToken);
+            var result = await _authenticationService.RefreshTokenAsync(token.Token, token.RefreshToken, cancellationToken);
 
-            if (!result.IsSucceed || result.Result is null)
+            if (!result.Result || result.Value is null)
             {
-                await _tokenStorageAccessor.RemoveTokenAsync();
+                await _tokenStorageAccessor.RemoveTokenAsync(cancellationToken);
                 _jwtAuthenticationStateProvider.StateChanged();
 
                 return false;
             }
 
-            await _tokenStorageAccessor.SetTokenAsync(result.Result);
+            await _tokenStorageAccessor.SetTokenAsync(result.Value, cancellationToken);
             return true;
         }
     }

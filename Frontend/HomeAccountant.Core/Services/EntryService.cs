@@ -1,6 +1,7 @@
-﻿using HomeAccountant.Core.DTOs;
+﻿using HomeAccountant.Core.DTOs.Entry;
 using HomeAccountant.Core.Model;
 using System.Net.Http.Json;
+using System.Reflection.Metadata.Ecma335;
 
 namespace HomeAccountant.Core.Services
 {
@@ -13,66 +14,76 @@ namespace HomeAccountant.Core.Services
             _httpClient = httpClient;
         }
 
-        public async Task<ServiceResponse<EntryReadDto?>> CreateEntry(int registerId, EntryCreateDto entryCreateDto)
+        public async Task<ServiceResponse<EntryReadDto>> CreateEntry(int registerId, int billingPeriodId, EntryCreateDto entryCreateDto)
         {
-            var url = $"/api/Register/{registerId}/Entry";
-
-            var response = await _httpClient.PostAsJsonAsync(url, entryCreateDto);
-
-            if (!response.IsSuccessStatusCode)
+            try
             {
-                return new ServiceResponse<EntryReadDto?>(false);
+                var url = $"/api/Register/{registerId}/BillingPeriod/{billingPeriodId}/Entry";
+
+                var response = await _httpClient.PostAsJsonAsync(url, entryCreateDto);
+
+                var responseContent = await response.Content.ReadFromJsonAsync<ServiceResponse<EntryReadDto>>();
+
+                return responseContent.Protect();
             }
-
-            var result = await response.Content.ReadFromJsonAsync<EntryReadDto>();
-
-            return new ServiceResponse<EntryReadDto?>(result);
-        }
-
-        public async Task<ServiceResponse> DeleteEntry(int registerId, int entryId)
-        {
-            var url = $"/api/Register/{registerId}/Entry/{entryId}";
-
-            var response = await _httpClient.DeleteAsync(url);
-
-            if (!response.IsSuccessStatusCode)
-                return new ServiceResponse(false);
-
-            return new ServiceResponse(true);
-        }
-
-        public async Task<ServiceResponse<IEnumerable<EntryReadDto>?>> GetEntries(int registerId)
-        {
-            var url = $"/api/Register/{registerId}/Entry";
-
-            var response = await _httpClient.GetAsync(url);
-
-            if (!response.IsSuccessStatusCode)
+            catch (Exception ex)
             {
-                return new ServiceResponse<IEnumerable<EntryReadDto>?>(false);
+                return new ServiceResponse<EntryReadDto>(ex.Message);
             }
-
-            var result = await response.Content.ReadFromJsonAsync<IEnumerable<EntryReadDto>>();
-
-            return new ServiceResponse<IEnumerable<EntryReadDto>?>(result);
         }
 
-        public async Task<ServiceResponse> UpdateEntry(int registerId, EntryUpdateDto entryUpdateDto)
+        public async Task<ServiceResponse> DeleteEntry(int registerId, int billingPeriodId, int entryId)
         {
-            var url = $"/api/Register/{registerId}/Entry";
-
-            var response = await _httpClient.PutAsJsonAsync(url, entryUpdateDto);
-
-            if (!response.IsSuccessStatusCode)
+            try
             {
-                return new ServiceResponse(false);
-            }
+                var url = $"/api/Register/{registerId}/BillingPeriod/{billingPeriodId}/Entry/{entryId}";
 
-            return new ServiceResponse(true);
+                var response = await _httpClient.DeleteAsync(url);
+
+                var responseContent = await response.Content.ReadFromJsonAsync<ServiceResponse>();
+
+                return responseContent.Protect();
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponse(false, new List<string>() { ex.Message });
+            }
         }
 
+        public async Task<ServiceResponse<IEnumerable<EntryReadDto>>> GetEntries(int registerId, int billingPeriodId)
+        {
+            try
+            {
+                var url = $"/api/Register/{registerId}/BillingPeriod/{billingPeriodId}/Entry";
 
+                var response = await _httpClient.GetAsync(url);
 
+                var responseContent = await response.Content
+                    .ReadFromJsonAsync<ServiceResponse<IEnumerable<EntryReadDto>>>();
 
+                return responseContent.Protect();
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponse<IEnumerable<EntryReadDto>>(ex.Message);
+            }
+        }
+
+        public async Task<ServiceResponse> UpdateEntry(int registerId, int billingPeriodId, EntryUpdateDto entryUpdateDto)
+        {
+            try
+            {
+                var url = $"/api/Register/{registerId}/BillingPeriod/{billingPeriodId}/Entry";
+
+                var response = await _httpClient.PutAsJsonAsync(url, entryUpdateDto);
+                var responseContent = await response.Content.ReadFromJsonAsync<ServiceResponse>();
+
+                return responseContent.Protect();
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponse(false, new List<string>() { ex.Message });
+            }
+        }
     }
 }

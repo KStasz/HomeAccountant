@@ -14,10 +14,14 @@ namespace HomeAccountant.AccountingService.Profiles
 
             CreateMap<EntryCreateDto, Entry>();
             CreateMap<Entry, EntryReadDto>()
-                .ForMember(x => x.Register, x => x.MapFrom(y => y.Register))
+                .ForMember(x => x.Period, x => x.MapFrom(y => y.BillingPeriod))
                 .ForMember(x => x.Creator, x => x.MapFrom(y => y.CreatedBy));
 
             CreateMap<EntryUpdateDto, Entry>();
+
+            CreateMap<BillingPeriod, BillingPeriodReadDto>();
+            CreateMap<BillingPeriodCreateDto, BillingPeriod>();
+            CreateMap<BillingPeriodUpdateDto, BillingPeriod>();
         }
     }
 }

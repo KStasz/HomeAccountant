@@ -22,6 +22,7 @@ namespace HomeAccountant.AccountingService.Data
                 .Entity<Register>()
                 .Property(x => x.IsActive)
                 .HasDefaultValueSql("1");
+
             modelBuilder
                 .Entity<Register>()
                 .Property(x => x.CreatedDate)
@@ -31,21 +32,41 @@ namespace HomeAccountant.AccountingService.Data
                 .Entity<Entry>()
                 .Property(x => x.CreatedDate)
                 .HasDefaultValueSql("GETDATE()");
+
             modelBuilder
                 .Entity<Entry>()
-                .HasOne(x => x.Register)
+                .HasOne(x => x.BillingPeriod)
                 .WithMany(x => x.Entries)
-                .HasForeignKey(x => x.RegisterId);
+                .HasForeignKey(x => x.BillingPeriodId);
 
             modelBuilder
                 .Entity<RegisterSharing>()
                 .Property(x => x.CreatedDate)
                 .HasDefaultValueSql("GETDATE()");
+
             modelBuilder
                 .Entity<RegisterSharing>()
                 .HasOne(x => x.Register)
                 .WithMany(x => x.Sharings)
                 .HasForeignKey(x => x.RegisterId);
+
+            modelBuilder
+                .Entity<BillingPeriod>()
+                .HasKey(x => x.Id);
+
+            modelBuilder
+                .Entity<BillingPeriod>()
+                .HasOne(x => x.Register)
+                .WithMany(x => x.BillingPeriods)
+                .HasForeignKey(x => x.RegisterId);
+
+            modelBuilder.Entity<BillingPeriod>()
+                .Property(x => x.CreationDate)
+                .HasDefaultValueSql("GETDATE()");
+
+            modelBuilder.Entity<BillingPeriod>()
+                .Property(x => x.IsOpen)
+                .HasDefaultValueSql("1");
         }
     }
 }

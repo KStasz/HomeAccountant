@@ -38,10 +38,10 @@ namespace HomeAccountant.Core.ViewModels
         {
             var response = await _categoriesService.GetCategoriesAsync();
 
-            if (!response.IsSucceed)
+            if (!response.Result)
                 Categories = new List<CategoryReadDto>();
 
-            Categories = response.Result;
+            Categories = response.Value;
         }
 
         public async Task CreateCategoryAsync()

@@ -1,4 +1,4 @@
-﻿using HomeAccountant.Core.DTOs;
+﻿using HomeAccountant.Core.DTOs.Register;
 using HomeAccountant.Core.Services;
 using Microsoft.AspNetCore.Components;
 
@@ -40,9 +40,12 @@ namespace HomeAccountant.Pages
 
         public async Task<ModalResult> ShowModalAsync()
         {
-            await _modalReference?.ShowModalAsync();
+            if (_modalReference is null || _tcs is null)
+                return ModalResult.Cancel;
 
-            return await _tcs?.Task;
+            await _modalReference.ShowModalAsync();
+
+            return await _tcs.Task;
         }
 
     }

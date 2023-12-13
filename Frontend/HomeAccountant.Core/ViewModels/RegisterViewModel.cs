@@ -1,4 +1,4 @@
-﻿using HomeAccountant.Core.DTOs;
+﻿using HomeAccountant.Core.DTOs.Register;
 using HomeAccountant.Core.Services;
 
 namespace HomeAccountant.Core.ViewModels
@@ -33,19 +33,21 @@ namespace HomeAccountant.Core.ViewModels
 
         private async Task InitializeAsync()
         {
+            IsBusy = true;
             await ReadRegisters();
+            IsBusy = false;
         }
 
         private async Task ReadRegisters()
         {
             var result = await _registerService.GetRegistersAsync();
 
-            if (!result.IsSucceed)
+            if (!result.Result)
             {
                 return;
             }
 
-            AvailableRegisters = result.Result;
+            AvailableRegisters = result.Value;
         }
 
         public async Task CreateRegister()
@@ -62,7 +64,7 @@ namespace HomeAccountant.Core.ViewModels
 
             var response = await _registerService.CreateRegisterAsync(result);
 
-            if (!response.IsSucceed)
+            if (!response.Result)
             {
                 SetErrorMessage("Nie udało się utworzyć księgi.");
             }

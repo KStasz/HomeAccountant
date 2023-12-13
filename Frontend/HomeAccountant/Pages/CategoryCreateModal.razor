@@ -6,7 +6,7 @@
             <ModalBody>
                 <div class="mb-3">
                     <label for="categoryName" class="form-label">Nazwa</label>
-                    <InputText type="text" class="form-control" id="categoryName" @bind-Value="_model.Name" />
+                    <InputText type="text" class="form-control" id="categoryName" @bind-Value="_model!.Name" />
                     <ValidationMessage For="() => _model.Name" />
                 </div>
             </ModalBody>

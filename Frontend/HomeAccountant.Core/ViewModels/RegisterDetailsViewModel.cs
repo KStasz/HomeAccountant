@@ -1,5 +1,5 @@
-﻿using HomeAccountant.Core.DTOs;
-using HomeAccountant.Core.DTOs.Category;
+﻿using HomeAccountant.Core.DTOs.Category;
+using HomeAccountant.Core.DTOs.Entry;
 using HomeAccountant.Core.Model;
 using HomeAccountant.Core.Services;
 
@@ -9,6 +9,7 @@ namespace HomeAccountant.Core.ViewModels
     {
         private readonly IEntryService _entryService;
         private readonly ICategoriesService _categoriesService;
+        private int _billingPerdiodId;
         private int _registerId;
 
         public RegisterPositionsViewModel(IEntryService entryService,
@@ -24,11 +25,11 @@ namespace HomeAccountant.Core.ViewModels
         private IEnumerable<EntryReadDto>? _entries;
         public IEnumerable<EntryReadDto>? Entries
         {
-            get 
+            get
             {
-                return _entries; 
+                return _entries;
             }
-            set 
+            set
             {
                 _entries = value;
                 NotifyPropertyChanged();
@@ -49,33 +50,57 @@ namespace HomeAccountant.Core.ViewModels
             }
         }
 
-
-        public async Task InitializeAsync(int registerId)
+        private bool _isBillingPeriodOpen;
+        public bool IsBillingPeriodOpen
         {
+            get 
+            {
+                return _isBillingPeriodOpen; 
+            }
+            set 
+            {
+                _isBillingPeriodOpen = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public Dictionary<string, object> IsButtonBlocked
+        {
+            get
+            {
+                return IsBillingPeriodOpen ? new Dictionary<string, object>() : new Dictionary<string, object>() { { "disabled", "" } };
+            }
+        }
+
+        public async Task InitializeAsync(int registerId, int billingPeriodId)
+        {
+            IsBusy = true;
+            _billingPerdiodId = billingPeriodId;
             _registerId = registerId;
 
             await ReadEntries();
             await ReadCategories();
+            IsBusy = false;
         }
 
         private async Task ReadEntries()
         {
-            ServiceResponse<IEnumerable<EntryReadDto>?> result = await _entryService.GetEntries(_registerId);
+            var result = await _entryService.GetEntries(_registerId, _billingPerdiodId);
 
-            if (!result.IsSucceed)
+            if (!result.Result)
                 return;
 
-            Entries = result.Result;
+            Entries = result.Value;
         }
 
         private async Task ReadCategories()
         {
             var result = await _categoriesService.GetCategoriesAsync();
 
-            if (!result.IsSucceed)
+            if (!result.Result)
                 return;
 
-            AvailableCategories = result.Result;
+            AvailableCategories = result.Value;
         }
 
         public async Task CreateEntry()
@@ -94,7 +119,7 @@ namespace HomeAccountant.Core.ViewModels
                 return;
             }
 
-            var creationResult = await _entryService.CreateEntry(_registerId, result);
+            var creationResult = await _entryService.CreateEntry(_registerId, _billingPerdiodId, result);
             await ReadEntries();
         }
 
@@ -110,7 +135,7 @@ namespace HomeAccountant.Core.ViewModels
             if (result == ModalResult.Cancel)
                 return;
 
-            await _entryService.DeleteEntry(_registerId, entryReadDto.Id);
+            await _entryService.DeleteEntry(_registerId, _billingPerdiodId, entryReadDto.Id);
             await ReadEntries();
         }
     }

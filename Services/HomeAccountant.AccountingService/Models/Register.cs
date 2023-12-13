@@ -19,7 +19,7 @@ namespace HomeAccountant.AccountingService.Models
         [Required]
         public DateTime CreatedDate { get; set; }
         
-        public ICollection<Entry>? Entries { get; set; }
         public ICollection<RegisterSharing>? Sharings { get; set; }
+        public ICollection<BillingPeriod>? BillingPeriods { get; set; }
     }
 }

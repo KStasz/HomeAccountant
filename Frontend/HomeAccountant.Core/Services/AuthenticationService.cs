@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using HomeAccountant.Core.DTOs;
+using HomeAccountant.Core.DTOs.Authentication;
 using HomeAccountant.Core.Model;
 using HomeAccountant.Core.Storage;
 using Microsoft.Extensions.Logging;
@@ -68,7 +68,7 @@ namespace HomeAccountant.Core.Services
             }
         }
 
-        public async Task<ServiceResponse<TokenAuthenticationModel>> RefreshTokenAsync(string token, string refreshToken)
+        public async Task<ServiceResponse<TokenAuthenticationModel>> RefreshTokenAsync(string token, string refreshToken, CancellationToken cancellationToken = default)
         {
             var url = "/api/Authentication/RefreshToken";
 
@@ -95,7 +95,7 @@ namespace HomeAccountant.Core.Services
             return new ServiceResponse<TokenAuthenticationModel>(tokenAuthentication);
         }
 
-        public async Task<ServiceResponse<TokenAuthenticationModel>> Register(string email, string username, string password)
+        public async Task<ServiceResponse<TokenAuthenticationModel>> Register(string email, string username, string password, CancellationToken cancellationToken = default)
         {
             try
             {
