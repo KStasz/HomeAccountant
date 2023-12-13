@@ -1,45 +1,55 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace HomeAccountant.Core.Model
+﻿namespace HomeAccountant.Core.Model
 {
     public class ServiceResponse<T> : ServiceResponse
     {
+        public ServiceResponse() : base(false)
+        {
+
+        }
+
         public ServiceResponse(T result) : base(true)
         {
-            Result = result;
+            Value = result;
         }
 
         public ServiceResponse(bool isSucceed) : base(isSucceed)
         {
-            Result = default;
+            Value = default;
         }
 
-        public ServiceResponse(bool isSucceed, IEnumerable<string>? errors) : base(isSucceed, errors)
+        public ServiceResponse(params string[] errors) : base(false, new List<string>(errors))
         {
-            Result = default;
+
         }
 
-        public T? Result { get; set; }
+        public ServiceResponse(bool isSucceed, IEnumerable<string>? errorCollection) : base(isSucceed, errorCollection)
+        {
+            Value = default;
+        }
+
+        public T? Value { get; set; }
     }
 
     public class ServiceResponse
     {
+
+        public ServiceResponse()
+        {
+            
+        }
+
         public ServiceResponse(bool isSucceed)
         {
-            IsSucceed = isSucceed;
+            Result = isSucceed;
         }
 
         public ServiceResponse(bool isSucceed, IEnumerable<string>? errors)
         {
-            IsSucceed = isSucceed;
+            Result = isSucceed;
             Errors = errors;
         }
 
-        public bool IsSucceed { get; set; }
+        public bool Result { get; set; }
         public IEnumerable<string>? Errors { get; set; }
     }
 }

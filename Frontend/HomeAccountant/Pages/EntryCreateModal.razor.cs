@@ -1,5 +1,5 @@
-﻿using HomeAccountant.Core.DTOs;
-using HomeAccountant.Core.DTOs.Category;
+﻿using HomeAccountant.Core.DTOs.Category;
+using HomeAccountant.Core.DTOs.Entry;
 using HomeAccountant.Core.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;

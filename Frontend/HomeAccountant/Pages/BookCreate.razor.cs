@@ -1,4 +1,4 @@
-﻿using HomeAccountant.Core.DTOs;
+﻿using HomeAccountant.Core.DTOs.Register;
 using HomeAccountant.Core.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
@@ -16,7 +16,10 @@ namespace HomeAccountant.Pages
 
         private void ClearModal()
         {
-            _registerModel?.ClearModel();
+            if (_registerModel is null)
+                return;
+
+            _registerModel.ClearModel();
             _editContext = new EditContext(_registerModel);
         }
 

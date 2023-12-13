@@ -27,6 +27,7 @@ builder.Services.AddScoped<IEntryService, EntryService>();
 builder.Services.AddScoped<ICategoriesService, CategoriesService>();
 builder.Services.AddScoped<IModalService, ModalService>();
 builder.Services.AddScoped<IJwtTokenParser, JwtTokenParser>();
+builder.Services.AddScoped<IBillingPeriodService, BillingPeriodService>();
 
 builder.Services.AddHttpClient("UnauhorizedHttpClient", 
     client => client.BaseAddress = new Uri(GetBaseAddress()));
@@ -37,6 +38,7 @@ builder.Services.AddScoped<LoginViewModel>();
 builder.Services.AddScoped<RegisterViewModel>();
 builder.Services.AddScoped<RegisterPositionsViewModel>();
 builder.Services.AddScoped<CategoriesViewModel>();
+builder.Services.AddScoped<BillingPeriodViewModel>();
 
 await builder.Build().RunAsync();
 

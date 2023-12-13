@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace HomeAccountant.Core.DTOs
+namespace HomeAccountant.Core.DTOs.Entry
 {
     public class EntryCreateDto : IClearableObject
     {

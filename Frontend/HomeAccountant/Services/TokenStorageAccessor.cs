@@ -19,10 +19,10 @@ namespace HomeAccountant.Services
             await _jSRuntime.InvokeVoidAsync("clearToken");
         }
 
-        public async Task<TokenAuthenticationModel?> GetTokenAsync()
+        public async Task<TokenAuthenticationModel?> GetTokenAsync(CancellationToken cancellationToken = default)
         {
-            var result = await _jSRuntime.InvokeAsync<string>("getToken");
-            
+            var result = await _jSRuntime.InvokeAsync<string>("getToken", cancellationToken);
+
             if (result is null)
             {
                 return null;
@@ -31,15 +31,15 @@ namespace HomeAccountant.Services
             return JsonSerializer.Deserialize<TokenAuthenticationModel?>(result);
         }
 
-        public async Task RemoveTokenAsync()
+        public async Task RemoveTokenAsync(CancellationToken cancellationToken = default)
         {
-            await _jSRuntime.InvokeVoidAsync("removeToken");
+            await _jSRuntime.InvokeVoidAsync("removeToken", cancellationToken);
         }
 
-        public async Task SetTokenAsync(TokenAuthenticationModel tokenAuthenticationModel)
+        public async Task SetTokenAsync(TokenAuthenticationModel tokenAuthenticationModel, CancellationToken cancellationToken = default)
         {
             var token = JsonSerializer.Serialize(tokenAuthenticationModel);
-            await _jSRuntime.InvokeVoidAsync("setToken", token);
+            await _jSRuntime.InvokeVoidAsync("setToken", cancellationToken, token);
         }
     }
 }

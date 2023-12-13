@@ -1,5 +1,5 @@
 ﻿using HomeAccountant.Core.Authentication;
-using HomeAccountant.Core.DTOs;
+using HomeAccountant.Core.DTOs.Authentication;
 using HomeAccountant.Core.Services;
 
 namespace HomeAccountant.Core.ViewModels
@@ -59,7 +59,7 @@ namespace HomeAccountant.Core.ViewModels
 
             var result = await _authenticationService.Login(LoginData.Email!, LoginData.Password!);
 
-            if (!result.IsSucceed)
+            if (!result.Result)
             {
                 if (result.Errors is null)
                 {
@@ -73,14 +73,14 @@ namespace HomeAccountant.Core.ViewModels
                 return;
             }
 
-            if (result.Result is null)
+            if (result.Value is null)
             {
                 SetErrorMessage("Wystpił błąd podczas logowania");
 
                 return;
             }
 
-            await _tokenStorage.SetTokenAsync(result.Result);
+            await _tokenStorage.SetTokenAsync(result.Value);
             _jwtAuthenticationStateProvider.StateChanged();
             
             await _jsCodeExecutor.ExecuteFunction("HideModal");
@@ -102,7 +102,7 @@ namespace HomeAccountant.Core.ViewModels
                 RegisterData.UserName!,
                 RegisterData.Password!);
 
-            if (!result.IsSucceed)
+            if (!result.Result)
             {
                 if (result.Errors is null)
                 {
@@ -114,14 +114,14 @@ namespace HomeAccountant.Core.ViewModels
                 return;
             }
 
-            if (result.Result is null)
+            if (result.Value is null)
             {
                 SetErrorMessage("Wystąpił błąd podczas rejestracji");
                 
                 return;
             }
 
-            await _tokenStorage.SetTokenAsync(result.Result);
+            await _tokenStorage.SetTokenAsync(result.Value);
             _jwtAuthenticationStateProvider.StateChanged();
 
             await _jsCodeExecutor.ExecuteFunction("HideModal");

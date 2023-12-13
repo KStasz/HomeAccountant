@@ -4,9 +4,9 @@ namespace HomeAccountant.Core.Services
 {
     public interface ITokenStorageAccessor
     {
-        Task<TokenAuthenticationModel?> GetTokenAsync();
-        Task SetTokenAsync(TokenAuthenticationModel tokenAuthenticationModel);
+        Task<TokenAuthenticationModel?> GetTokenAsync(CancellationToken cancellationToken = default);
+        Task SetTokenAsync(TokenAuthenticationModel tokenAuthenticationModel, CancellationToken cancellationToken = default);
         Task ClearAsync();
-        Task RemoveTokenAsync();
+        Task RemoveTokenAsync(CancellationToken cancellationToken = default);
     }
 }

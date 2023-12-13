@@ -1,13 +1,13 @@
 ﻿<Modal @ref="_modalReference">
     <ModalContent>
-        <ModalHeader ModalTitle="@(_registerModel?.Name)" />
+        <ModalHeader ModalTitle="@(_registerModel?.Name ?? string.Empty)" />
         <ModalBody>
             <p>Czy na pewno chcesz usunąć wybraną pozycję?</p>
             
             <div class="row mb-3">
                 <label for="bookName" class="col-auto col-form-label">Nazwa: </label>
                 <div class="col-auto">
-                    <input type="text" class="form-control" id="bookName" readonly value="@_registerModel?.Name">
+                    <input type="text" class="form-control" id="bookName" readonly value="@(_registerModel?.Name ?? string.Empty)">
                 </div>
             </div>
         </ModalBody>

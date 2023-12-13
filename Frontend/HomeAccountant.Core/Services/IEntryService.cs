@@ -1,13 +1,13 @@
-﻿using HomeAccountant.Core.DTOs;
+﻿using HomeAccountant.Core.DTOs.Entry;
 using HomeAccountant.Core.Model;
 
 namespace HomeAccountant.Core.Services
 {
     public interface IEntryService
     {
-        Task<ServiceResponse<IEnumerable<EntryReadDto>?>> GetEntries(int registerId);
-        Task<ServiceResponse<EntryReadDto?>> CreateEntry(int registerId, EntryCreateDto entryCreateDto);
-        Task<ServiceResponse> UpdateEntry(int registerId, EntryUpdateDto entryUpdateDto);
-        Task<ServiceResponse> DeleteEntry(int registerId, int entryId);
+        Task<ServiceResponse<IEnumerable<EntryReadDto>>> GetEntries(int registerId, int billingPeriodId);
+        Task<ServiceResponse<EntryReadDto>> CreateEntry(int registerId, int billingPeriodId, EntryCreateDto entryCreateDto);
+        Task<ServiceResponse> UpdateEntry(int registerId, int billingPeriodId, EntryUpdateDto entryUpdateDto);
+        Task<ServiceResponse> DeleteEntry(int registerId, int billingPeriodId, int entryId);
     }
 }

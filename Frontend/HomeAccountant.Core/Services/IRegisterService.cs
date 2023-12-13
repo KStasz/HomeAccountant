@@ -1,4 +1,4 @@
-﻿using HomeAccountant.Core.DTOs;
+﻿using HomeAccountant.Core.DTOs.Register;
 using HomeAccountant.Core.Model;
 
 namespace HomeAccountant.Core.Services

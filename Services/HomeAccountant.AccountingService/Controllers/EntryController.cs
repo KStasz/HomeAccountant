@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Domain.Dtos;
 using Domain.Dtos.AccountingService;
 using Domain.Dtos.CategoryService;
 using HomeAccountant.AccountingService.Models;
@@ -11,7 +12,7 @@ using System.Linq.Expressions;
 
 namespace HomeAccountant.AccountingService.Controllers
 {
-    [Route("api/Register/{registerId}/[controller]")]
+    [Route("api/Register/{registerId}/BillingPeriod/{billingPeriodId}/[controller]")]
     [ApiController]
     [Authorize]
     public class EntryController : ServiceControllerBase
@@ -33,38 +34,34 @@ namespace HomeAccountant.AccountingService.Controllers
         }
 
         [HttpGet("{entryId}", Name = "GetEntryById")]
-        public async Task<IActionResult> GetEntryById(int entryId)
+        public async Task<ActionResult<ServiceResponse<EntryReadDto>>> GetEntryById(int entryId)
         {
             var entryModel = _repository.Get(x => x.Id == entryId);
 
             if (entryModel is null)
-                return NotFound();
+                return NotFound(new ServiceResponse("Entry not found"));
 
             var categoryModel = await _categoriesService.GetCategoryAsync(entryModel.CategoryId);
-            var registerModel = _registerRepository.Get(x => x.Id == entryModel.RegisterId);
 
             if (categoryModel is null)
-                return NotFound();
-
-            if (registerModel is null)
-                return NotFound();
+                return NotFound(new ServiceResponse("Category not found"));
 
             var entryRead = _mapper.Map<EntryReadDto>(entryModel);
-            var registerRead = _mapper.Map<RegisterReadDto>(registerModel);
-
             entryRead.Category = categoryModel;
-            entryRead.Register = registerRead;
 
-            return Ok(entryRead);
+            return Ok(new ServiceResponse<EntryReadDto>(entryRead));
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get(int registerId)
+        public async Task<ActionResult<ServiceResponse<IEnumerable<EntryReadDto>>>> Get(int billingPeriodId)
         {
             try
             {
-
-                var entryModels = _repository.GetAll(x => x.RegisterId == registerId).ToList();
+                var entryModels = _repository
+                    .GetAll(
+                        x => x.BillingPeriodId == billingPeriodId,
+                        x => x.BillingPeriod)
+                    .ToList();
 
                 List<EntryReadDto> result = new List<EntryReadDto>();
 
@@ -72,48 +69,42 @@ namespace HomeAccountant.AccountingService.Controllers
                 {
                     var model = _mapper.Map<EntryReadDto>(item);
                     var categoryModel = await _categoriesService.GetCategoryAsync(item.CategoryId);
-                    var registerModel = _registerRepository.Get(x => x.Id == item.RegisterId);
 
                     if (categoryModel is null)
                         continue;
 
-                    if (registerModel is null)
-                        continue;
-
                     model.Category = _mapper.Map<CategoryReadDto>(categoryModel);
-                    model.Register = _mapper.Map<RegisterReadDto>(registerModel);
                     result.Add(model);
                 }
 
-                return Ok(result);
+                return Ok(new ServiceResponse<IEnumerable<EntryReadDto>>(result));
             }
             catch (Exception ex)
             {
-
-                throw;
+                return BadRequest(new ServiceResponse(ex.Message));
             }
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add(int registerId, EntryCreateDto entryCreateDto)
+        public async Task<ActionResult<ServiceResponse<EntryReadDto>>> Add(int registerId, int billingPeriodId, EntryCreateDto entryCreateDto)
         {
             if (!ModelState.IsValid)
-                return BadRequest("Invalid payload");
+                return BadRequest(new ServiceResponse("Invalid payload"));
 
             var userId = GetUserId();
 
             if (userId is null)
-                return BadRequest();
+                return BadRequest(new ServiceResponse("Missing UserId"));
 
             if (!CheckIfRegisterExists(registerId))
-                return NotFound();
+                return NotFound(new ServiceResponse("Register doesn't exist"));
 
             if (!await _categoriesService.CategoryExists(entryCreateDto.CategoryId))
-                return NotFound("Category not found");
+                return NotFound(new ServiceResponse("Category not found"));
 
             var entryModel = _mapper.Map<Entry>(entryCreateDto);
             entryModel.CreatedBy = userId;
-            entryModel.RegisterId = registerId;
+            entryModel.BillingPeriodId = billingPeriodId;
             _repository.Add(entryModel);
             await _repository.SaveChangesAsync();
 
@@ -122,7 +113,14 @@ namespace HomeAccountant.AccountingService.Controllers
             var entryModelRead = _mapper.Map<EntryReadDto>(entryModel);
             entryModelRead.Category = _mapper.Map<CategoryReadDto>(categoryModel);
 
-            return CreatedAtRoute(nameof(GetEntryById), new { registerId = registerId, entryId = entryModel.Id }, entryModelRead);
+            return CreatedAtRoute(
+                nameof(GetEntryById),
+                new
+                {
+                    registerId = billingPeriodId,
+                    entryId = entryModel.Id
+                },
+                new ServiceResponse<EntryReadDto>(entryModelRead));
         }
 
         private bool CheckIfRegisterExists(int registerId)
@@ -138,36 +136,36 @@ namespace HomeAccountant.AccountingService.Controllers
             var entryModel = _repository.Get(x => x.Id == entryId);
 
             if (entryModel is null)
-                return NotFound();
+                return NotFound(new ServiceResponse("Entry not found"));
 
             _repository.Remove(entryModel);
             await _repository.SaveChangesAsync();
 
-            return Ok();
+            return Ok(new ServiceResponse(true));
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update(int registerId, EntryUpdateDto entryUpdateDto)
+        public async Task<ActionResult<ServiceResponse>> Update(int billingPeriodId, EntryUpdateDto entryUpdateDto)
         {
             if (!ModelState.IsValid)
-                return BadRequest("Invalid payload");
+                return BadRequest(new ServiceResponse("Invalid payload"));
 
             var entryModel = _mapper.Map<Entry>(entryUpdateDto);
 
             var userId = GetUserId();
 
             if (userId is null)
-                return BadRequest("Invalid payload");
+                return BadRequest(new ServiceResponse("Invalid payload"));
 
             if (!await _categoriesService.CategoryExists(entryUpdateDto.CategoryId))
-                return NotFound("Category not found");
+                return NotFound(new ServiceResponse("Category not found"));
 
             entryModel.CreatedBy = userId;
-            entryModel.RegisterId = registerId;
+            entryModel.BillingPeriodId = billingPeriodId;
             _repository.Update(entryModel);
             await _repository.SaveChangesAsync();
 
-            return Ok();
+            return Ok(new ServiceResponse(true));
         }
     }
 }

@@ -1,12 +1,12 @@
 ﻿<Modal @ref="_modal">
     <ModalContent>
-        <ModalHeader ModalTitle="_model.Name" />
+        <ModalHeader ModalTitle="@(_model?.Name ?? string.Empty)" />
         <ModalBody>
             <p>Czy na pewno chcesz usunąć wybraną kategorię?</p>
             <div class="row mb-3">
                 <label for="categoryName" class="col-auto col-form-label">Nazwa</label>
                 <div class="col-auto">
-                    <input type="email" class="form-control" id="categoryName" value="@_model.Name" readonly>
+                    <input type="email" class="form-control" id="categoryName" value="@(_model?.Name ?? string.Empty)" readonly>
                 </div>
             </div>
         </ModalBody>

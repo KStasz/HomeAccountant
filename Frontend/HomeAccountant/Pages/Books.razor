@@ -2,34 +2,41 @@
 @attribute [Authorize]
 <h3>Dostępne księgi</h3>
 
-<div class="row mb-3">
-    <div class="d-flex flex-row-reverse">
-        <button class="btn btn-primary" @onclick="ViewModel.CreateRegister">
-            Utwórz nową księgę
-        </button>
-    </div>
-</div>
-
-@if (ViewModel.AvailableRegisters is not null)
+@if (!ViewModel.IsBusy)
 {
-    <div class="d-flex flex-column flex-sm-row mb-3" style="flex-flow: column wrap;">
-        @foreach (var item in ViewModel.AvailableRegisters)
-        {
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">@item.Name</h5>
-                    <h6 class="card-subtitle mb-2 text-body-secondary">Data utworzenia: </h6>
-                    <p class="card-text">Opis księgi</p>
-                    <NavLink role="button" class="btn btn-sm btn-primary" href="@($"/books/{item.Id}")">Pokaż pozycje</NavLink>
-                    <a role="button" class="btn btn-sm btn-danger" @onclick="(() => ViewModel.DeleteRegister(item))">Usuń</a>
-                </div>
-            </div>
-        }
+    <div class="row mb-3">
+        <div class="d-flex flex-row-reverse">
+            <button class="btn btn-primary" @onclick="ViewModel.CreateRegister">
+                Utwórz nową księgę
+            </button>
+        </div>
     </div>
+
+    @if (ViewModel.AvailableRegisters is not null)
+    {
+        <div class="d-flex flex-column flex-sm-row mb-3" style="flex-flow: column wrap;">
+            @foreach (var item in ViewModel.AvailableRegisters)
+            {
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">@item.Name</h5>
+                        <h6 class="card-subtitle mb-2 text-body-secondary">Data utworzenia: </h6>
+                        <p class="card-text">Opis księgi</p>
+                        <NavLink role="button" class="btn btn-sm btn-primary" href="@($"/books/{item.Id}")">Pokaż pozycje</NavLink>
+                        <a role="button" class="btn btn-sm btn-danger" @onclick="(() => ViewModel.DeleteRegister(item))">Usuń</a>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p>Brak dostępnych ksiąg</p>
+    }
 }
 else
 {
-    <p>Brak dostępnych ksiąg</p>
+    <Placeholder />
 }
 
 <BookCreate @ref="ViewModel.CreateRegisterDialog" />
