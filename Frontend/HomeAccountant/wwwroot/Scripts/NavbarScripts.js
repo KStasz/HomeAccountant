@@ -1,6 +1,12 @@
-﻿function CollapseNavabar(navbarId) {
-    const menuToggle = document.getElementById(navbarId);
-    const navbarCollapse = bootstrap.Collapse.getOrCreateInstance(menuToggle)
+﻿var navbar;
 
-    navbarCollapse.toggle();
+function InitializeNavbar(navbarId) {
+    const menuToggle = document.getElementById(navbarId);
+    navbar = bootstrap.Collapse.getOrCreateInstance(menuToggle, { toggle: false });
+}
+
+function TryToggleNavbar() {
+    if (navbar._isShown()) {
+        navbar.toggle();
+    }
 }

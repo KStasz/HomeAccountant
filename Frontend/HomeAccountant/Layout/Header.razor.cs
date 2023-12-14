@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using HomeAccountant.Core.Services;
+using Microsoft.AspNetCore.Components;
 
 namespace HomeAccountant.Layout
 {
@@ -7,6 +8,15 @@ namespace HomeAccountant.Layout
         [Parameter]
         public required string PageTitle { get; set; }
 
+        [Inject]
+        public required IJsCodeExecutor JsCodeExecutor { get; set; }
+
         private string _togglerId = "navbarToggler";
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await JsCodeExecutor.ExecuteFunction("InitializeNavbar", _togglerId);
+            await base.OnAfterRenderAsync(firstRender);
+        }
     }
 }

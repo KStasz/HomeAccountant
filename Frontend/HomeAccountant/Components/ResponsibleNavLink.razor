@@ -2,8 +2,7 @@
     @ChildContent
 </NavLink>
 
-@code{
-
+@code {
     [CascadingParameter(Name = "NavbarTogglerId")]
     public string? NavbarTogglerId { get; set; }
 
@@ -24,6 +23,6 @@
 
     private async Task ToggleNavbar()
     {
-        await JsCodeExecutor.ExecuteFunction("CollapseNavabar", NavbarTogglerId ?? string.Empty);
+        await JsCodeExecutor.ExecuteFunction("TryToggleNavbar");
     }
 }
