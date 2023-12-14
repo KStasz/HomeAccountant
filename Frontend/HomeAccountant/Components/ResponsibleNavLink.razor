@@ -1,0 +1,29 @@
+﻿<NavLink class="@CssClass" href="@Href" Match="@Match" @onclick="ToggleNavbar">
+    @ChildContent
+</NavLink>
+
+@code{
+
+    [CascadingParameter(Name = "NavbarTogglerId")]
+    public string? NavbarTogglerId { get; set; }
+
+    [Parameter]
+    public string CssClass { get; set; } = "nav-link";
+
+    [Parameter]
+    public string Href { get; set; } = "#";
+
+    [Parameter]
+    public NavLinkMatch Match { get; set; } = NavLinkMatch.Prefix;
+
+    [Parameter]
+    public required RenderFragment ChildContent { get; set; }
+
+    [Inject]
+    public required HomeAccountant.Core.Services.IJsCodeExecutor JsCodeExecutor { get; set; }
+
+    private async Task ToggleNavbar()
+    {
+        await JsCodeExecutor.ExecuteFunction("CollapseNavabar", NavbarTogglerId ?? string.Empty);
+    }
+}

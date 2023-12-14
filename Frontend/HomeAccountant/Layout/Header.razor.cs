@@ -6,5 +6,7 @@ namespace HomeAccountant.Layout
     {
         [Parameter]
         public required string PageTitle { get; set; }
+
+        private string _togglerId = "navbarToggler";
     }
 }
