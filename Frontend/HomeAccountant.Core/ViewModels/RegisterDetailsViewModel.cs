@@ -1,7 +1,9 @@
-﻿using HomeAccountant.Core.DTOs.Category;
+﻿using HomeAccountant.Core.DTOs.BillingPeriod;
+using HomeAccountant.Core.DTOs.Category;
 using HomeAccountant.Core.DTOs.Entry;
 using HomeAccountant.Core.Model;
 using HomeAccountant.Core.Services;
+using System.Drawing;
 
 namespace HomeAccountant.Core.ViewModels
 {
@@ -9,8 +11,19 @@ namespace HomeAccountant.Core.ViewModels
     {
         private readonly IEntryService _entryService;
         private readonly ICategoriesService _categoriesService;
-        private int _billingPerdiodId;
+        private BillingPeriodReadDto? _billingPerdiod;
         private int _registerId;
+        private Color[] colorPallete = new Color[]
+        {
+            Color.Red,
+            Color.Orange,
+            Color.Yellow,
+            Color.Green,
+            Color.Blue,
+            Color.Purple,
+            Color.Magenta,
+            Color.Pink
+        };
 
         public RegisterPositionsViewModel(IEntryService entryService,
             ICategoriesService categoriesService)
@@ -50,32 +63,18 @@ namespace HomeAccountant.Core.ViewModels
             }
         }
 
-        private bool _isBillingPeriodOpen;
-        public bool IsBillingPeriodOpen
-        {
-            get 
-            {
-                return _isBillingPeriodOpen; 
-            }
-            set 
-            {
-                _isBillingPeriodOpen = value;
-                NotifyPropertyChanged();
-            }
-        }
-
         public Dictionary<string, object> IsButtonBlocked
         {
             get
             {
-                return IsBillingPeriodOpen ? new Dictionary<string, object>() : new Dictionary<string, object>() { { "disabled", "" } };
+                return (_billingPerdiod?.IsOpen ?? false) ? new Dictionary<string, object>() : new Dictionary<string, object>() { { "disabled", "" } };
             }
         }
 
-        public async Task InitializeAsync(int registerId, int billingPeriodId)
+        public async Task InitializeAsync(int registerId, BillingPeriodReadDto? billingPeriod)
         {
             IsBusy = true;
-            _billingPerdiodId = billingPeriodId;
+            _billingPerdiod = billingPeriod;
             _registerId = registerId;
 
             await ReadEntries();
@@ -83,9 +82,35 @@ namespace HomeAccountant.Core.ViewModels
             IsBusy = false;
         }
 
+        public List<ChartDataset>? GetChartDataset()
+        {
+            if (_billingPerdiod is null)
+            {
+                return null;
+            }
+
+            var groupedEntries = Entries?
+                .GroupBy(x => x.Category.Name)
+                .Select((x, i) => new
+                ChartValue(x.Key, (double)x.Sum(y => y.Price), colorPallete[i]));
+
+            if (groupedEntries is null)
+                return null;
+
+            return new List<ChartDataset>()
+            {
+                new ChartDataset(_billingPerdiod!.Name!, groupedEntries)
+            };
+        }
+
         private async Task ReadEntries()
         {
-            var result = await _entryService.GetEntries(_registerId, _billingPerdiodId);
+            if (_billingPerdiod is null)
+            {
+                return;
+            }
+
+            var result = await _entryService.GetEntries(_registerId, _billingPerdiod.Id);
 
             if (!result.Result)
                 return;
@@ -105,7 +130,7 @@ namespace HomeAccountant.Core.ViewModels
 
         public async Task CreateEntry()
         {
-            if (EntryCreateDialog is null)
+            if (EntryCreateDialog is null || _billingPerdiod is null)
             {
                 return;
             }
@@ -119,13 +144,13 @@ namespace HomeAccountant.Core.ViewModels
                 return;
             }
 
-            var creationResult = await _entryService.CreateEntry(_registerId, _billingPerdiodId, result);
+            var creationResult = await _entryService.CreateEntry(_registerId, _billingPerdiod.Id, result);
             await ReadEntries();
         }
 
         public async Task DeleteEntry(EntryReadDto entryReadDto)
         {
-            if (EntryDeleteDialog is null)
+            if (EntryDeleteDialog is null || _billingPerdiod is null)
                 return;
 
             await EntryDeleteDialog.InitializeDialogAsync(entryReadDto);
@@ -135,7 +160,7 @@ namespace HomeAccountant.Core.ViewModels
             if (result == ModalResult.Cancel)
                 return;
 
-            await _entryService.DeleteEntry(_registerId, _billingPerdiodId, entryReadDto.Id);
+            await _entryService.DeleteEntry(_registerId, _billingPerdiod.Id, entryReadDto.Id);
             await ReadEntries();
         }
     }

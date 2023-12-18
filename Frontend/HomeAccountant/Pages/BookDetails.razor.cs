@@ -1,33 +1,19 @@
-﻿using HomeAccountant.Core.ViewModels;
+﻿using HomeAccountant.Core.DTOs.BillingPeriod;
+using HomeAccountant.Core.ViewModels;
 using Microsoft.AspNetCore.Components;
 
 namespace HomeAccountant.Pages
 {
     public partial class BookDetails : ComponentBase, IDisposable
     {
-        [Parameter]
-        public int BillingPeriodId { get; set; }
+        [CascadingParameter(Name = "BillingPeriod")]
+        public BillingPeriodReadDto? BillingPeriod { get; set; }
 
         [Parameter]
         public int RegisterId { get; set; }
 
         [Inject]
         public required RegisterPositionsViewModel ViewModel { get; set; }
-
-#pragma warning disable BL0007
-        [Parameter]
-        public bool IsBillingPeriodOpen
-        {
-            get
-            {
-                return ViewModel.IsBillingPeriodOpen;
-            }
-            set
-            {
-                ViewModel.IsBillingPeriodOpen = value;
-            }
-        }
-#pragma warning restore BL0007
 
 
         public void Dispose()
@@ -38,13 +24,12 @@ namespace HomeAccountant.Pages
 
         protected virtual void Dispose(bool disposing)
         {
-            var xd = ViewModel.IsBillingPeriodOpen ? new Dictionary<string, object>() : new Dictionary<string, object>() { { "disabled", "" } };
             ViewModel.PropertyChangedAsync -= ViewModel_PropertyChangedAsync;
         }
 
         protected override async Task OnParametersSetAsync()
         {
-            await ViewModel.InitializeAsync(RegisterId, BillingPeriodId);
+            await ViewModel.InitializeAsync(RegisterId, BillingPeriod);
 
             await base.OnParametersSetAsync();
         }
