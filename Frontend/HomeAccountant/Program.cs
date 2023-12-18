@@ -36,7 +36,7 @@ builder.Services.AddHttpClient<AuthorizableHttpClient>(
     client => client.BaseAddress = new Uri(GetBaseAddress()));
 builder.Services.AddScoped<LoginViewModel>();
 builder.Services.AddScoped<RegisterViewModel>();
-builder.Services.AddScoped<RegisterPositionsViewModel>();
+builder.Services.AddTransient<RegisterPositionsViewModel>();
 builder.Services.AddScoped<CategoriesViewModel>();
 builder.Services.AddScoped<BillingPeriodViewModel>();
 

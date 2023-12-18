@@ -63,6 +63,64 @@ namespace HomeAccountant.Core.ViewModels
             }
         }
 
+        private int _currentPage = 1;
+        public int CurrentPage
+        {
+            get
+            {
+                return _currentPage;
+            }
+            set
+            {
+                _currentPage = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private int _totalPages;
+        public int TotalPages
+        {
+            get
+            {
+                return _totalPages;
+            }
+            set
+            {
+                _totalPages = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private IEnumerable<int>? _availablePagesCollection;
+        public IEnumerable<int>? AvailablePagesCollection
+        {
+            get 
+            {
+                return _availablePagesCollection; 
+            }
+            set 
+            {
+                _availablePagesCollection = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public string IsNextPageButtonDisabled
+        {
+            get
+            {
+                return CurrentPage >= TotalPages ? "disabled" : string.Empty;
+            }
+        }
+
+        public string IsPreviousPageButtonDisabled
+        {
+            get
+            {
+                return CurrentPage <= 1 ? "disabled" : string.Empty;
+            }
+        }
+
         public Dictionary<string, object> IsButtonBlocked
         {
             get
@@ -76,6 +134,9 @@ namespace HomeAccountant.Core.ViewModels
             IsBusy = true;
             _billingPerdiod = billingPeriod;
             _registerId = registerId;
+            CurrentPage = 1;
+            TotalPages = 0;
+            Entries = null;
 
             await ReadEntries();
             await ReadCategories();
@@ -103,6 +164,13 @@ namespace HomeAccountant.Core.ViewModels
             };
         }
 
+        private void CalculateAvailablePages()
+        {
+            var pages = Enumerable.Range(1, TotalPages)
+                .Chunk(5);
+            AvailablePagesCollection = pages.FirstOrDefault(x => x.Contains(CurrentPage));
+        }
+
         private async Task ReadEntries()
         {
             if (_billingPerdiod is null)
@@ -110,12 +178,46 @@ namespace HomeAccountant.Core.ViewModels
                 return;
             }
 
-            var result = await _entryService.GetEntries(_registerId, _billingPerdiod.Id);
+            var result = await _entryService.GetEntries(_registerId, _billingPerdiod.Id, CurrentPage);
 
             if (!result.Result)
                 return;
 
-            Entries = result.Value;
+
+            Entries = result.Value?.Result;
+            CurrentPage = result.Value?.CurrentPage ?? 0;
+            TotalPages = result.Value?.TotalPages ?? 0;
+            CalculateAvailablePages();
+        }
+
+        public async Task SetPage(int page)
+        {
+            IsBusy = true;
+            CurrentPage = page;
+            await ReadEntries();
+            IsBusy = false;
+        }
+
+        public async Task NextPage()
+        {
+            if (CurrentPage < TotalPages)
+            {
+                IsBusy = true;
+                CurrentPage++;
+                await ReadEntries();
+                IsBusy = false;
+            }
+        }
+
+        public async Task PreviousPage()
+        {
+            if (CurrentPage > 1)
+            {
+                IsBusy = true;
+                CurrentPage--;
+                await ReadEntries();
+                IsBusy = false;
+            }
         }
 
         private async Task ReadCategories()

@@ -51,22 +51,22 @@ namespace HomeAccountant.Core.Services
             }
         }
 
-        public async Task<ServiceResponse<IEnumerable<EntryReadDto>>> GetEntries(int registerId, int billingPeriodId)
+        public async Task<ServiceResponse<PaggedResult<EntryReadDto>>> GetEntries(int registerId, int billingPeriodId, int page = 1, int recordsOnPage = 10)
         {
             try
             {
-                var url = $"/api/Register/{registerId}/BillingPeriod/{billingPeriodId}/Entry";
+                var url = $"/api/Register/{registerId}/BillingPeriod/{billingPeriodId}/Entry?page={page}&recordsOnPage={recordsOnPage}";
 
                 var response = await _httpClient.GetAsync(url);
 
                 var responseContent = await response.Content
-                    .ReadFromJsonAsync<ServiceResponse<IEnumerable<EntryReadDto>>>();
+                    .ReadFromJsonAsync<ServiceResponse<PaggedResult<EntryReadDto>>>();
 
                 return responseContent.Protect();
             }
             catch (Exception ex)
             {
-                return new ServiceResponse<IEnumerable<EntryReadDto>>(ex.Message);
+                return new ServiceResponse<PaggedResult<EntryReadDto>>(ex.Message);
             }
         }
 
