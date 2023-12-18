@@ -11,6 +11,10 @@
       "provider": "unpkg",
       "library": "@popperjs/core@2",
       "destination": "wwwroot/popperjs/core/"
+    },
+    {
+      "library": "Chart.js@4.4.1",
+      "destination": "wwwroot/Chart.js/"
     }
   ]
 }

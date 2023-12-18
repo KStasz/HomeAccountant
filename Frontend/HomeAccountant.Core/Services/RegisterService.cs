@@ -1,4 +1,5 @@
 ﻿using HomeAccountant.Core.DTOs.Register;
+using HomeAccountant.Core.Extensions;
 using HomeAccountant.Core.Model;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;

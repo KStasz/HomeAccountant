@@ -1,4 +1,5 @@
 ﻿using HomeAccountant.Core.DTOs.Entry;
+using HomeAccountant.Core.Extensions;
 using HomeAccountant.Core.Model;
 using System.Net.Http.Json;
 using System.Reflection.Metadata.Ecma335;
