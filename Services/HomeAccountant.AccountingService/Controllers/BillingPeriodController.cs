@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Domain.Dtos;
 using Domain.Dtos.AccountingService;
+using Domain.Model;
 using HomeAccountant.AccountingService.Models;
 using HomeAccountant.AccountingService.Services;
 using Microsoft.AspNetCore.Authorization;

@@ -17,7 +17,12 @@ namespace HomeAccountant.Core.ViewModels
         public event PropertyChangedEventHandlerAsync? PropertyChangedAsync;
 
         protected void NotifyPropertyChangedAsync([CallerMemberName] string propertyName = "") => PropertyChangedAsync?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        protected void NotifyPropertyChangedSync([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            NotifyPropertyChangedAsync(propertyName);
+            NotifyPropertyChangedSync(propertyName);
+        }
 
         private bool _isBusy;
         public bool IsBusy
@@ -30,7 +35,6 @@ namespace HomeAccountant.Core.ViewModels
             {
                 _isBusy = value;
                 NotifyPropertyChanged();
-                NotifyPropertyChangedAsync();
             }
         }
 
@@ -44,7 +48,7 @@ namespace HomeAccountant.Core.ViewModels
             set 
             {
                 _errorMessage = value;
-                NotifyPropertyChanged();
+                NotifyPropertyChangedSync();
                 NotifyPropertyChangedAsync();
             }
         }

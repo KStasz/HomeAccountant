@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using Domain.Dtos;
 using Domain.Dtos.AccountingService;
 using Domain.Dtos.CategoryService;
+using Domain.Model;
 using HomeAccountant.AccountingService.Models;
 using HomeAccountant.AccountingService.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -53,15 +53,27 @@ namespace HomeAccountant.AccountingService.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<ServiceResponse<IEnumerable<EntryReadDto>>>> Get(int billingPeriodId)
+        public async Task<ActionResult<ServiceResponse<PaggedResult<EntryReadDto>>>> Get(int billingPeriodId, [Required] int page = 1, int recordsOnPage = 10)
         {
             try
             {
-                var entryModels = _repository
+                var currentPage = page - 1;
+                var paggedEntryModels = _repository
                     .GetAll(
                         x => x.BillingPeriodId == billingPeriodId,
                         x => x.BillingPeriod)
-                    .ToList();
+                    .Chunk(recordsOnPage);
+                    
+
+                if (paggedEntryModels is null)
+                    return NotFound(new ServiceResponse("Entries not found"));
+
+                var entryModels = paggedEntryModels
+                    .Skip(currentPage)
+                    .FirstOrDefault();
+
+                if (entryModels is null)
+                    return NotFound(new ServiceResponse("Entries not found"));
 
                 List<EntryReadDto> result = new List<EntryReadDto>();
 
@@ -77,7 +89,7 @@ namespace HomeAccountant.AccountingService.Controllers
                     result.Add(model);
                 }
 
-                return Ok(new ServiceResponse<IEnumerable<EntryReadDto>>(result));
+                return Ok(new ServiceResponse<PaggedResult<EntryReadDto>>(new PaggedResult<EntryReadDto>(result, page, paggedEntryModels.Count())));
             }
             catch (Exception ex)
             {

@@ -1,4 +1,4 @@
-﻿namespace Domain.Dtos
+﻿namespace Domain.Model
 {
     public class ServiceResponse<T> : ServiceResponse
     {
