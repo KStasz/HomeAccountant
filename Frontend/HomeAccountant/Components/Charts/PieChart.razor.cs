@@ -6,7 +6,7 @@ using System.Text.Json;
 
 namespace HomeAccountant.Components.Charts
 {
-    public partial class PieChart : ComponentBase, IChart
+    public partial class PieChart : ComponentBase
     {
         private string _chartIdentifier = $"Chart_{Guid.NewGuid()}";
 
@@ -18,17 +18,20 @@ namespace HomeAccountant.Components.Charts
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if (Dataset is not null)
-            {
-                var config = GetJsonConfiguration(Dataset);
-                await JsCodeExecutor.ExecuteFunction("CreateChart", _chartIdentifier, config);
-            }
+            if (Dataset is null)
+                return;
+            
+            var config = GetJsonConfiguration(Dataset);
+            await JsCodeExecutor.ExecuteFunction("CreateChart", _chartIdentifier, config);
 
             await base.OnAfterRenderAsync(firstRender);
         }
 
-        public async Task CreateChart(IEnumerable<ChartDataset> dataset)
+        public async Task CreateChartAsync(IEnumerable<ChartDataset>? dataset)
         {
+            if (dataset == null)
+                return;
+
             var config = GetJsonConfiguration(dataset);
             await JsCodeExecutor.ExecuteFunction("CreateChart", _chartIdentifier, config);
         }
@@ -37,6 +40,11 @@ namespace HomeAccountant.Components.Charts
         {
             PieChartConfiguration config = new PieChartConfiguration(dataset);
             return JsonSerializer.Serialize(config);
+        }
+
+        public async Task DestroyChart()
+        {
+            await JsCodeExecutor.ExecuteFunction("DestroyChart");
         }
     }
 }

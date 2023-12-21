@@ -1,7 +1,10 @@
 ﻿using HomeAccountant.Core.DTOs.BillingPeriod;
 using HomeAccountant.Core.Extensions;
 using HomeAccountant.Core.Model;
+using System.Drawing;
 using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace HomeAccountant.Core.Services
 {
@@ -93,6 +96,27 @@ namespace HomeAccountant.Core.Services
             catch (Exception ex)
             {
                 return new ServiceResponse<IEnumerable<BillingPeriodReadDto>>(
+                    false,
+                    new List<string>()
+                    {
+                        ex.Message
+                    });
+            }
+        }
+
+        public async Task<ServiceResponse<BillingPeriodStatisticDto>> GetBillingPeriodStatisticAsync(int registerId, int billingPeriodId, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var url = $"/api/Register/{registerId}/BillingPeriod/{billingPeriodId}/Statistic";
+                var response = await _httpClient.GetAsync(url, cancellationToken);
+                var responseContent = await response.Content.ReadFromJsonAsync<ServiceResponse<BillingPeriodStatisticDto>>();
+
+                return responseContent.Protect();
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponse<BillingPeriodStatisticDto>(
                     false,
                     new List<string>()
                     {

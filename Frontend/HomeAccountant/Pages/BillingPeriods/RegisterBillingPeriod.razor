@@ -1,4 +1,6 @@
 ﻿@page "/books/{registerId:int}"
+@inherits MvvmComponent<BillingPeriodViewModel>
+
 <Alert @ref="ViewModel.Alert" />
 @if (!ViewModel.IsBusy)
 {
@@ -37,12 +39,12 @@
         </div>
         <div class="col-12 col-sm-4 col-md-3 my-auto">
             <div class="btn-group col-12" role="group" aria-label="Button group with nested dropdown">
-                <button type="button" class="btn btn-secondary" @onclick="ViewModel.PreviousPeriod">
+                <button type="button" class="btn btn-secondary" @onclick="ViewModel.PreviousPeriod" @attributes="ViewModel.IsPreviousPeriodButtonEnabled">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
                         <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8" />
                     </svg>
                 </button>
-                <button type="button" class="btn btn-secondary" @onclick="ViewModel.NextPeriod">
+                <button type="button" class="btn btn-secondary" @onclick="ViewModel.NextPeriod" @attributes="ViewModel.IsNextPeriodButtonEnabled">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
                         <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8" />
                     </svg>
@@ -74,17 +76,40 @@
 
     @if (ViewModel.SelectedBillingPeriod is not null)
     {
-
-        @if (ViewModel.SelectedBillingPeriod is not null)
-        {
-            <CascadingValue Value="ViewModel.SelectedBillingPeriod" Name="BillingPeriod">
-                <BookDetails RegisterId="RegisterId" />
-            </CascadingValue>
-        }
-        else
-        {
-            <Placeholder />
-        }
+        <div class="row">
+            <div class="col-md-8 col-12 order-md-0 order-1">
+                @if (ViewModel.SelectedBillingPeriod is not null)
+                {
+                    <CascadingValue Value="ViewModel.RefreshChart" Name="RefreshChart">
+                        <EntriesPage RegisterId="RegisterId" BillingPeriod="ViewModel.SelectedBillingPeriod" />
+                    </CascadingValue>
+                }
+                else
+                {
+                     <Placeholder /> 
+                }
+            </div>
+            <div class="col order-md-1 order-0 align-self-start sticky-md-top" style="height: 400px; top: 15px;">
+                @if (ViewModel.IsChartVisible)
+                {
+                    <PieChart Dataset="(ViewModel.GetChartDataset())" />
+                }
+                <div class="card mb-3">
+                    <div class="card-body p-0">
+                        <div class="col-md-12 mx-auto">
+                            <table class="table m-0 table-borderless">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" width="50%" class="text-center">Suma</th>
+                                        <th scope="col">@(ViewModel.BillingPeriodStatistic?.TotalSum)</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     }
     else
     {

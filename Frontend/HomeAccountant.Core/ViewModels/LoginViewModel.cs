@@ -127,8 +127,6 @@ namespace HomeAccountant.Core.ViewModels
             await _jsCodeExecutor.ExecuteFunction("HideModal");
         }
 
-
-
         private void ClearLoginData()
         {
             LoginData = new LoginDTO();

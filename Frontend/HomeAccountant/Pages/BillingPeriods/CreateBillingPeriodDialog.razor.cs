@@ -3,7 +3,7 @@ using HomeAccountant.Core.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 
-namespace HomeAccountant.Pages
+namespace HomeAccountant.Pages.BillingPeriods
 {
     public partial class CreateBillingPeriodDialog : ComponentBase, IModalDialog<BillingPeriodCreateDto, BillingPeriodCreateDto>
     {
@@ -35,7 +35,7 @@ namespace HomeAccountant.Pages
                 return null;
 
             await _modal.ShowModalAsync();
-            
+
             return await _tcs.Task;
         }
 

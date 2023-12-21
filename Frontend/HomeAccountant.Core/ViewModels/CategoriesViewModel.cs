@@ -3,7 +3,7 @@ using HomeAccountant.Core.Services;
 
 namespace HomeAccountant.Core.ViewModels
 {
-    public class CategoriesViewModel : BaseViewModel
+    public class CategoriesViewModel : MvvmViewModel
     {
         private readonly ICategoriesService _categoriesService;
 
@@ -29,7 +29,7 @@ namespace HomeAccountant.Core.ViewModels
             }
         }
 
-        public async Task InitializeAsync()
+        public override async Task PageInitializedAsync()
         {
             await ReadCategoriesAsync();
         }

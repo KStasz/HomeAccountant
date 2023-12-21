@@ -1,4 +1,5 @@
-﻿namespace HomeAccountant.Core.Model
+﻿
+namespace HomeAccountant.Core.Model
 {
     public class ChartDataset
     {

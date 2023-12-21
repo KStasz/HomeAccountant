@@ -3,9 +3,9 @@ using HomeAccountant.Core.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 
-namespace HomeAccountant.Pages
+namespace HomeAccountant.Pages.Registers
 {
-    public partial class BookCreate : ComponentBase, IModalDialog<RegisterCreateDto, RegisterCreateDto>
+    public partial class RegisterCreate : ComponentBase, IModalDialog<RegisterCreateDto, RegisterCreateDto>
     {
         private RegisterCreateDto? _registerModel;
         private TaskCompletionSource<RegisterCreateDto?>? _tcs;

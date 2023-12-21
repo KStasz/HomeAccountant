@@ -1,35 +1,25 @@
 ﻿using HomeAccountant.Core.DTOs.BillingPeriod;
 using HomeAccountant.Core.DTOs.Category;
 using HomeAccountant.Core.DTOs.Entry;
-using HomeAccountant.Core.Model;
 using HomeAccountant.Core.Services;
-using System.Drawing;
 
 namespace HomeAccountant.Core.ViewModels
 {
-    public class RegisterPositionsViewModel : BaseViewModel
+    public class EntryViewModel : MvvmViewModel
     {
         private readonly IEntryService _entryService;
         private readonly ICategoriesService _categoriesService;
+        private readonly IBillingPeriodService _billingPeriodService;
         private BillingPeriodReadDto? _billingPerdiod;
         private int _registerId;
-        private Color[] colorPallete = new Color[]
-        {
-            Color.Red,
-            Color.Orange,
-            Color.Yellow,
-            Color.Green,
-            Color.Blue,
-            Color.Purple,
-            Color.Magenta,
-            Color.Pink
-        };
 
-        public RegisterPositionsViewModel(IEntryService entryService,
-            ICategoriesService categoriesService)
+        public EntryViewModel(IEntryService entryService,
+            ICategoriesService categoriesService,
+            IBillingPeriodService billingPeriodService)
         {
             _entryService = entryService;
             _categoriesService = categoriesService;
+            _billingPeriodService = billingPeriodService;
         }
 
         public IModalDialog<EntryCreateDto, EntryCreateDto>? EntryCreateDialog { get; set; }
@@ -48,6 +38,7 @@ namespace HomeAccountant.Core.ViewModels
                 NotifyPropertyChanged();
             }
         }
+        public Func<Task>? RefreshChart { get; set; }
 
         private IEnumerable<CategoryReadDto>? _availableCategories;
         public IEnumerable<CategoryReadDto>? AvailableCategories
@@ -94,11 +85,11 @@ namespace HomeAccountant.Core.ViewModels
         private IEnumerable<int>? _availablePagesCollection;
         public IEnumerable<int>? AvailablePagesCollection
         {
-            get 
+            get
             {
-                return _availablePagesCollection; 
+                return _availablePagesCollection;
             }
-            set 
+            set
             {
                 _availablePagesCollection = value;
                 NotifyPropertyChanged();
@@ -129,11 +120,11 @@ namespace HomeAccountant.Core.ViewModels
             }
         }
 
-        public async Task InitializeAsync(int registerId, BillingPeriodReadDto? billingPeriod)
+        public override async Task PageParameterSetAsync(Dictionary<string, object?> parameters)
         {
             IsBusy = true;
-            _billingPerdiod = billingPeriod;
-            _registerId = registerId;
+            _billingPerdiod = GetParameter<BillingPeriodReadDto>(parameters["BillingPeriod"]);
+            _registerId = GetParameter<int>(parameters["RegisterId"]);
             CurrentPage = 1;
             TotalPages = 0;
             Entries = null;
@@ -141,27 +132,6 @@ namespace HomeAccountant.Core.ViewModels
             await ReadEntries();
             await ReadCategories();
             IsBusy = false;
-        }
-
-        public List<ChartDataset>? GetChartDataset()
-        {
-            if (_billingPerdiod is null)
-            {
-                return null;
-            }
-
-            var groupedEntries = Entries?
-                .GroupBy(x => x.Category.Name)
-                .Select((x, i) => new
-                ChartValue(x.Key, (double)x.Sum(y => y.Price), colorPallete[i]));
-
-            if (groupedEntries is null)
-                return null;
-
-            return new List<ChartDataset>()
-            {
-                new ChartDataset(_billingPerdiod!.Name!, groupedEntries)
-            };
         }
 
         private void CalculateAvailablePages()
@@ -182,7 +152,6 @@ namespace HomeAccountant.Core.ViewModels
 
             if (!result.Result)
                 return;
-
 
             Entries = result.Value?.Result;
             CurrentPage = result.Value?.CurrentPage ?? 0;
@@ -248,6 +217,13 @@ namespace HomeAccountant.Core.ViewModels
 
             var creationResult = await _entryService.CreateEntry(_registerId, _billingPerdiod.Id, result);
             await ReadEntries();
+
+            if (RefreshChart is null)
+            {
+                return;
+            }
+
+            await RefreshChart();
         }
 
         public async Task DeleteEntry(EntryReadDto entryReadDto)

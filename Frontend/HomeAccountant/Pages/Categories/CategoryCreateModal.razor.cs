@@ -3,7 +3,7 @@ using HomeAccountant.Core.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 
-namespace HomeAccountant.Pages
+namespace HomeAccountant.Pages.Categories
 {
     public partial class CategoryCreateModal : ComponentBase, IModalDialog<CategoryCreateDto, CategoryCreateDto>
     {

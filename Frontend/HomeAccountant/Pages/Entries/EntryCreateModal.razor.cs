@@ -4,7 +4,7 @@ using HomeAccountant.Core.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 
-namespace HomeAccountant.Pages
+namespace HomeAccountant.Pages.Entries
 {
     public partial class EntryCreateModal : ComponentBase, IModalDialog<EntryCreateDto, EntryCreateDto>
     {

@@ -1,4 +1,5 @@
 ﻿@page "/books"
+@inherits MvvmComponent<RegisterViewModel>
 @attribute [Authorize]
 <h3>Dostępne księgi</h3>
 
@@ -41,7 +42,7 @@ else
     <Placeholder />
 }
 
-<BookCreate @ref="ViewModel.CreateRegisterDialog" />
+<RegisterCreate @ref="ViewModel.CreateRegisterDialog" />
 
-<BookDelete @ref="ViewModel.DeleteRegisterDialog" />
+<RegisterDelete @ref="ViewModel.DeleteRegisterDialog" />
 

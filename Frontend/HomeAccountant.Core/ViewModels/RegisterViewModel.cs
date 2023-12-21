@@ -3,17 +3,15 @@ using HomeAccountant.Core.Services;
 
 namespace HomeAccountant.Core.ViewModels
 {
-    public class RegisterViewModel : BaseViewModel
+    public class RegisterViewModel : MvvmViewModel
     {
         private readonly IRegisterService _registerService;
 
         public RegisterViewModel(IRegisterService registerService)
         {
             _registerService = registerService;
-            AsyncInitialize = InitializeAsync();
         }
 
-        public Task AsyncInitialize { get; set; }
         public IModalDialog<RegisterReadDto>? DeleteRegisterDialog { get; set; }
         public IModalDialog<RegisterCreateDto, RegisterCreateDto>? CreateRegisterDialog { get; set; }
 
@@ -31,7 +29,7 @@ namespace HomeAccountant.Core.ViewModels
             }
         }
 
-        private async Task InitializeAsync()
+        public override async Task PageInitializedAsync()
         {
             IsBusy = true;
             await ReadRegisters();

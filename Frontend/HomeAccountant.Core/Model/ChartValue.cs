@@ -4,6 +4,11 @@ namespace HomeAccountant.Core.Model
 {
     public class ChartValue
     {
+        public ChartValue()
+        {
+            
+        }
+
         public ChartValue(string label, double value, Color color)
         {
             Label = label;
@@ -12,7 +17,9 @@ namespace HomeAccountant.Core.Model
         }
 
         public string Label { get; set; }
+        
         public double Value { get; set; }
+
         public Color Color { get; set; }
     }
 }

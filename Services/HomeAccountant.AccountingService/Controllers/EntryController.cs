@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using System.Drawing;
 using System.Linq.Expressions;
 
 namespace HomeAccountant.AccountingService.Controllers
@@ -63,7 +64,6 @@ namespace HomeAccountant.AccountingService.Controllers
                         x => x.BillingPeriodId == billingPeriodId,
                         x => x.BillingPeriod)
                     .Chunk(recordsOnPage);
-                    
 
                 if (paggedEntryModels is null)
                     return NotFound(new ServiceResponse("Entries not found"));

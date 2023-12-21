@@ -2,9 +2,9 @@
 using HomeAccountant.Core.Services;
 using Microsoft.AspNetCore.Components;
 
-namespace HomeAccountant.Pages
+namespace HomeAccountant.Pages.Registers
 {
-    public partial class BookDelete : ComponentBase, IModalDialog<RegisterReadDto>
+    public partial class RegisterDelete : ComponentBase, IModalDialog<RegisterReadDto>
     {
         private IModal? _modalReference;
         private RegisterReadDto? _registerModel;

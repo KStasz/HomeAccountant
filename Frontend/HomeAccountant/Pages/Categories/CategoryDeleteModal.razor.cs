@@ -2,7 +2,7 @@
 using HomeAccountant.Core.Services;
 using Microsoft.AspNetCore.Components;
 
-namespace HomeAccountant.Pages
+namespace HomeAccountant.Pages.Categories
 {
     public partial class CategoryDeleteModal : ComponentBase, IModalDialog<CategoryReadDto>
     {
