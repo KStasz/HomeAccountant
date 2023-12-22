@@ -2,7 +2,7 @@
 {
     public interface IJsCodeExecutor
     {
-        Task ExecuteFunction(string functionName);
-        Task ExecuteFunction(string functionName, params object[] parameters);
+        Task ExecuteFunctionAsync(string functionName, CancellationToken cancellationToken = default);
+        Task ExecuteFunctionAsync(string functionName, CancellationToken cancellationToken = default, params object[] parameters);
     }
 }

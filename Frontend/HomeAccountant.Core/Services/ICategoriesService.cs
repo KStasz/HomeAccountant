@@ -5,9 +5,9 @@ namespace HomeAccountant.Core.Services
 {
     public interface ICategoriesService
     {
-        Task<ServiceResponse<IEnumerable<CategoryReadDto>?>> GetCategoriesAsync();
-        Task<ServiceResponse<CategoryReadDto?>> CreateCategoryAsync(CategoryCreateDto categoryCreateDto);
-        Task<ServiceResponse> DeleteCategoryAsync(int categoryId);
-        Task<ServiceResponse> UpdateCategoryAsync(CategoryUpdateDto categoryUpdateDto);
+        Task<ServiceResponse<IEnumerable<CategoryReadDto>?>> GetCategoriesAsync(CancellationToken cancellationToken = default);
+        Task<ServiceResponse<CategoryReadDto?>> CreateCategoryAsync(CategoryCreateDto categoryCreateDto, CancellationToken cancellationToken = default);
+        Task<ServiceResponse> DeleteCategoryAsync(int categoryId, CancellationToken cancellationToken = default);
+        Task<ServiceResponse> UpdateCategoryAsync(CategoryUpdateDto categoryUpdateDto, CancellationToken cancellationToken = default);
     }
 }

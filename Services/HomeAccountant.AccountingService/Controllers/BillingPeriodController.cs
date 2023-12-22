@@ -1,29 +1,46 @@
 ﻿using AutoMapper;
+using Domain.Controller;
 using Domain.Dtos.AccountingService;
 using Domain.Model;
+using Domain.Services;
+using HomeAccountant.AccountingService.Data;
 using HomeAccountant.AccountingService.Models;
 using HomeAccountant.AccountingService.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Drawing;
 
 namespace HomeAccountant.AccountingService.Controllers
 {
     [Route("api/Register/{registerId}/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class BillingPeriodController : ServiceControllerBase
     {
-        private readonly IRepository<BillingPeriod> _billingPeriodRepository;
-        private readonly IRepository<Register> _registerRepository;
+        private readonly IRepository<ApplicationDbContext, BillingPeriod> _billingPeriodRepository;
+        private readonly IRepository<ApplicationDbContext, Register> _registerRepository;
         private readonly IMapper _mapper;
+        private readonly ICategoriesService _categoriesService;
+        private Color[] _colorPallete = new Color[]
+        {
+            Color.Red,
+            Color.Orange,
+            Color.Yellow,
+            Color.Green,
+            Color.Blue,
+            Color.Purple,
+            Color.Magenta,
+            Color.Pink
+        };
 
-        public BillingPeriodController(IRepository<BillingPeriod> billingPeriodRepository,
-            IRepository<Register> registerRepository,
-            IMapper mapper)
+        public BillingPeriodController(IRepository<ApplicationDbContext, BillingPeriod> billingPeriodRepository,
+            IRepository<ApplicationDbContext, Register> registerRepository,
+            IMapper mapper,
+            ICategoriesService categoriesService)
         {
             _billingPeriodRepository = billingPeriodRepository;
             _registerRepository = registerRepository;
             _mapper = mapper;
+            _categoriesService = categoriesService;
         }
 
         [HttpGet]
@@ -42,6 +59,59 @@ namespace HomeAccountant.AccountingService.Controllers
             var billingPeriodResponse = _mapper.Map<IEnumerable<BillingPeriodReadDto>>(result);
 
             return Ok(new ServiceResponse<IEnumerable<BillingPeriodReadDto>>(billingPeriodResponse));
+        }
+
+        [HttpGet("{billingPeriodId}/Statistic")]
+        public async Task<ActionResult<ServiceResponse<EntriesStatisticDto>>> GetStatistic(int billingPeriodId)
+        {
+            var entryModels = _billingPeriodRepository
+                .GetAll(
+                    x => x.Id == billingPeriodId,
+                    x => x.Entries);
+
+            if (!entryModels.Any())
+            {
+                return NotFound();
+            }
+
+            var grouppedEntryModels = entryModels
+                .SelectMany(x => x.Entries)
+                .GroupBy(x => x.CategoryId)
+                .Select((x, i) => new
+                {
+                    CategoryId = x.Key,
+                    Sum = x.Sum(y => y.Price),
+                    Color = _colorPallete[i]
+                });
+
+            var result = new EntriesStatisticDto();
+            result.TotalSum = (double)entryModels.SelectMany(x => x.Entries.Select(y => y.Price)).Sum(x => x);
+            var chartData = new List<EntriesStatisticChartData>();
+            int counter = 0;
+
+            foreach (var item in grouppedEntryModels)
+            {
+                var category = await _categoriesService.GetCategoryAsync(item.CategoryId);
+
+                if (category is null)
+                    continue;
+
+                var selectedColor = _colorPallete[counter++];
+
+                chartData.Add(new EntriesStatisticChartData()
+                {
+                    CategoryName = category.Name,
+                    Sum = (double)item.Sum,
+                    ColorA = selectedColor.A,
+                    ColorR = selectedColor.R,
+                    ColorG = selectedColor.G,
+                    ColorB = selectedColor.B
+                });
+            }
+
+            result.ChartData = chartData;
+
+            return Ok(new ServiceResponse<EntriesStatisticDto>(result));
         }
 
         [HttpGet("{billingPeriodId}", Name = "GetById")]

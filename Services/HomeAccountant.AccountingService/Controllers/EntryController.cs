@@ -1,14 +1,15 @@
 ﻿using AutoMapper;
+using Domain.Controller;
 using Domain.Dtos.AccountingService;
 using Domain.Dtos.CategoryService;
 using Domain.Model;
+using Domain.Services;
+using HomeAccountant.AccountingService.Data;
 using HomeAccountant.AccountingService.Models;
 using HomeAccountant.AccountingService.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
-using System.Linq.Expressions;
 
 namespace HomeAccountant.AccountingService.Controllers
 {
@@ -17,13 +18,13 @@ namespace HomeAccountant.AccountingService.Controllers
     [Authorize]
     public class EntryController : ServiceControllerBase
     {
-        private readonly IRepository<Entry> _repository;
-        private readonly IRepository<Register> _registerRepository;
+        private readonly IRepository<ApplicationDbContext, Entry> _repository;
+        private readonly IRepository<ApplicationDbContext, Register> _registerRepository;
         private readonly IMapper _mapper;
         private readonly ICategoriesService _categoriesService;
 
-        public EntryController(IRepository<Entry> entryRepository,
-            IRepository<Register> registerRepository,
+        public EntryController(IRepository<ApplicationDbContext, Entry> entryRepository,
+            IRepository<ApplicationDbContext, Register> registerRepository,
             IMapper mapper,
             ICategoriesService categoriesService)
         {
@@ -63,7 +64,6 @@ namespace HomeAccountant.AccountingService.Controllers
                         x => x.BillingPeriodId == billingPeriodId,
                         x => x.BillingPeriod)
                     .Chunk(recordsOnPage);
-                    
 
                 if (paggedEntryModels is null)
                     return NotFound(new ServiceResponse("Entries not found"));

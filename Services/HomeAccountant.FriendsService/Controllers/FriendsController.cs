@@ -1,5 +1,9 @@
 ﻿using AutoMapper;
+using Domain.Controller;
 using Domain.Dtos.FriendsService;
+using Domain.Services;
+using HomeAccountant.FriendsService.Data;
+using HomeAccountant.FriendsService.Model;
 using HomeAccountant.FriendsService.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -10,16 +14,15 @@ namespace HomeAccountant.FriendsService.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public class FriendsController : ControllerBase
+    public class FriendsController : ServiceControllerBase
     {
-        private readonly IFriendsService _friendsService;
-        private readonly IFriendRequestsService _friendRequestsService;
+        private readonly IRepository<ApplicationDbContext, Friend> _friendsService;
+        private readonly IRepository<ApplicationDbContext, FriendRequest> _friendRequestsService;
         private readonly IFriendshipCreator _friendshipCreator;
         private readonly IIdentityPlatformService _identityPlatformService;
 
-        public FriendsController(IFriendsService friendsService,
-            IFriendRequestsService friendRequestsService,
-            IMapper mapper,
+        public FriendsController(IRepository<ApplicationDbContext, Friend> friendsService,
+            IRepository<ApplicationDbContext, FriendRequest> friendRequestsService,
             IFriendshipCreator friendshipCreator,
             IIdentityPlatformService identityPlatformService)
         {
@@ -32,7 +35,7 @@ namespace HomeAccountant.FriendsService.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateFriendship(CreateFriendshipDto createFriendRequest)
         {
-            var friendRequest = _friendRequestsService.GetRequest(createFriendRequest.FriendRequestId);
+            var friendRequest = _friendRequestsService.Get(x => x.Id == createFriendRequest.FriendRequestId);
 
             if (friendRequest is null)
             {
@@ -56,20 +59,20 @@ namespace HomeAccountant.FriendsService.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeleteFriendship(int id)
         {
-            var friend = _friendsService.GetFriend(x => x.Id == id);
+            var friend = _friendsService.Get(x => x.Id == id);
 
             if (friend is null)
             {
                 return NotFound();
             }
 
-            _friendsService.DeleteFriendship(friend);
+            _friendsService.Remove(friend);
 
             return Ok();
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetFriend([FromQuery] string? email, string? name)
+        public async Task<IActionResult> GetFriends([FromQuery] string? email, string? name)
         {
             var userId = this.User.Claims.FirstOrDefault(x => x.Type == "UserId")?.Value;
 
@@ -78,7 +81,7 @@ namespace HomeAccountant.FriendsService.Controllers
                 return BadRequest("Invalid payload");
             }
 
-            var friends = _friendsService.GetFriends(userId);
+            var friends = _friendsService.GetAll(x => x.UserId == userId);
 
             var users = await _identityPlatformService.GetUsersAsync(friends.Select(x => x.FriendId).ToArray());
 

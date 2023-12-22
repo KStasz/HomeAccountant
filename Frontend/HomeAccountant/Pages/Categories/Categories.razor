@@ -1,0 +1,54 @@
+﻿@page "/categories"
+@inherits MvvmComponent<CategoriesViewModel>
+@attribute [Authorize]
+
+<h3>Dostępne kategorie</h3>
+
+@if (!ViewModel.IsBusy)
+{
+    <div class="table-responsive mt-3">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Nazwa</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            @{
+                int counter = 1;
+            }
+            <tbody>
+                @if (ViewModel.Categories?.Any() ?? false)
+                {
+                    @foreach (var item in ViewModel.Categories)
+                    {
+                        <tr>
+                            <th width="20%" scope="row">@(counter++)</th>
+                            <td>@item.Name</td>
+                            <td width="20%">
+                                <button type="button" class="btn btn-danger" @onclick="(() => ViewModel.DeleteCategoryAsync(item))">
+                                    Usuń
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                }
+                <tr>
+                    <td colspan="100" class="text-center">
+                        <button type="button" class="btn btn-success" @onclick="ViewModel.CreateCategoryAsync">
+                            Dodaj
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <Placeholder />
+}
+
+<CategoryCreateModal @ref="ViewModel.CreateCategoryDialog" />
+<CategoryDeleteModal @ref="ViewModel.DeleteCategoryDialog" />

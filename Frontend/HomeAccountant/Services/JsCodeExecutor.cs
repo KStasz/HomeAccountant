@@ -12,12 +12,12 @@ namespace HomeAccountant.Services
             _jSRuntime = jSRuntime;
         }
 
-        public async Task ExecuteFunction(string functionName)
+        public async Task ExecuteFunctionAsync(string functionName, CancellationToken cancellationToken = default)
         {
             await _jSRuntime.InvokeVoidAsync(functionName);
         }
 
-        public async Task ExecuteFunction(string functionName, params object[] parameters)
+        public async Task ExecuteFunctionAsync(string functionName, CancellationToken cancellationToken = default, params object[] parameters)
         {
             await _jSRuntime.InvokeVoidAsync(functionName, parameters);
         }

@@ -1,10 +1,7 @@
 ﻿using HomeAccountant.Core.Authentication;
 using HomeAccountant.Core.Model;
-using System.Data;
-using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Net.Http;
 
 namespace HomeAccountant.Core.Services
 {
@@ -84,7 +81,7 @@ namespace HomeAccountant.Core.Services
 
             if (expirationDate < DateTime.UtcNow)
             {
-                var refreshingResult = await RefreshToken(token, cancellationToken);
+                var refreshingResult = await RefreshTokenAsync(token, cancellationToken);
 
                 if (!refreshingResult)
                     return;
@@ -97,7 +94,7 @@ namespace HomeAccountant.Core.Services
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(AUTHORIZATION_SCHEMA, token.Token);
         }
 
-        private async Task<bool> RefreshToken(TokenAuthenticationModel token, CancellationToken cancellationToken = default)
+        private async Task<bool> RefreshTokenAsync(TokenAuthenticationModel token, CancellationToken cancellationToken = default)
         {
             var result = await _authenticationService.RefreshTokenAsync(token.Token, token.RefreshToken, cancellationToken);
 

@@ -3,26 +3,26 @@
     public interface IModalDialog<T, U>
     {
         Task InitializeDialogAsync(T model);
-        Task<U?> ShowModalAsync();
-        Task HideModalAsync();
+        Task<U?> ShowModalAsync(CancellationToken cancellationToken = default);
+        Task HideModalAsync(CancellationToken cancellationToken = default);
     }
 
     public interface IModalDialog<T>
     {
         Task InitializeDialogAsync(T model);
-        Task<ModalResult> ShowModalAsync();
-        Task HideModalAsync();
+        Task<ModalResult> ShowModalAsync(CancellationToken cancellationToken = default);
+        Task HideModalAsync(CancellationToken cancellationToken = default);
     }
 
     public interface IModal<T>
     {
-        Task ShowModalAsync(T model);
-        Task HideModalAsync();
+        Task ShowModalAsync(T model, CancellationToken cancellationToken = default);
+        Task HideModalAsync(CancellationToken cancellationToken = default);
     }
 
     public interface IModal
     {
-        Task ShowModalAsync();
-        Task HideModalAsync();
+        Task ShowModalAsync(CancellationToken cancellationToken = default);
+        Task HideModalAsync(CancellationToken cancellationToken = default);
     }
 }

@@ -12,19 +12,19 @@ namespace HomeAccountant.Services
             _jsCodeExecutor = jsCodeExecutor;
         }
 
-        public async Task CloseModalAsync(string modalId)
+        public async Task CloseModalAsync(string modalId, CancellationToken cancellationToken = default)
         {
-            await _jsCodeExecutor.ExecuteFunction("HideModalWithIdentifier", modalId);
+            await _jsCodeExecutor.ExecuteFunctionAsync("HideModalWithIdentifier", cancellationToken, modalId);
         }
 
-        public async Task ShowModalAsync(string modalId)
+        public async Task ShowModalAsync(string modalId, CancellationToken cancellationToken = default)
         {
-            await _jsCodeExecutor.ExecuteFunction("ShowModalWithIdentifier", modalId);
+            await _jsCodeExecutor.ExecuteFunctionAsync("ShowModalWithIdentifier", cancellationToken, modalId);
         }
 
-        public async Task InitializeModalAsync(string modalId)
+        public async Task InitializeModalAsync(string modalId, CancellationToken cancellationToken = default)
         {
-            await _jsCodeExecutor.ExecuteFunction("Initialize", modalId);
+            await _jsCodeExecutor.ExecuteFunctionAsync("Initialize", cancellationToken, modalId);
         }
     }
 }

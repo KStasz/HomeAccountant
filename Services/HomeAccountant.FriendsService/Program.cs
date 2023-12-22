@@ -2,8 +2,9 @@ using HomeAccountant.FriendsService.Data;
 using HomeAccountant.FriendsService.Service;
 using Microsoft.EntityFrameworkCore;
 using JwtAuthenticationManager;
-using System.Runtime.CompilerServices;
 using HomeAccountant.FriendsService.Config;
+using Domain;
+using Domain.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,8 +20,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddTransient<IAuthorizationTokenProvider, AuthorizationTokenProvider>();
-builder.Services.AddScoped<IFriendRequestsService, FriendRequestsService>();
-builder.Services.AddScoped<IFriendsService, FriendsService>();
+builder.Services.ConfigureDbContext();
 builder.Services.AddScoped<IFriendshipCreator, FriendshipCreator>();
 
 builder.Services.RegisterHttpClientServices(builder.Configuration);
@@ -44,6 +44,6 @@ app.UseAuthentication();
 app.MapControllers();
 
 if (builder.Environment.IsProduction())
-    app.PrepareDatabase();
+    app.PrepareDatabase<ApplicationDbContext>();
 
 app.Run();

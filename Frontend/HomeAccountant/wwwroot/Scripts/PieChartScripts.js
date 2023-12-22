@@ -18,3 +18,9 @@ function CreateChart(chartId, config) {
         }
     });
 }
+
+function DestroyChart() {
+    if (chart !== undefined && chart !== null) {
+        chart.destroy();
+    }
+}

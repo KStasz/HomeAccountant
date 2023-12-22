@@ -57,7 +57,7 @@ namespace HomeAccountant.Core.ViewModels
         {
             ClearErrorMessage();
 
-            var result = await _authenticationService.Login(LoginData.Email!, LoginData.Password!);
+            var result = await _authenticationService.LoginAsync(LoginData.Email!, LoginData.Password!);
 
             if (!result.Result)
             {
@@ -83,7 +83,7 @@ namespace HomeAccountant.Core.ViewModels
             await _tokenStorage.SetTokenAsync(result.Value);
             _jwtAuthenticationStateProvider.StateChanged();
             
-            await _jsCodeExecutor.ExecuteFunction("HideModal");
+            await _jsCodeExecutor.ExecuteFunctionAsync("HideModal");
         }
 
         public void Logout()
@@ -97,7 +97,7 @@ namespace HomeAccountant.Core.ViewModels
         public async Task Register()
         {
             ClearErrorMessage();
-            var result = await _authenticationService.Register(
+            var result = await _authenticationService.RegisterAsync(
                 RegisterData.Email!,
                 RegisterData.UserName!,
                 RegisterData.Password!);
@@ -124,10 +124,8 @@ namespace HomeAccountant.Core.ViewModels
             await _tokenStorage.SetTokenAsync(result.Value);
             _jwtAuthenticationStateProvider.StateChanged();
 
-            await _jsCodeExecutor.ExecuteFunction("HideModal");
+            await _jsCodeExecutor.ExecuteFunctionAsync("HideModal");
         }
-
-
 
         private void ClearLoginData()
         {

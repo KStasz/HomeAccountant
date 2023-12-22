@@ -5,8 +5,8 @@ namespace HomeAccountant.Core.Services
 {
     public interface IRegisterService
     {
-        Task<ServiceResponse<IEnumerable<RegisterReadDto>>> GetRegistersAsync();
-        Task<ServiceResponse> CreateRegisterAsync(RegisterCreateDto registerCreateDto);
-        Task<ServiceResponse> DeleteRegisterAsync(RegisterReadDto registerReadDto);
+        Task<ServiceResponse<IEnumerable<RegisterReadDto>>> GetRegistersAsync(CancellationToken cancellationToken = default);
+        Task<ServiceResponse> CreateRegisterAsync(RegisterCreateDto registerCreateDto, CancellationToken cancellationToken = default);
+        Task<ServiceResponse> DeleteRegisterAsync(RegisterReadDto registerReadDto, CancellationToken cancellationToken = default);
     }
 }

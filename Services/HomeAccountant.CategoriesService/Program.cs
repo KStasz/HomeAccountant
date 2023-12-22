@@ -3,6 +3,8 @@ using HomeAccountant.CategoriesService.Service;
 using Microsoft.EntityFrameworkCore;
 using JwtAuthenticationManager;
 using Microsoft.OpenApi.Models;
+using Domain;
+using Domain.Data;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -45,7 +47,7 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
-builder.Services.AddScoped<ICategoriesService, CategoryService>();
+builder.Services.ConfigureDbContext();
 builder.Services.AddScoped<IAccountingService, AccountingService>();
 builder.Services.AddJwtAuthentication();
 builder.Services.AddHttpContextAccessor();
@@ -69,6 +71,6 @@ app.UseAuthentication();
 app.MapControllers();
 
 if (builder.Environment.IsProduction())
-    app.PrepareDatabase();
+    app.PrepareDatabase<ApplicationDbContext>();
 
 app.Run();

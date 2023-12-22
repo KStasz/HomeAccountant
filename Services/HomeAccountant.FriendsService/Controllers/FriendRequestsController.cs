@@ -1,5 +1,8 @@
 ﻿using AutoMapper;
+using Domain.Controller;
 using Domain.Dtos.FriendsService;
+using Domain.Services;
+using HomeAccountant.FriendsService.Data;
 using HomeAccountant.FriendsService.Model;
 using HomeAccountant.FriendsService.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -11,19 +14,19 @@ namespace HomeAccountant.FriendsService.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public class FriendRequestsController : ControllerBase
+    public class FriendRequestsController : ServiceControllerBase
     {
-        private readonly IFriendRequestsService _friendRequestsService;
+        private readonly IRepository<ApplicationDbContext, FriendRequest> _friendRequestsService;
         private readonly IMapper _mapper;
         private readonly IIdentityPlatformService _identityPlatformService;
         private readonly IFriendshipCreator _friendshipCreator;
-        private readonly IFriendsService _friendsService;
+        private readonly IRepository<ApplicationDbContext, Friend> _friendsService;
 
-        public FriendRequestsController(IFriendRequestsService friendRequestsService,
+        public FriendRequestsController(IRepository<ApplicationDbContext, FriendRequest> friendRequestsService,
             IMapper mapper,
             IIdentityPlatformService identityPlatformService,
             IFriendshipCreator friendshipCreator,
-            IFriendsService friendsService)
+            IRepository<ApplicationDbContext, Friend> friendsService)
         {
             _friendRequestsService = friendRequestsService;
             _mapper = mapper;
@@ -31,8 +34,6 @@ namespace HomeAccountant.FriendsService.Controllers
             _friendshipCreator = friendshipCreator;
             _friendsService = friendsService;
         }
-
-        private string? GetUserId() => this.User.Claims.FirstOrDefault(x => x.Type == "UserId")?.Value;
 
         [HttpGet("CreatedRequests")]
         public IActionResult GetCreatedRequests()
@@ -44,7 +45,7 @@ namespace HomeAccountant.FriendsService.Controllers
                 return BadRequest("Invalid payload");
             }
 
-            var requestsResponse = _friendRequestsService.GetRequests(x => x.CreatorId == userId);
+            var requestsResponse = _friendRequestsService.Get(x => x.CreatorId == userId);
 
             if (requestsResponse is null)
             {
@@ -66,7 +67,7 @@ namespace HomeAccountant.FriendsService.Controllers
                 return BadRequest("Invalid payload");
             }
 
-            var requestsResponse = _friendRequestsService.GetRequests(x => x.RecipientId == userId);
+            var requestsResponse = _friendRequestsService.Get(x => x.RecipientId == userId);
 
             if (requestsResponse is null)
             {
@@ -86,7 +87,7 @@ namespace HomeAccountant.FriendsService.Controllers
             if (userId is null)
                 return BadRequest("Invalid payload");
 
-            var request = _friendRequestsService.GetRequest(requestId);
+            var request = _friendRequestsService.Get(x => x.Id == requestId);
 
             if (request is null)
                 return NotFound();
@@ -95,7 +96,7 @@ namespace HomeAccountant.FriendsService.Controllers
                 return BadRequest("You can't accept request created by you");
 
             _friendshipCreator.CreateFriendship(request);
-            _friendRequestsService.DeleteRequest(request);
+            _friendRequestsService.Remove(request);
             await _friendRequestsService.SaveChangesAsync();
 
             return Ok();
@@ -109,7 +110,7 @@ namespace HomeAccountant.FriendsService.Controllers
             if (userId is null)
                 return BadRequest("Invalid payload");
 
-            var request = _friendRequestsService.GetRequest(requestId);
+            var request = _friendRequestsService.Get(x => x.Id == requestId);
 
             if (request is null)
             {
@@ -121,7 +122,7 @@ namespace HomeAccountant.FriendsService.Controllers
 
             request.IsRejected = true;
 
-            _friendRequestsService.UpdateRequest(request);
+            _friendRequestsService.Update(request);
             await _friendRequestsService.SaveChangesAsync();
 
             return Ok();
@@ -130,7 +131,7 @@ namespace HomeAccountant.FriendsService.Controllers
         [HttpGet("{requestId}", Name = "GetRequest")]
         public IActionResult GetRequest(int requestId)
         {
-            var request = _friendRequestsService.GetRequest(requestId);
+            var request = _friendRequestsService.Get(x => x.Id == requestId);
 
             if (request is null)
             {
@@ -148,7 +149,7 @@ namespace HomeAccountant.FriendsService.Controllers
             var userId = GetUserId();
             var recipientId = await _identityPlatformService.GetUserIdByEmailAsync(createFriendRequestDto.RecipientEmail);
 
-            var existingRequest = _friendRequestsService.SearchRequest(x => x.CreatorId == userId
+            var existingRequest = _friendRequestsService.Get(x => x.CreatorId == userId
                 && x.RecipientId == recipientId
                 && x.IsRejected == false);
 
@@ -164,7 +165,7 @@ namespace HomeAccountant.FriendsService.Controllers
             if (userId == recipientId)
                 return BadRequest("Creator cannot be the same as recipient");
             
-            var existingFriendShip = _friendsService.GetFriend(x => x.UserId == userId && x.FriendId == recipientId);
+            var existingFriendShip = _friendsService.Get(x => x.UserId == userId && x.FriendId == recipientId);
 
             if (existingFriendShip is not null)
                 return BadRequest("Cannot send a request because you are friends already");
@@ -177,7 +178,7 @@ namespace HomeAccountant.FriendsService.Controllers
 
             try
             {
-                _friendRequestsService.CreateRequest(friendRequest);
+                _friendRequestsService.Add(friendRequest);
 
                 await _friendRequestsService.SaveChangesAsync();
 

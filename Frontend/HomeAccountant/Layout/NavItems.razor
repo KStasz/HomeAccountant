@@ -3,18 +3,17 @@
         Home
     </ResponsibleNavLink>
 </li>
-<li class="nav-item">
-    <ResponsibleNavLink Href="/counter" Match="NavLinkMatch.Prefix">
-        Licznik
-    </ResponsibleNavLink>
-</li>
-<li class="nav-item">
-    <ResponsibleNavLink Href="/books" Match="NavLinkMatch.Prefix">
-        Księgi
-    </ResponsibleNavLink>
-</li>
-<li class="nav-item">
-    <ResponsibleNavLink Href="/categories" Match="NavLinkMatch.Prefix">
-        Kategorie
-    </ResponsibleNavLink>
-</li>
+<AuthorizeView>
+    <Authorized>
+        <li class="nav-item">
+            <ResponsibleNavLink Href="/books" Match="NavLinkMatch.Prefix">
+                Księgi
+            </ResponsibleNavLink>
+        </li>
+        <li class="nav-item">
+            <ResponsibleNavLink Href="/categories" Match="NavLinkMatch.Prefix">
+                Kategorie
+            </ResponsibleNavLink>
+        </li>
+    </Authorized>
+</AuthorizeView>

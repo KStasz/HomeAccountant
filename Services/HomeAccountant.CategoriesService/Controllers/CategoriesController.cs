@@ -1,25 +1,26 @@
 ﻿using AutoMapper;
+using Domain.Controller;
 using Domain.Dtos.CategoryService;
+using Domain.Services;
+using HomeAccountant.CategoriesService.Data;
 using HomeAccountant.CategoriesService.Model;
 using HomeAccountant.CategoriesService.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Concurrent;
-using System.Reflection.Metadata.Ecma335;
 
 namespace HomeAccountant.CategoriesService.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public class CategoriesController : ControllerBase
+    public class CategoriesController : ServiceControllerBase
     {
-        private readonly ICategoriesService _categoriesService;
+        private readonly IRepository<ApplicationDbContext, CategoryModel> _categoriesService;
         private readonly IMapper _mapper;
         private readonly IAccountingService _registerService;
 
-        public CategoriesController(ICategoriesService categoriesService,
+        public CategoriesController(IRepository<ApplicationDbContext, CategoryModel> categoriesService,
             IMapper mapper,
             IAccountingService registerService)
         {
@@ -31,7 +32,7 @@ namespace HomeAccountant.CategoriesService.Controllers
         [HttpGet("{id:int}", Name = "GetById")]
         public IActionResult GetById(int id)
         {
-            CategoryModel? categoryModel = _categoriesService.Get(id);
+            CategoryModel? categoryModel = _categoriesService.Get(x => x.Id == id);
 
             if (categoryModel is null)
             {
@@ -50,7 +51,7 @@ namespace HomeAccountant.CategoriesService.Controllers
             if (userId is null)
                 return BadRequest("Invalid payload");
 
-            var categories = _categoriesService.GetAll().Where(x => x.CreatedBy == userId);
+            var categories = _categoriesService.GetAll(x => x.CreatedBy == userId);
 
             return Ok(_mapper.Map<IEnumerable<CategoryReadDto>>(categories));
         }
@@ -58,7 +59,7 @@ namespace HomeAccountant.CategoriesService.Controllers
         [HttpPut]
         public async Task<IActionResult> Update([FromBody] CategoryUpdateDto categoryUpdateDto)
         {
-            var categoryModel = _categoriesService.Get(categoryUpdateDto.Id);
+            var categoryModel = _categoriesService.Get(x => x.Id == categoryUpdateDto.Id);
 
             if (categoryModel is null)
                 return NotFound();
@@ -96,22 +97,17 @@ namespace HomeAccountant.CategoriesService.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var categoryModel = _categoriesService.Get(id);
+            var categoryModel = _categoriesService.Get(x => x.Id == id);
 
             if (categoryModel is null)
                 return NotFound();
 
             await _registerService.DeleteEntriesByCategoryId(categoryModel.Id);
 
-            _categoriesService.Delete(categoryModel);
+            _categoriesService.Remove(categoryModel);
             await _categoriesService.SaveChangesAsync();
 
             return Ok();
-        }
-
-        private string? GetUserId()
-        {
-            return this.User.Claims.FirstOrDefault(x => x.Type == "UserId")?.Value;
         }
     }
 }

@@ -1,0 +1,66 @@
+﻿ @page "/books/{registerId:int}/BillingPeriod/{billingPeriodId:int}"
+ @inherits MvvmComponent<EntryViewModel>
+
+<div style="min-height: 550px;">
+    @if (!ViewModel.IsBusy)
+    {
+        <button type="button" class="btn btn-success w-100" @onclick="ViewModel.CreateEntryAsync" @attributes="ViewModel.IsButtonBlocked">Dodaj</button>
+        <table class="table responsiveTable mt-3">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Nazwa</th>
+                    <th scope="col">Kategoria</th>
+                    <th scope="col">Cena (zł)</th>
+                    <th scope="col">Utworzone przez</th>
+                    <th scope="col">Data utworzenia</th>
+                </tr>
+            </thead>
+            @{
+                int counter = 1;
+            }
+            <tbody>
+                @foreach (var item in ViewModel.Entries ?? new List<EntryReadDto>())
+                {
+                    <tr>
+                        <td data-label="#" scope="row">@(counter++)</td>
+                        <td data-label="Nazwa">@item.Name</td>
+                        <td data-label="Kategoria">@item.Category.Name</td>
+                        <td data-label="Cena (zł)">@item.Price</td>
+                        <td data-label="Utworzone przez">-</td>
+                        <td data-label="Data utworzenia">@item.CreatedDate.ToString("dd-MM-yyyy")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <Placeholder />
+    }
+</div>
+
+<nav aria-label="Page navigation example">
+    <ul class="pagination">
+        <li class="page-item">
+            <button type="button" class="page-link @ViewModel.IsPreviousPageButtonDisabled" @onclick="ViewModel.PreviousPageAsync">
+                Poprzednia
+            </button>
+        </li>
+        @foreach (var item in ViewModel.AvailablePagesCollection ?? new List<int>())
+        {
+            <li class="page-item @(ViewModel.CurrentPage == item ? "active" : string.Empty)">
+                <button type="button" class="page-link" @onclick="() => ViewModel.SetPageAsync(item)">@item</button>
+            </li>
+        }
+        <li class="page-item">
+            <button type="button" class="page-link @ViewModel.IsNextPageButtonDisabled" @onclick="ViewModel.NextPageAsync">
+                Następna
+            </button>
+        </li>
+    </ul>
+</nav>
+
+
+<EntryCreateModal @ref="ViewModel!.EntryCreateDialog"
+                  Categories="ViewModel?.AvailableCategories" />

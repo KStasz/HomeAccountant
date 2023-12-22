@@ -1,13 +1,14 @@
 ﻿using AutoMapper;
+using Domain.Controller;
 using Domain.Dtos.AccountingService;
 using Domain.Model;
+using Domain.Services;
+using HomeAccountant.AccountingService.Data;
 using HomeAccountant.AccountingService.Models;
 using HomeAccountant.AccountingService.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using System.Linq.Expressions;
-using System.Reflection.Metadata.Ecma335;
 
 namespace HomeAccountant.AccountingService.Controllers
 {
@@ -16,15 +17,15 @@ namespace HomeAccountant.AccountingService.Controllers
     [Authorize]
     public class RegisterController : ServiceControllerBase
     {
-        private readonly IRepository<Register> _repository;
+        private readonly IRepository<ApplicationDbContext, Register> _repository;
         private readonly IMapper _mapper;
         private readonly ICategoriesService _categoriesService;
-        private readonly IRepository<Entry> _entryRepository;
+        private readonly IRepository<ApplicationDbContext, Entry> _entryRepository;
 
-        public RegisterController(IRepository<Register> repository,
+        public RegisterController(IRepository<ApplicationDbContext, Register> repository,
             IMapper mapper,
             ICategoriesService categoriesService,
-            IRepository<Entry> entryRepository)
+            IRepository<ApplicationDbContext, Entry> entryRepository)
         {
             _repository = repository;
             _mapper = mapper;

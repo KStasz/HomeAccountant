@@ -17,8 +17,8 @@ namespace HomeAccountant.Core.Model
             TotalPages = totalPages;
         }
 
-        public IEnumerable<T> Result { get;  set; }
-        public int CurrentPage { get;  set; }
-        public int TotalPages { get;  set; }
+        public IEnumerable<T>? Result { get; set; }
+        public int? CurrentPage { get; set; }
+        public int? TotalPages { get; set; }
     }
 }

@@ -2,8 +2,8 @@
 {
     public interface IModalService
     {
-        Task CloseModalAsync(string modalId);
-        Task InitializeModalAsync(string modalId);
-        Task ShowModalAsync(string modalId);
+        Task CloseModalAsync(string modalId, CancellationToken cancellationToken = default);
+        Task InitializeModalAsync(string modalId, CancellationToken cancellationToken = default);
+        Task ShowModalAsync(string modalId, CancellationToken cancellationToken = default);
     }
 }

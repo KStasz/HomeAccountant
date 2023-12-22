@@ -24,7 +24,7 @@ namespace HomeAccountant.Components.Tooltip
         {
             if (firstRender)
             {
-                await JSCodeExecutor.ExecuteFunction("InitializeTooltip", _tooltipIdentifier);
+                await JSCodeExecutor.ExecuteFunctionAsync("InitializeTooltip", default, _tooltipIdentifier);
             }
 
             await base.OnAfterRenderAsync(firstRender);

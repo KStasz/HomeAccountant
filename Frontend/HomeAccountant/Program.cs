@@ -1,8 +1,6 @@
-using AutoMapper;
 using HomeAccountant;
 using HomeAccountant.Core.Authentication;
 using HomeAccountant.Core.Services;
-using HomeAccountant.Core.Storage;
 using HomeAccountant.Core.ViewModels;
 using HomeAccountant.Services;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -18,7 +16,6 @@ builder.Services.AddScoped<JwtAuthenticationStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<JwtAuthenticationStateProvider>());
 builder.Services.AddScoped<IJsCodeExecutor, JsCodeExecutor>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-builder.Services.AddSingleton<ILocalStorage, LocalStorage>();
 builder.Services.AddSingleton<ITokenStorageAccessor, TokenStorageAccessor>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 
@@ -36,7 +33,7 @@ builder.Services.AddHttpClient<AuthorizableHttpClient>(
     client => client.BaseAddress = new Uri(GetBaseAddress()));
 builder.Services.AddScoped<LoginViewModel>();
 builder.Services.AddScoped<RegisterViewModel>();
-builder.Services.AddTransient<RegisterPositionsViewModel>();
+builder.Services.AddTransient<EntryViewModel>();
 builder.Services.AddScoped<CategoriesViewModel>();
 builder.Services.AddScoped<BillingPeriodViewModel>();
 

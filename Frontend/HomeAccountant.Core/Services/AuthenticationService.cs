@@ -1,16 +1,8 @@
 ﻿using AutoMapper;
 using HomeAccountant.Core.DTOs.Authentication;
 using HomeAccountant.Core.Model;
-using HomeAccountant.Core.Storage;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using System.Net.Http.Json;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace HomeAccountant.Core.Services
 {
@@ -31,7 +23,7 @@ namespace HomeAccountant.Core.Services
             _logger = logger;
         }
 
-        public async Task<ServiceResponse<TokenAuthenticationModel>> Login(string email, string password)
+        public async Task<ServiceResponse<TokenAuthenticationModel>> LoginAsync(string email, string password, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -39,9 +31,9 @@ namespace HomeAccountant.Core.Services
                 {
                     email,
                     password,
-                });
+                }, cancellationToken);
 
-                var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponseDTO>();
+                var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponseDTO>(cancellationToken);
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -76,9 +68,9 @@ namespace HomeAccountant.Core.Services
             {
                 token,
                 refreshToken
-            });
+            }, cancellationToken);
 
-            var responseContent = await response.Content.ReadFromJsonAsync<LoginResponseDTO>();
+            var responseContent = await response.Content.ReadFromJsonAsync<LoginResponseDTO>(cancellationToken);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -95,7 +87,7 @@ namespace HomeAccountant.Core.Services
             return new ServiceResponse<TokenAuthenticationModel>(tokenAuthentication);
         }
 
-        public async Task<ServiceResponse<TokenAuthenticationModel>> Register(string email, string username, string password, CancellationToken cancellationToken = default)
+        public async Task<ServiceResponse<TokenAuthenticationModel>> RegisterAsync(string email, string username, string password, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -104,9 +96,9 @@ namespace HomeAccountant.Core.Services
                     email,
                     username,
                     password
-                });
+                }, cancellationToken);
 
-                var registerResponse = await response.Content.ReadFromJsonAsync<LoginResponseDTO>();
+                var registerResponse = await response.Content.ReadFromJsonAsync<LoginResponseDTO>(cancellationToken);
 
                 if (!response.IsSuccessStatusCode)
                 {
