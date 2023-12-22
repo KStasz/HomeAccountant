@@ -3,6 +3,8 @@ using HomeAccountant.IdentityPlatform.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using JwtAuthenticationManager;
+using Domain.Data;
+using JwtAuthenticationManager.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,6 +53,10 @@ app.UseAuthorization();
 app.MapControllers();
 
 if (builder.Environment.IsProduction())
-    app.PrepareDatabase();
+{
+    app.PrepareDatabase<ApplicationDbContext>();
+    app.PrepareDatabase<JwtAuthenticationManagerDbContext>();
+    
+}
 
 app.Run();

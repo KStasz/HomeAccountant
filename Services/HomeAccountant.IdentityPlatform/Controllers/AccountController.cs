@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Domain.Controller;
 using Domain.Dtos.IdentityPlatform;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -12,7 +13,7 @@ namespace HomeAccountant.IdentityPlatform.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public class AccountController : ControllerBase
+    public class AccountController : ServiceControllerBase
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IMapper _mapper;
@@ -117,7 +118,5 @@ namespace HomeAccountant.IdentityPlatform.Controllers
 
             return Ok(_mapper.Map<UserModelDto[]>(users.Where(x => x is not null).ToArray()));
         }
-
-        private string? GetUserId() => this.User.Claims.FirstOrDefault(x => x.Type == "UserId")?.Value;
     }
 }

@@ -33,13 +33,13 @@ namespace HomeAccountant.Components.Modal
             await base.OnAfterRenderAsync(firstRender);
         }
 
-        public async Task ShowModalAsync()
+        public async Task ShowModalAsync(CancellationToken cancellationToken = default)
         {
             _isVisible = true;
             await ModalService.ShowModalAsync(ModalIdentifier);
         }
 
-        public Task HideModalAsync()
+        public Task HideModalAsync(CancellationToken cancellationToken = default)
         {
             _isVisible = false;
             return ModalService.CloseModalAsync(ModalIdentifier);

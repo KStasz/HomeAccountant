@@ -53,7 +53,7 @@ namespace HomeAccountant.Pages.Registers
             await InvokeAsync(StateHasChanged);
         }
 
-        public async Task<RegisterCreateDto?> ShowModalAsync()
+        public async Task<RegisterCreateDto?> ShowModalAsync(CancellationToken cancellationToken = default)
         {
             if (_modal is null || _tcs is null)
                 return null;
@@ -62,7 +62,7 @@ namespace HomeAccountant.Pages.Registers
             return await _tcs.Task;
         }
 
-        public async Task HideModalAsync()
+        public async Task HideModalAsync(CancellationToken cancellationToken = default)
         {
             if (_modal is null)
                 return;

@@ -1,15 +1,14 @@
-﻿using HomeAccountant.AccountingService.Data;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Linq.Expressions;
 
-namespace HomeAccountant.AccountingService.Services
+namespace Domain.Services
 {
-    public class DbContextRepository<T> : IRepository<T> where T : class
+    public class DbContextRepository<U, T> : IRepository<U, T> where T : class where U : DbContext
     {
-        private readonly ApplicationDbContext _applicationDbContext;
+        private readonly U _applicationDbContext;
 
-        public DbContextRepository(ApplicationDbContext applicationDbContext)
+        public DbContextRepository(U applicationDbContext)
         {
             _applicationDbContext = applicationDbContext;
         }

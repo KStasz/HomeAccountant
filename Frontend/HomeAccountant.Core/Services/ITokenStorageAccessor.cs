@@ -6,7 +6,7 @@ namespace HomeAccountant.Core.Services
     {
         Task<TokenAuthenticationModel?> GetTokenAsync(CancellationToken cancellationToken = default);
         Task SetTokenAsync(TokenAuthenticationModel tokenAuthenticationModel, CancellationToken cancellationToken = default);
-        Task ClearAsync();
+        Task ClearAsync(CancellationToken cancellationToken = default);
         Task RemoveTokenAsync(CancellationToken cancellationToken = default);
     }
 }

@@ -14,15 +14,15 @@ namespace HomeAccountant.Core.Services
             _httpClient = httpClient;
         }
 
-        public async Task<ServiceResponse<EntryReadDto>> CreateEntry(int registerId, int billingPeriodId, EntryCreateDto entryCreateDto)
+        public async Task<ServiceResponse<EntryReadDto>> CreateEntryAsync(int registerId, int billingPeriodId, EntryCreateDto entryCreateDto, CancellationToken cancellationToken = default)
         {
             try
             {
                 var url = $"/api/Register/{registerId}/BillingPeriod/{billingPeriodId}/Entry";
 
-                var response = await _httpClient.PostAsJsonAsync(url, entryCreateDto);
+                var response = await _httpClient.PostAsJsonAsync(url, entryCreateDto, cancellationToken);
 
-                var responseContent = await response.Content.ReadFromJsonAsync<ServiceResponse<EntryReadDto>>();
+                var responseContent = await response.Content.ReadFromJsonAsync<ServiceResponse<EntryReadDto>>(cancellationToken);
 
                 return responseContent.Protect();
             }
@@ -32,15 +32,15 @@ namespace HomeAccountant.Core.Services
             }
         }
 
-        public async Task<ServiceResponse> DeleteEntry(int registerId, int billingPeriodId, int entryId)
+        public async Task<ServiceResponse> DeleteEntryAsync(int registerId, int billingPeriodId, int entryId, CancellationToken cancellationToken = default)
         {
             try
             {
                 var url = $"/api/Register/{registerId}/BillingPeriod/{billingPeriodId}/Entry/{entryId}";
 
-                var response = await _httpClient.DeleteAsync(url);
+                var response = await _httpClient.DeleteAsync(url, cancellationToken);
 
-                var responseContent = await response.Content.ReadFromJsonAsync<ServiceResponse>();
+                var responseContent = await response.Content.ReadFromJsonAsync<ServiceResponse>(cancellationToken);
 
                 return responseContent.Protect();
             }
@@ -50,16 +50,16 @@ namespace HomeAccountant.Core.Services
             }
         }
 
-        public async Task<ServiceResponse<PaggedResult<EntryReadDto>>> GetEntries(int registerId, int billingPeriodId, int page = 1, int recordsOnPage = 10)
+        public async Task<ServiceResponse<PaggedResult<EntryReadDto>>> GetEntriesAsync(int registerId, int billingPeriodId, int page = 1, int recordsOnPage = 10, CancellationToken cancellationToken = default)
         {
             try
             {
                 var url = $"/api/Register/{registerId}/BillingPeriod/{billingPeriodId}/Entry?page={page}&recordsOnPage={recordsOnPage}";
 
-                var response = await _httpClient.GetAsync(url);
+                var response = await _httpClient.GetAsync(url, cancellationToken);
 
                 var responseContent = await response.Content
-                    .ReadFromJsonAsync<ServiceResponse<PaggedResult<EntryReadDto>>>();
+                    .ReadFromJsonAsync<ServiceResponse<PaggedResult<EntryReadDto>>>(cancellationToken);
 
                 return responseContent.Protect();
             }
@@ -69,14 +69,14 @@ namespace HomeAccountant.Core.Services
             }
         }
 
-        public async Task<ServiceResponse> UpdateEntry(int registerId, int billingPeriodId, EntryUpdateDto entryUpdateDto)
+        public async Task<ServiceResponse> UpdateEntryAsync(int registerId, int billingPeriodId, EntryUpdateDto entryUpdateDto, CancellationToken cancellationToken = default)
         {
             try
             {
                 var url = $"/api/Register/{registerId}/BillingPeriod/{billingPeriodId}/Entry";
 
-                var response = await _httpClient.PutAsJsonAsync(url, entryUpdateDto);
-                var responseContent = await response.Content.ReadFromJsonAsync<ServiceResponse>();
+                var response = await _httpClient.PutAsJsonAsync(url, entryUpdateDto, cancellationToken);
+                var responseContent = await response.Content.ReadFromJsonAsync<ServiceResponse>(cancellationToken);
 
                 return responseContent.Protect();
             }

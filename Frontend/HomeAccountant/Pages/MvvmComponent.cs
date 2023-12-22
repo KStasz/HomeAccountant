@@ -79,6 +79,7 @@ namespace HomeAccountant.Pages
         protected virtual void Dispose(bool disposing)
         {
             ViewModel.PropertyChangedAsync -= ViewModel_PropertyChangedAsync;
+            ViewModel.Dispose();
         }
     }
 }

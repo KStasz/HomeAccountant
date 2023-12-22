@@ -32,13 +32,54 @@ namespace HomeAccountant.Core.ViewModels
         public override async Task PageInitializedAsync()
         {
             IsBusy = true;
-            await ReadRegisters();
+            await ReadRegistersAsync(CancellationToken);
             IsBusy = false;
         }
-
-        private async Task ReadRegisters()
+        
+        public async Task CreateRegisterAsync()
         {
-            var result = await _registerService.GetRegistersAsync();
+            if (CreateRegisterDialog is null)
+                return;
+
+            await CreateRegisterDialog.InitializeDialogAsync(new RegisterCreateDto());
+
+            var result = await CreateRegisterDialog.ShowModalAsync(CancellationToken);
+
+            if (result is null)
+                return;
+
+            var response = await _registerService.CreateRegisterAsync(result, CancellationToken);
+
+            if (!response.Result)
+            {
+                SetErrorMessage("Nie udało się utworzyć księgi.");
+            }
+
+            await ReadRegistersAsync(CancellationToken);
+        }
+
+        public async Task DeleteRegisterAsync(RegisterReadDto registerReadDto)
+        {
+            if (DeleteRegisterDialog is null)
+                return;
+
+            await DeleteRegisterDialog.InitializeDialogAsync(registerReadDto);
+
+            var result = await DeleteRegisterDialog.ShowModalAsync(CancellationToken);
+
+            if (result == ModalResult.Cancel)
+            {
+                return;
+            }
+
+            await _registerService.DeleteRegisterAsync(registerReadDto, CancellationToken);
+
+            await ReadRegistersAsync(CancellationToken);
+        }
+
+        private async Task ReadRegistersAsync(CancellationToken cancellationToken = default)
+        {
+            var result = await _registerService.GetRegistersAsync(cancellationToken);
 
             if (!result.Result)
             {
@@ -46,47 +87,6 @@ namespace HomeAccountant.Core.ViewModels
             }
 
             AvailableRegisters = result.Value;
-        }
-
-        public async Task CreateRegister()
-        {
-            if (CreateRegisterDialog is null)
-                return;
-
-            await CreateRegisterDialog.InitializeDialogAsync(new RegisterCreateDto());
-
-            var result = await CreateRegisterDialog.ShowModalAsync();
-
-            if (result is null)
-                return;
-
-            var response = await _registerService.CreateRegisterAsync(result);
-
-            if (!response.Result)
-            {
-                SetErrorMessage("Nie udało się utworzyć księgi.");
-            }
-
-            await ReadRegisters();
-        }
-
-        public async Task DeleteRegister(RegisterReadDto registerReadDto)
-        {
-            if (DeleteRegisterDialog is null)
-                return;
-
-            await DeleteRegisterDialog.InitializeDialogAsync(registerReadDto);
-
-            var result = await DeleteRegisterDialog.ShowModalAsync();
-
-            if (result == ModalResult.Cancel)
-            {
-                return;
-            }
-
-            await _registerService.DeleteRegisterAsync(registerReadDto);
-
-            await ReadRegisters();
         }
     }
 }

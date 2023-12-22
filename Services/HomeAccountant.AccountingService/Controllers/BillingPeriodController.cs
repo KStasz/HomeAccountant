@@ -1,11 +1,12 @@
 ﻿using AutoMapper;
+using Domain.Controller;
 using Domain.Dtos.AccountingService;
 using Domain.Model;
+using Domain.Services;
+using HomeAccountant.AccountingService.Data;
 using HomeAccountant.AccountingService.Models;
 using HomeAccountant.AccountingService.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
 using System.Drawing;
 
 namespace HomeAccountant.AccountingService.Controllers
@@ -15,8 +16,8 @@ namespace HomeAccountant.AccountingService.Controllers
     //[Authorize]
     public class BillingPeriodController : ServiceControllerBase
     {
-        private readonly IRepository<BillingPeriod> _billingPeriodRepository;
-        private readonly IRepository<Register> _registerRepository;
+        private readonly IRepository<ApplicationDbContext, BillingPeriod> _billingPeriodRepository;
+        private readonly IRepository<ApplicationDbContext, Register> _registerRepository;
         private readonly IMapper _mapper;
         private readonly ICategoriesService _categoriesService;
         private Color[] _colorPallete = new Color[]
@@ -31,8 +32,8 @@ namespace HomeAccountant.AccountingService.Controllers
             Color.Pink
         };
 
-        public BillingPeriodController(IRepository<BillingPeriod> billingPeriodRepository,
-            IRepository<Register> registerRepository,
+        public BillingPeriodController(IRepository<ApplicationDbContext, BillingPeriod> billingPeriodRepository,
+            IRepository<ApplicationDbContext, Register> registerRepository,
             IMapper mapper,
             ICategoriesService categoriesService)
         {

@@ -12,7 +12,7 @@ namespace HomeAccountant.Pages.BillingPeriods
         private TaskCompletionSource<BillingPeriodCreateDto?>? _tcs;
         private EditContext? _editContext;
 
-        public Task HideModalAsync()
+        public Task HideModalAsync(CancellationToken cancellationToken = default)
         {
             if (_modal is null)
                 return Task.CompletedTask;
@@ -29,7 +29,7 @@ namespace HomeAccountant.Pages.BillingPeriods
             await InvokeAsync(StateHasChanged);
         }
 
-        public async Task<BillingPeriodCreateDto?> ShowModalAsync()
+        public async Task<BillingPeriodCreateDto?> ShowModalAsync(CancellationToken cancellationToken = default)
         {
             if (_modal is null || _tcs is null)
                 return null;

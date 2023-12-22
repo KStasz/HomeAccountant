@@ -4,7 +4,7 @@
 <div style="min-height: 550px;">
     @if (!ViewModel.IsBusy)
     {
-        <button type="button" class="btn btn-success w-100" @onclick="ViewModel.CreateEntry" @attributes="ViewModel.IsButtonBlocked">Dodaj</button>
+        <button type="button" class="btn btn-success w-100" @onclick="ViewModel.CreateEntryAsync" @attributes="ViewModel.IsButtonBlocked">Dodaj</button>
         <table class="table responsiveTable mt-3">
             <thead>
                 <tr>
@@ -43,18 +43,18 @@
 <nav aria-label="Page navigation example">
     <ul class="pagination">
         <li class="page-item">
-            <button type="button" class="page-link @ViewModel.IsPreviousPageButtonDisabled" @onclick="ViewModel.PreviousPage">
+            <button type="button" class="page-link @ViewModel.IsPreviousPageButtonDisabled" @onclick="ViewModel.PreviousPageAsync">
                 Poprzednia
             </button>
         </li>
         @foreach (var item in ViewModel.AvailablePagesCollection ?? new List<int>())
         {
             <li class="page-item @(ViewModel.CurrentPage == item ? "active" : string.Empty)">
-                <button type="button" class="page-link" @onclick="() => ViewModel.SetPage(item)">@item</button>
+                <button type="button" class="page-link" @onclick="() => ViewModel.SetPageAsync(item)">@item</button>
             </li>
         }
         <li class="page-item">
-            <button type="button" class="page-link @ViewModel.IsNextPageButtonDisabled" @onclick="ViewModel.NextPage">
+            <button type="button" class="page-link @ViewModel.IsNextPageButtonDisabled" @onclick="ViewModel.NextPageAsync">
                 Następna
             </button>
         </li>

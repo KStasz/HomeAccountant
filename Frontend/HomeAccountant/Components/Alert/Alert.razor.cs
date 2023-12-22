@@ -22,10 +22,11 @@ namespace HomeAccountant.Components.Alert
             { AlertType.Dark, AlertType.Dark.ToString().ToLower() }
         };
 
-        public async Task ShowAlert(string message, AlertType type)
+        public async Task ShowAlertAsync(string message, AlertType type, CancellationToken cancellationToken = default)
         {
-            await JsCodeExecutor.ExecuteFunction(
+            await JsCodeExecutor.ExecuteFunctionAsync(
                 "ShowAlert",
+                cancellationToken,
                 AlertIdentifier,
                 AlertTypesDictionary[type],
                 message);

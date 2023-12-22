@@ -14,9 +14,9 @@ namespace HomeAccountant.Services
             _jSRuntime = jSRuntime;
         }
 
-        public async Task ClearAsync()
+        public async Task ClearAsync(CancellationToken cancellationToken = default)
         {
-            await _jSRuntime.InvokeVoidAsync("clearToken");
+            await _jSRuntime.InvokeVoidAsync("clearToken", cancellationToken: cancellationToken);
         }
 
         public async Task<TokenAuthenticationModel?> GetTokenAsync(CancellationToken cancellationToken = default)

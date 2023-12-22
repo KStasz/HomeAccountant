@@ -38,6 +38,7 @@ namespace HomeAccountant.Core.ViewModels
                 NotifyPropertyChanged();
             }
         }
+
         public Func<Task>? RefreshChart { get; set; }
 
         private IEnumerable<CategoryReadDto>? _availableCategories;
@@ -129,77 +130,42 @@ namespace HomeAccountant.Core.ViewModels
             TotalPages = 0;
             Entries = null;
 
-            await ReadEntries();
-            await ReadCategories();
+            await ReadEntriesAsync(CancellationToken);
+            await ReadCategoriesAsync(CancellationToken);
             IsBusy = false;
         }
 
-        private void CalculateAvailablePages()
-        {
-            var pages = Enumerable.Range(1, TotalPages)
-                .Chunk(5);
-            AvailablePagesCollection = pages.FirstOrDefault(x => x.Contains(CurrentPage));
-        }
-
-        private async Task ReadEntries()
-        {
-            if (_billingPerdiod is null)
-            {
-                return;
-            }
-
-            var result = await _entryService.GetEntries(_registerId, _billingPerdiod.Id, CurrentPage);
-
-            if (!result.Result)
-                return;
-
-            Entries = result.Value?.Result;
-            CurrentPage = result.Value?.CurrentPage ?? 0;
-            TotalPages = result.Value?.TotalPages ?? 0;
-            CalculateAvailablePages();
-        }
-
-        public async Task SetPage(int page)
+        public async Task SetPageAsync(int page)
         {
             IsBusy = true;
             CurrentPage = page;
-            await ReadEntries();
+            await ReadEntriesAsync(CancellationToken);
             IsBusy = false;
         }
 
-        public async Task NextPage()
+        public async Task NextPageAsync()
         {
             if (CurrentPage < TotalPages)
             {
                 IsBusy = true;
                 CurrentPage++;
-                await ReadEntries();
+                await ReadEntriesAsync(CancellationToken);
                 IsBusy = false;
             }
         }
 
-        public async Task PreviousPage()
+        public async Task PreviousPageAsync()
         {
             if (CurrentPage > 1)
             {
                 IsBusy = true;
                 CurrentPage--;
-                await ReadEntries();
+                await ReadEntriesAsync(CancellationToken);
                 IsBusy = false;
             }
         }
 
-        private async Task ReadCategories()
-        {
-            var result = await _categoriesService.GetCategoriesAsync();
-
-            if (!result.Result)
-                return;
-
-            AvailableCategories = result.Value;
-        }
-
-        public async Task CreateEntry()
+        public async Task CreateEntryAsync()
         {
             if (EntryCreateDialog is null || _billingPerdiod is null)
             {
@@ -208,15 +174,15 @@ namespace HomeAccountant.Core.ViewModels
 
             await EntryCreateDialog.InitializeDialogAsync(new EntryCreateDto());
 
-            var result = await EntryCreateDialog.ShowModalAsync();
+            var result = await EntryCreateDialog.ShowModalAsync(CancellationToken);
 
             if (result is null)
             {
                 return;
             }
 
-            var creationResult = await _entryService.CreateEntry(_registerId, _billingPerdiod.Id, result);
-            await ReadEntries();
+            var creationResult = await _entryService.CreateEntryAsync(_registerId, _billingPerdiod.Id, result, CancellationToken);
+            await ReadEntriesAsync(CancellationToken);
 
             if (RefreshChart is null)
             {
@@ -233,13 +199,48 @@ namespace HomeAccountant.Core.ViewModels
 
             await EntryDeleteDialog.InitializeDialogAsync(entryReadDto);
 
-            var result = await EntryDeleteDialog.ShowModalAsync();
+            var result = await EntryDeleteDialog.ShowModalAsync(CancellationToken);
 
             if (result == ModalResult.Cancel)
                 return;
 
-            await _entryService.DeleteEntry(_registerId, _billingPerdiod.Id, entryReadDto.Id);
-            await ReadEntries();
+            await _entryService.DeleteEntryAsync(_registerId, _billingPerdiod.Id, entryReadDto.Id, CancellationToken);
+            await ReadEntriesAsync(CancellationToken);
+        }
+
+        private async Task ReadCategoriesAsync(CancellationToken cancellationToken)
+        {
+            var result = await _categoriesService.GetCategoriesAsync();
+
+            if (!result.Result)
+                return;
+
+            AvailableCategories = result.Value;
+        }
+
+        private void CalculateAvailablePages()
+        {
+            var pages = Enumerable.Range(1, TotalPages)
+                .Chunk(5);
+            AvailablePagesCollection = pages.FirstOrDefault(x => x.Contains(CurrentPage));
+        }
+
+        private async Task ReadEntriesAsync(CancellationToken cancellationToken)
+        {
+            if (_billingPerdiod is null)
+            {
+                return;
+            }
+
+            var result = await _entryService.GetEntriesAsync(_registerId, _billingPerdiod.Id, CurrentPage);
+
+            if (!result.Result)
+                return;
+
+            Entries = result.Value?.Result;
+            CurrentPage = result.Value?.CurrentPage ?? 0;
+            TotalPages = result.Value?.TotalPages ?? 0;
+            CalculateAvailablePages();
         }
     }
 }

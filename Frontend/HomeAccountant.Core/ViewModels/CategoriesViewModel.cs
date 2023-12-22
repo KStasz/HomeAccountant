@@ -31,17 +31,9 @@ namespace HomeAccountant.Core.ViewModels
 
         public override async Task PageInitializedAsync()
         {
-            await ReadCategoriesAsync();
-        }
-
-        private async Task ReadCategoriesAsync()
-        {
-            var response = await _categoriesService.GetCategoriesAsync();
-
-            if (!response.Result)
-                Categories = new List<CategoryReadDto>();
-
-            Categories = response.Value;
+            IsBusy = true;
+            await ReadCategoriesAsync(CancellationToken);
+            IsBusy = false;
         }
 
         public async Task CreateCategoryAsync()
@@ -51,14 +43,14 @@ namespace HomeAccountant.Core.ViewModels
 
             await CreateCategoryDialog.InitializeDialogAsync(new CategoryCreateDto());
 
-            var result = await CreateCategoryDialog.ShowModalAsync();
+            var result = await CreateCategoryDialog.ShowModalAsync(CancellationToken);
 
             if (result is null)
                 return;
 
-            await _categoriesService.CreateCategoryAsync(result);
+            await _categoriesService.CreateCategoryAsync(result, CancellationToken);
 
-            await ReadCategoriesAsync();
+            await ReadCategoriesAsync(CancellationToken);
         }
 
         public async Task DeleteCategoryAsync(CategoryReadDto categoryReadDto)
@@ -67,14 +59,24 @@ namespace HomeAccountant.Core.ViewModels
                 return;
 
             await DeleteCategoryDialog.InitializeDialogAsync(categoryReadDto);
-            var result = await DeleteCategoryDialog.ShowModalAsync();
+            var result = await DeleteCategoryDialog.ShowModalAsync(CancellationToken);
 
             if (result == ModalResult.Cancel)
                 return;
 
-            await _categoriesService.DeleteCategoryAsync(categoryReadDto.Id);
+            await _categoriesService.DeleteCategoryAsync(categoryReadDto.Id, CancellationToken);
 
-            await ReadCategoriesAsync();
+            await ReadCategoriesAsync(CancellationToken);
+        }
+
+        private async Task ReadCategoriesAsync(CancellationToken cancellationToken = default)
+        {
+            var response = await _categoriesService.GetCategoriesAsync(cancellationToken);
+
+            if (!response.Result)
+                Categories = new List<CategoryReadDto>();
+
+            Categories = response.Value;
         }
     }
 }

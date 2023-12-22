@@ -15,7 +15,7 @@ namespace HomeAccountant.Layout
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            await JsCodeExecutor.ExecuteFunction("InitializeNavbar", _togglerId);
+            await JsCodeExecutor.ExecuteFunctionAsync("InitializeNavbar", default, _togglerId);
             await base.OnAfterRenderAsync(firstRender);
         }
     }

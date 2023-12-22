@@ -10,7 +10,7 @@ namespace HomeAccountant.Pages.Registers
         private RegisterReadDto? _registerModel;
         private TaskCompletionSource<ModalResult>? _tcs;
 
-        public async Task HideModalAsync()
+        public async Task HideModalAsync(CancellationToken cancellationToken = default)
         {
             if (_modalReference is null)
                 return;
@@ -38,7 +38,7 @@ namespace HomeAccountant.Pages.Registers
             await HideModalAsync();
         }
 
-        public async Task<ModalResult> ShowModalAsync()
+        public async Task<ModalResult> ShowModalAsync(CancellationToken cancellationToken = default)
         {
             if (_modalReference is null || _tcs is null)
                 return ModalResult.Cancel;

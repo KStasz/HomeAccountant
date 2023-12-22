@@ -12,12 +12,12 @@ namespace HomeAccountant.Pages.Categories
         private IModal? _modal;
         private EditContext? _editContext;
 
-        public async Task HideModalAsync()
+        public async Task HideModalAsync(CancellationToken cancellationToken = default)
         {
             if (_modal is null)
                 return;
 
-            await _modal.HideModalAsync();
+            await _modal.HideModalAsync(cancellationToken);
         }
 
         private async Task Accept()
@@ -55,12 +55,13 @@ namespace HomeAccountant.Pages.Categories
             await InvokeAsync(StateHasChanged);
         }
 
-        public async Task<CategoryCreateDto?> ShowModalAsync()
+        public async Task<CategoryCreateDto?> ShowModalAsync(CancellationToken cancellationToken = default)
         {
             if (_modal is null || _tcs is null)
                 return null;
 
-            await _modal.ShowModalAsync();
+            await _modal.ShowModalAsync(cancellationToken);
+            cancellationToken.Register(() => _tcs.TrySetCanceled());
 
             return await _tcs.Task;
         }

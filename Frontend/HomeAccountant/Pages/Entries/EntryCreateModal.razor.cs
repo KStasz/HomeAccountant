@@ -16,7 +16,7 @@ namespace HomeAccountant.Pages.Entries
         [Parameter]
         public IEnumerable<CategoryReadDto>? Categories { get; set; }
 
-        public async Task HideModalAsync()
+        public async Task HideModalAsync(CancellationToken cancellationToken = default)
         {
             if (_modal is null)
                 return;
@@ -59,7 +59,7 @@ namespace HomeAccountant.Pages.Entries
             await InvokeAsync(StateHasChanged);
         }
 
-        public async Task<EntryCreateDto?> ShowModalAsync()
+        public async Task<EntryCreateDto?> ShowModalAsync(CancellationToken cancellationToken = default)
         {
             if (_modal is null || _tcs is null)
                 return null;

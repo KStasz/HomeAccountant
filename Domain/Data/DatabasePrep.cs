@@ -1,17 +1,19 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace HomeAccountant.CategoriesService.Data
+namespace Domain.Data
 {
     public static class DatabasePrep
     {
-        public static void PrepareDatabase(this IApplicationBuilder applicationBuilder)
+        public static void PrepareDatabase<T>(this IApplicationBuilder applicationBuilder) where T : DbContext
         {
             Console.WriteLine("--> Migration started...");
             try
             {
                 using (var scope = applicationBuilder.ApplicationServices.CreateScope())
                 {
-                    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    var dbContext = scope.ServiceProvider.GetRequiredService<T>();
 
                     dbContext.Database.Migrate();
                 }

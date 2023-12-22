@@ -2,11 +2,7 @@
 using HomeAccountant.Core.Extensions;
 using HomeAccountant.Core.Model;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Text.Json;
 
 namespace HomeAccountant.Core.Services
 {
@@ -22,12 +18,12 @@ namespace HomeAccountant.Core.Services
             _logger = logger;
         }
 
-        public async Task<ServiceResponse> CreateRegisterAsync(RegisterCreateDto registerCreateDto)
+        public async Task<ServiceResponse> CreateRegisterAsync(RegisterCreateDto registerCreateDto, CancellationToken cancellationToken = default)
         {
             try
             {
-                var response = await _httpClient.PostAsJsonAsync("/api/Register", registerCreateDto);
-                var responseContent = await response.Content.ReadFromJsonAsync<ServiceResponse>();
+                var response = await _httpClient.PostAsJsonAsync("/api/Register", registerCreateDto, cancellationToken);
+                var responseContent = await response.Content.ReadFromJsonAsync<ServiceResponse>(cancellationToken);
 
                 return responseContent.Protect();
             }
@@ -44,14 +40,14 @@ namespace HomeAccountant.Core.Services
             }
         }
 
-        public async Task<ServiceResponse<IEnumerable<RegisterReadDto>>> GetRegistersAsync()
+        public async Task<ServiceResponse<IEnumerable<RegisterReadDto>>> GetRegistersAsync(CancellationToken cancellationToken = default)
         {
             try
             {
                 var url = "/api/Register";
-                var response = await _httpClient.GetAsync(url);
+                var response = await _httpClient.GetAsync(url, cancellationToken);
                 ServiceResponse<IEnumerable<RegisterReadDto>> ? responseContent = await response.Content
-                    .ReadFromJsonAsync<ServiceResponse<IEnumerable<RegisterReadDto>>>();
+                    .ReadFromJsonAsync<ServiceResponse<IEnumerable<RegisterReadDto>>>(cancellationToken);
 
                 return responseContent.Protect();
             }
@@ -68,13 +64,13 @@ namespace HomeAccountant.Core.Services
             }
         }
 
-        public async Task<ServiceResponse> DeleteRegisterAsync(RegisterReadDto registerReadDto)
+        public async Task<ServiceResponse> DeleteRegisterAsync(RegisterReadDto registerReadDto, CancellationToken cancellationToken = default)
         {
             try
             {
                 var url = $"/api/Register/{registerReadDto.Id}";
-                var response = await _httpClient.DeleteAsync(url);
-                var responseContent = await response.Content.ReadFromJsonAsync<ServiceResponse>();
+                var response = await _httpClient.DeleteAsync(url, cancellationToken);
+                var responseContent = await response.Content.ReadFromJsonAsync<ServiceResponse>(cancellationToken);
 
                 return responseContent.Protect();
             }

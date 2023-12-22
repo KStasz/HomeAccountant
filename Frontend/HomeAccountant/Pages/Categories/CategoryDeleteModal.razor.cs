@@ -10,7 +10,7 @@ namespace HomeAccountant.Pages.Categories
         private TaskCompletionSource<ModalResult>? _tcs;
         private IModal? _modal;
 
-        public async Task HideModalAsync()
+        public async Task HideModalAsync(CancellationToken cancellationToken = default)
         {
             if (_modal is null)
                 return;
@@ -40,12 +40,13 @@ namespace HomeAccountant.Pages.Categories
             await InvokeAsync(StateHasChanged);
         }
 
-        public async Task<ModalResult> ShowModalAsync()
+        public async Task<ModalResult> ShowModalAsync(CancellationToken cancellationToken = default)
         {
             if (_modal is null || _tcs is null)
                 return ModalResult.Cancel;
 
-            await _modal.ShowModalAsync();
+            await _modal.ShowModalAsync(cancellationToken);
+
             return await _tcs.Task;
         }
     }

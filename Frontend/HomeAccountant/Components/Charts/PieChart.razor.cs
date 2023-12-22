@@ -20,20 +20,11 @@ namespace HomeAccountant.Components.Charts
         {
             if (Dataset is null)
                 return;
-            
+
             var config = GetJsonConfiguration(Dataset);
-            await JsCodeExecutor.ExecuteFunction("CreateChart", _chartIdentifier, config);
+            await JsCodeExecutor.ExecuteFunctionAsync("CreateChart", cancellationToken: default, _chartIdentifier, config);
 
             await base.OnAfterRenderAsync(firstRender);
-        }
-
-        public async Task CreateChartAsync(IEnumerable<ChartDataset>? dataset)
-        {
-            if (dataset == null)
-                return;
-
-            var config = GetJsonConfiguration(dataset);
-            await JsCodeExecutor.ExecuteFunction("CreateChart", _chartIdentifier, config);
         }
 
         private string GetJsonConfiguration(IEnumerable<ChartDataset> dataset)
@@ -44,7 +35,7 @@ namespace HomeAccountant.Components.Charts
 
         public async Task DestroyChart()
         {
-            await JsCodeExecutor.ExecuteFunction("DestroyChart");
+            await JsCodeExecutor.ExecuteFunctionAsync("DestroyChart");
         }
     }
 }

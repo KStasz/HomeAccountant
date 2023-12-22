@@ -1,18 +1,7 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Reflection.Metadata.Ecma335;
-using System.Security.Claims;
-using System.Text;
-using Domain.Dtos.IdentityPlatform;
+﻿using Domain.Dtos.IdentityPlatform;
 using JwtAuthenticationManager;
-using JwtAuthenticationManager.Config;
-using JwtAuthenticationManager.Extensions;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 
 namespace HomeAccountant.IdentityPlatform;
 

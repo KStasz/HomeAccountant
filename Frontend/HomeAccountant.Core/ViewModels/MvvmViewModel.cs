@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-namespace HomeAccountant.Core.ViewModels
+﻿namespace HomeAccountant.Core.ViewModels
 {
     public abstract class MvvmViewModel : BaseViewModel
     {
