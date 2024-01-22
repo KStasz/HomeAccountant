@@ -27,30 +27,15 @@ namespace HomeAccountant.Core.ViewModels
         private LoginDTO _loginData;
         public LoginDTO LoginData
         {
-            get 
-            {
-                return _loginData; 
-            }
-            set 
-            {
-                _loginData = value;
-                NotifyPropertyChangedAsync();
-            }
+            get => _loginData; 
+            set => SetValue(ref  _loginData, value);
         }
-
 
         private RegisterUserDto _registerData;
         public RegisterUserDto RegisterData
         {
-            get 
-            {
-                return _registerData; 
-            }
-            set 
-            {
-                _registerData = value;
-                NotifyPropertyChangedAsync();
-            }
+            get => _registerData; 
+            set  => SetValue(ref _registerData, value);
         }
 
         public async Task Login()

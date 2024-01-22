@@ -18,15 +18,8 @@ namespace HomeAccountant.Core.ViewModels
         private IEnumerable<CategoryReadDto>? _categories;
         public IEnumerable<CategoryReadDto>? Categories
         {
-            get
-            {
-                return _categories;
-            }
-            set
-            {
-                _categories = value;
-                NotifyPropertyChanged();
-            }
+            get => _categories;
+            set => SetValue(ref _categories, value);
         }
 
         public override async Task PageInitializedAsync()

@@ -1,23 +1,16 @@
-﻿using HomeAccountant.Core.DTOs.BillingPeriod;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 
 namespace HomeAccountant.Pages.Entries
 {
     partial class EntriesPage
     {
         [Parameter]
-        public BillingPeriodReadDto? BillingPeriod { get; set; }
+        public int BillingPeriodId { get; set; } = 3;
 
         [Parameter]
-        public int RegisterId { get; set; }
+        public bool IsPeriodOpen { get; set; } = true;
 
-        [CascadingParameter(Name = "RefreshChart")]
-        public Func<Task>? RefreshChart { get; set; }
-
-        protected override Task OnParametersSetAsync()
-        {
-            ViewModel.RefreshChart = RefreshChart;
-            return base.OnParametersSetAsync();
-        }
+        [Parameter]
+        public int RegisterId { get; set; } = 13;
     }
 }

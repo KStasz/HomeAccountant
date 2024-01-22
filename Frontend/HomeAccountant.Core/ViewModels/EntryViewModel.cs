@@ -2,6 +2,7 @@
 using HomeAccountant.Core.DTOs.Category;
 using HomeAccountant.Core.DTOs.Entry;
 using HomeAccountant.Core.Services;
+using Microsoft.AspNetCore.Components;
 
 namespace HomeAccountant.Core.ViewModels
 {
@@ -9,17 +10,18 @@ namespace HomeAccountant.Core.ViewModels
     {
         private readonly IEntryService _entryService;
         private readonly ICategoriesService _categoriesService;
-        private readonly IBillingPeriodService _billingPeriodService;
-        private BillingPeriodReadDto? _billingPerdiod;
+        private readonly IPubSubService _pubSubService;
+        private int _billingPerdiodId;
         private int _registerId;
+        private bool _isPeriodOpen;
 
         public EntryViewModel(IEntryService entryService,
             ICategoriesService categoriesService,
-            IBillingPeriodService billingPeriodService)
+            IPubSubService pubSubService)
         {
             _entryService = entryService;
             _categoriesService = categoriesService;
-            _billingPeriodService = billingPeriodService;
+            _pubSubService = pubSubService;
         }
 
         public IModalDialog<EntryCreateDto, EntryCreateDto>? EntryCreateDialog { get; set; }
@@ -28,73 +30,36 @@ namespace HomeAccountant.Core.ViewModels
         private IEnumerable<EntryReadDto>? _entries;
         public IEnumerable<EntryReadDto>? Entries
         {
-            get
-            {
-                return _entries;
-            }
-            set
-            {
-                _entries = value;
-                NotifyPropertyChanged();
-            }
+            get => _entries;
+            set => SetValue(ref _entries, value);
         }
-
-        public Func<Task>? RefreshChart { get; set; }
 
         private IEnumerable<CategoryReadDto>? _availableCategories;
         public IEnumerable<CategoryReadDto>? AvailableCategories
         {
-            get
-            {
-                return _availableCategories;
-            }
-            set
-            {
-                _availableCategories = value;
-                NotifyPropertyChanged();
-            }
+            get => _availableCategories;
+            set => SetValue(ref _availableCategories, value);
         }
 
         private int _currentPage = 1;
         public int CurrentPage
         {
-            get
-            {
-                return _currentPage;
-            }
-            set
-            {
-                _currentPage = value;
-                NotifyPropertyChanged();
-            }
+            get => _currentPage;
+            set => SetValue(ref _currentPage, value);
         }
 
         private int _totalPages;
         public int TotalPages
         {
-            get
-            {
-                return _totalPages;
-            }
-            set
-            {
-                _totalPages = value;
-                NotifyPropertyChanged();
-            }
+            get => _totalPages;
+            set => SetValue(ref _totalPages, value);
         }
 
         private IEnumerable<int>? _availablePagesCollection;
         public IEnumerable<int>? AvailablePagesCollection
         {
-            get
-            {
-                return _availablePagesCollection;
-            }
-            set
-            {
-                _availablePagesCollection = value;
-                NotifyPropertyChanged();
-            }
+            get => _availablePagesCollection;
+            set => SetValue(ref _availablePagesCollection, value);
         }
 
         public string IsNextPageButtonDisabled
@@ -117,15 +82,16 @@ namespace HomeAccountant.Core.ViewModels
         {
             get
             {
-                return (_billingPerdiod?.IsOpen ?? false) ? new Dictionary<string, object>() : new Dictionary<string, object>() { { "disabled", "" } };
+                return _isPeriodOpen ? new Dictionary<string, object>() : new Dictionary<string, object>() { { "disabled", "" } };
             }
         }
 
         public override async Task PageParameterSetAsync(Dictionary<string, object?> parameters)
         {
             IsBusy = true;
-            _billingPerdiod = GetParameter<BillingPeriodReadDto>(parameters["BillingPeriod"]);
+            _billingPerdiodId = GetParameter<int>(parameters["BillingPeriodId"]);
             _registerId = GetParameter<int>(parameters["RegisterId"]);
+            _isPeriodOpen = GetParameter<bool>(parameters["IsPeriodOpen"]);
             CurrentPage = 1;
             TotalPages = 0;
             Entries = null;
@@ -167,7 +133,7 @@ namespace HomeAccountant.Core.ViewModels
 
         public async Task CreateEntryAsync()
         {
-            if (EntryCreateDialog is null || _billingPerdiod is null)
+            if (EntryCreateDialog is null)
             {
                 return;
             }
@@ -181,20 +147,14 @@ namespace HomeAccountant.Core.ViewModels
                 return;
             }
 
-            var creationResult = await _entryService.CreateEntryAsync(_registerId, _billingPerdiod.Id, result, CancellationToken);
-            await ReadEntriesAsync(CancellationToken);
+            var creationResult = await _entryService.CreateEntryAsync(_registerId, _billingPerdiodId, result, CancellationToken);
 
-            if (RefreshChart is null)
-            {
-                return;
-            }
-
-            await RefreshChart();
+            await _pubSubService.Send(this);
         }
 
         public async Task DeleteEntry(EntryReadDto entryReadDto)
         {
-            if (EntryDeleteDialog is null || _billingPerdiod is null)
+            if (EntryDeleteDialog is null)
                 return;
 
             await EntryDeleteDialog.InitializeDialogAsync(entryReadDto);
@@ -204,7 +164,7 @@ namespace HomeAccountant.Core.ViewModels
             if (result == ModalResult.Cancel)
                 return;
 
-            await _entryService.DeleteEntryAsync(_registerId, _billingPerdiod.Id, entryReadDto.Id, CancellationToken);
+            await _entryService.DeleteEntryAsync(_registerId, _billingPerdiodId, entryReadDto.Id, CancellationToken);
             await ReadEntriesAsync(CancellationToken);
         }
 
@@ -227,12 +187,7 @@ namespace HomeAccountant.Core.ViewModels
 
         private async Task ReadEntriesAsync(CancellationToken cancellationToken)
         {
-            if (_billingPerdiod is null)
-            {
-                return;
-            }
-
-            var result = await _entryService.GetEntriesAsync(_registerId, _billingPerdiod.Id, CurrentPage);
+            var result = await _entryService.GetEntriesAsync(_registerId, _billingPerdiodId, CurrentPage, cancellationToken: cancellationToken);
 
             if (!result.Result)
                 return;

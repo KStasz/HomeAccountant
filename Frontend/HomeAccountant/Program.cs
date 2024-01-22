@@ -36,6 +36,9 @@ builder.Services.AddScoped<RegisterViewModel>();
 builder.Services.AddTransient<EntryViewModel>();
 builder.Services.AddScoped<CategoriesViewModel>();
 builder.Services.AddScoped<BillingPeriodViewModel>();
+builder.Services.AddScoped<BillingPeriodChartViewModel>();
+builder.Services.AddScoped<IMemoryStorage, MemoryStorage>();
+builder.Services.AddScoped<IPubSubService, PubSubService>();
 
 await builder.Build().RunAsync();
 
