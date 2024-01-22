@@ -11,9 +11,8 @@ namespace HomeAccountant.Core.ViewModels
         public event PropertyChangedEventHandler? PropertyChanged;
         public event PropertyChangedEventHandlerAsync? PropertyChangedAsync;
         private CancellationTokenSource? CancellationTokenSource;
-
         protected CancellationToken CancellationToken => (CancellationTokenSource ??= new()).Token;
-        
+
         protected void NotifyPropertyChangedAsync([CallerMemberName] string propertyName = "") => PropertyChangedAsync?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         protected void NotifyPropertyChangedSync([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
@@ -22,18 +21,18 @@ namespace HomeAccountant.Core.ViewModels
             NotifyPropertyChangedSync(propertyName);
         }
 
+        protected void SetValue<T>(ref T backingFiled, T value, [CallerMemberName] string propertyName = null)
+        {
+            if (EqualityComparer<T>.Default.Equals(backingFiled, value)) return;
+            backingFiled = value;
+            NotifyPropertyChanged(propertyName);
+        }
+
         private bool _isBusy;
         public bool IsBusy
         {
-            get
-            {
-                return _isBusy;
-            }
-            set
-            {
-                _isBusy = value;
-                NotifyPropertyChanged();
-            }
+            get => _isBusy;
+            set => SetValue(ref _isBusy, value);
         }
 
         private MarkupString _errorMessage;

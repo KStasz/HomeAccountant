@@ -1,38 +1,38 @@
-﻿ @page "/books/{registerId:int}/BillingPeriod/{billingPeriodId:int}"
+﻿ @page "/books/{registerId:int}/BillingPeriod/{billingPeriodId:int}" 
  @inherits MvvmComponent<EntryViewModel>
 
 <div style="min-height: 550px;">
     @if (!ViewModel.IsBusy)
     {
-        <button type="button" class="btn btn-success w-100" @onclick="ViewModel.CreateEntryAsync" @attributes="ViewModel.IsButtonBlocked">Dodaj</button>
-        <table class="table responsiveTable mt-3">
-            <thead>
+    <button type="button" class="btn btn-success w-100" @onclick="ViewModel.CreateEntryAsync" @attributes="ViewModel.IsButtonBlocked">Dodaj</button>
+    <table class="table responsiveTable mt-3">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Nazwa</th>
+                <th scope="col">Kategoria</th>
+                <th scope="col">Cena (zł)</th>
+                <th scope="col">Utworzone przez</th>
+                <th scope="col">Data utworzenia</th>
+            </tr>
+        </thead>
+        @{
+            int counter = 1;
+        }
+        <tbody>
+            @foreach (var item in ViewModel.Entries ?? new List<EntryReadDto>())
+            {
                 <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Nazwa</th>
-                    <th scope="col">Kategoria</th>
-                    <th scope="col">Cena (zł)</th>
-                    <th scope="col">Utworzone przez</th>
-                    <th scope="col">Data utworzenia</th>
+                    <td data-label="#" scope="row">@(counter++)</td>
+                    <td data-label="Nazwa">@item.Name</td>
+                    <td data-label="Kategoria">@item.Category.Name</td>
+                    <td data-label="Cena (zł)">@item.Price</td>
+                    <td data-label="Utworzone przez">-</td>
+                    <td data-label="Data utworzenia">@item.CreatedDate.ToString("dd-MM-yyyy")</td>
                 </tr>
-            </thead>
-            @{
-                int counter = 1;
             }
-            <tbody>
-                @foreach (var item in ViewModel.Entries ?? new List<EntryReadDto>())
-                {
-                    <tr>
-                        <td data-label="#" scope="row">@(counter++)</td>
-                        <td data-label="Nazwa">@item.Name</td>
-                        <td data-label="Kategoria">@item.Category.Name</td>
-                        <td data-label="Cena (zł)">@item.Price</td>
-                        <td data-label="Utworzone przez">-</td>
-                        <td data-label="Data utworzenia">@item.CreatedDate.ToString("dd-MM-yyyy")</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+        </tbody>
+    </table>
     }
     else
     {
@@ -60,7 +60,6 @@
         </li>
     </ul>
 </nav>
-
 
 <EntryCreateModal @ref="ViewModel!.EntryCreateDialog"
                   Categories="ViewModel?.AvailableCategories" />

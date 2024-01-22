@@ -18,15 +18,8 @@ namespace HomeAccountant.Core.ViewModels
         private IEnumerable<RegisterReadDto>? _availableRegisters;
         public IEnumerable<RegisterReadDto>? AvailableRegisters
         {
-            get
-            {
-                return _availableRegisters;
-            }
-            set
-            {
-                _availableRegisters = value;
-                NotifyPropertyChangedAsync();
-            }
+            get => _availableRegisters;
+            set => SetValue(ref _availableRegisters, value);
         }
 
         public override async Task PageInitializedAsync()

@@ -78,36 +78,14 @@
     {
         <div class="row">
             <div class="col-md-8 col-12 order-md-0 order-1">
-                @if (ViewModel.SelectedBillingPeriod is not null)
-                {
-                    <CascadingValue Value="ViewModel.RefreshChart" Name="RefreshChart">
-                        <EntriesPage RegisterId="RegisterId" BillingPeriod="ViewModel.SelectedBillingPeriod" />
-                    </CascadingValue>
-                }
-                else
-                {
-                     <Placeholder /> 
-                }
+                <EntriesPage RegisterId="RegisterId"
+                             BillingPeriodId="ViewModel.SelectedBillingPeriod.Id"
+                             IsPeriodOpen="ViewModel.SelectedBillingPeriod.IsOpen" />
             </div>
             <div class="col order-md-1 order-0 align-self-start sticky-md-top" style="height: 400px; top: 15px;">
-                @if (ViewModel.IsChartVisible)
-                {
-                    <PieChart Dataset="(ViewModel.GetChartDataset())" />
-                }
-                <div class="card mb-3">
-                    <div class="card-body p-0">
-                        <div class="col-md-12 mx-auto">
-                            <table class="table m-0 table-borderless">
-                                <thead>
-                                    <tr>
-                                        <th scope="col" width="50%" class="text-center">Suma</th>
-                                        <th scope="col">@(ViewModel.BillingPeriodStatistic?.TotalSum)</th>
-                                    </tr>
-                                </thead>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+                <BillingPeriodChart BillingPeriodId="ViewModel.SelectedBillingPeriod.Id"
+                                    Registerid="RegisterId"
+                                    BillingPeriodName="@ViewModel.SelectedBillingPeriod.Name" />
             </div>
         </div>
     }

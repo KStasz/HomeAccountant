@@ -1,39 +1,31 @@
 ﻿using HomeAccountant.Core.DTOs.BillingPeriod;
-using HomeAccountant.Core.Model;
 using HomeAccountant.Core.Services;
-using System.Drawing;
 
 namespace HomeAccountant.Core.ViewModels
 {
-    public class BillingPeriodViewModel : MvvmViewModel
+    public class BillingPeriodViewModel : MvvmViewModel, IRefreshBillingService
     {
         private readonly IBillingPeriodService _billingPeriodService;
+        private readonly IPubSubService _pubSubService;
         private int _registerId;
         private int _currentPeriodIndex;
 
-        public BillingPeriodViewModel(IBillingPeriodService billingPeriodService)
+        public BillingPeriodViewModel(IBillingPeriodService billingPeriodService,
+            IPubSubService pubSubService)
         {
             _billingPeriodService = billingPeriodService;
-            RefreshChart = () => ReadStatisticAsync(CancellationToken);
+            _pubSubService = pubSubService;
+
+            _pubSubService.MessageSender += _pubSubService_MessageSender;
         }
+        public List<BillingPeriodReadDto>? AvailableBillingPeriods { get; set; }
 
         private BillingPeriodReadDto? _selectedBillingPeriod;
         public BillingPeriodReadDto? SelectedBillingPeriod
         {
-            get
-            {
-                return _selectedBillingPeriod;
-            }
-            set
-            {
-                _selectedBillingPeriod = value;
-                NotifyPropertyChanged();
-            }
+            get => _selectedBillingPeriod;
+            set => SetValue(ref _selectedBillingPeriod, value);
         }
-
-        public Func<Task> RefreshChart { get; set; }
-
-        public List<BillingPeriodReadDto>? AvailableBillingPeriods { get; set; }
 
         public int AvailableBillingPeriodsCount
         {
@@ -46,15 +38,8 @@ namespace HomeAccountant.Core.ViewModels
         private bool _isChartVisible = true;
         public bool IsChartVisible
         {
-            get
-            {
-                return _isChartVisible;
-            }
-            set
-            {
-                _isChartVisible = value;
-                NotifyPropertyChanged();
-            }
+            get => _isChartVisible;
+            set => SetValue(ref _isChartVisible, value);
         }
 
         public IModalDialog<BillingPeriodCreateDto, BillingPeriodCreateDto>? BillingCreateDialog { get; set; }
@@ -84,24 +69,8 @@ namespace HomeAccountant.Core.ViewModels
             }
         }
 
-
-        private BillingPeriodStatisticDto? _billingPeriodStatistic;
-        public BillingPeriodStatisticDto? BillingPeriodStatistic
-        {
-            get
-            {
-                return _billingPeriodStatistic;
-            }
-            set
-            {
-                _billingPeriodStatistic = value;
-                NotifyPropertyChanged();
-            }
-        }
-
         public async Task ToggleBillingPeriodAsync()
         {
-            IsChartVisible = false;
             if (SelectedBillingPeriod is null)
                 return;
 
@@ -115,26 +84,6 @@ namespace HomeAccountant.Core.ViewModels
             }
 
             await RefreshBillingPeriodAsync(CancellationToken);
-            IsChartVisible = true;
-        }
-
-        public List<ChartDataset>? GetChartDataset()
-        {
-            if (BillingPeriodStatistic is null || BillingPeriodStatistic.ChartData is null)
-            {
-                return null;
-            }
-
-            return new List<ChartDataset>()
-            {
-                new ChartDataset(
-                    SelectedBillingPeriod!.Name!,
-                    BillingPeriodStatistic.ChartData
-                        .Select(x => new ChartValue(
-                                x.CategoryName,
-                                x.Sum,
-                                Color.FromArgb(x.ColorA, x.ColorR, x.ColorG, x.ColorB))))
-            };
         }
 
         public async Task CreateBillingDialogAsync()
@@ -169,35 +118,25 @@ namespace HomeAccountant.Core.ViewModels
             IsBusy = false;
         }
 
-        public async Task PreviousPeriodAsync()
+        public void PreviousPeriodAsync()
         {
             if ((!AvailableBillingPeriods?.Any() ?? false)
                 || _currentPeriodIndex == 0)
                 return;
 
-            _selectedBillingPeriod = AvailableBillingPeriods?[--_currentPeriodIndex];
-
-            await ReadStatisticAsync(CancellationToken);
+            SelectedBillingPeriod = AvailableBillingPeriods?[--_currentPeriodIndex];
         }
 
-        public async Task NextPeriodAsync()
+        public void NextPeriodAsync()
         {
             if ((!AvailableBillingPeriods?.Any() ?? false)
                 || _currentPeriodIndex == AvailableBillingPeriodsCount - 1)
                 return;
 
             SelectedBillingPeriod = AvailableBillingPeriods?[++_currentPeriodIndex];
-
-            await ReadStatisticAsync(CancellationToken);
         }
 
-        private async Task ReadInitialDataAsync(int registerId, CancellationToken cancellationToken = default)
-        {
-            await GetBillingPeriodAsync(registerId, cancellationToken);
-            await ReadStatisticAsync(cancellationToken);
-        }
-
-        private async Task RefreshBillingPeriodAsync(CancellationToken cancellationToken = default)
+        public async Task RefreshBillingPeriodAsync(CancellationToken cancellationToken = default)
         {
             var result = await _billingPeriodService.GetBiilingPeriodsAsync(_registerId, cancellationToken);
 
@@ -205,7 +144,28 @@ namespace HomeAccountant.Core.ViewModels
                 return;
 
             AvailableBillingPeriods = result.Value?.OrderBy(x => x.Id).ToList();
-            SelectedBillingPeriod = AvailableBillingPeriods?[_currentPeriodIndex];
+
+            await Task.Run(() =>
+            {
+                SelectedBillingPeriod = null;
+                SelectedBillingPeriod = AvailableBillingPeriods?[_currentPeriodIndex];
+            });
+        }
+
+        private async Task ReadInitialDataAsync(int registerId, CancellationToken cancellationToken = default)
+        {
+            await GetBillingPeriodAsync(registerId, cancellationToken);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            _pubSubService.MessageSender -= _pubSubService_MessageSender;
+            base.Dispose(disposing);
+        }
+
+        private async Task _pubSubService_MessageSender(object? sender, EventArgs e)
+        {
+            await RefreshBillingPeriodAsync();
         }
 
         private async Task GetBillingPeriodAsync(int registerId, CancellationToken cancellationToken = default)
@@ -224,27 +184,6 @@ namespace HomeAccountant.Core.ViewModels
 
             _currentPeriodIndex = AvailableBillingPeriodsCount - 1;
             _selectedBillingPeriod = AvailableBillingPeriods?[_currentPeriodIndex];
-        }
-
-        private async Task ReadStatisticAsync(CancellationToken cancellationToken = default)
-        {
-            IsChartVisible = false;
-            if (_selectedBillingPeriod is null)
-            {
-                return;
-            }
-
-            var result = await _billingPeriodService.GetBillingPeriodStatisticAsync(_registerId, _selectedBillingPeriod.Id, cancellationToken);
-
-            if (!result.Result)
-            {
-                _billingPeriodStatistic = null;
-
-                return;
-            }
-
-            _billingPeriodStatistic = result.Value;
-            IsChartVisible = true;
         }
     }
 }
