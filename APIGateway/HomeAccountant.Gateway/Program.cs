@@ -9,16 +9,11 @@ builder.Configuration.SetBasePath(builder.Environment.ContentRootPath)
     .AddJsonFile($"ocelot.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
 
-Debug.WriteLine("Aaaaa");
-
 builder.Services.AddCors(options =>
 {
-    //options.AddPolicy("CorsPolicy",
-    //    builder => builder.WithOrigins("http://localhost:5225")
-    //        .AllowAnyMethod()
-    //        .AllowAnyHeader());
+    var corsOrigin = builder.Configuration["CorsOrigin"] ?? string.Empty;
     options.AddPolicy("CorsPolicy",
-        builder => builder.WithOrigins("http://localhost:8081")
+        builder => builder.WithOrigins(corsOrigin)
             .AllowAnyMethod()
             .AllowAnyHeader());
 });
