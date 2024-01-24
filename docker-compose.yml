@@ -64,6 +64,7 @@ services:
             - ASPNETCORE_URLS=http://+:80
             - ConnectionStrings__DefaultConnection=Server=AccountingService_SqlServer;Database=AccountingDb;User Id=sa;Password=1qazXSW@3edc;TrustServerCertificate=True;
             - CategoriesServiceBaseUri=http://homeaccountant_categoriesservice:80
+            - IdentityServiceBaseUri=http://identity_platform:80
         networks:
             - dev
     

@@ -2,6 +2,7 @@
 using Domain.Controller;
 using Domain.Dtos.AccountingService;
 using Domain.Dtos.CategoryService;
+using Domain.Dtos.IdentityPlatform;
 using Domain.Model;
 using Domain.Services;
 using HomeAccountant.AccountingService.Data;
@@ -22,16 +23,19 @@ namespace HomeAccountant.AccountingService.Controllers
         private readonly IRepository<ApplicationDbContext, Register> _registerRepository;
         private readonly IMapper _mapper;
         private readonly ICategoriesService _categoriesService;
+        private readonly IAccountInfoService _accountInfoService;
 
         public EntryController(IRepository<ApplicationDbContext, Entry> entryRepository,
             IRepository<ApplicationDbContext, Register> registerRepository,
             IMapper mapper,
-            ICategoriesService categoriesService)
+            ICategoriesService categoriesService,
+            IAccountInfoService accountInfoService)
         {
             _repository = entryRepository;
             _registerRepository = registerRepository;
             _mapper = mapper;
             _categoriesService = categoriesService;
+            _accountInfoService = accountInfoService;
         }
 
         [HttpGet("{entryId}", Name = "GetEntryById")]
@@ -75,6 +79,12 @@ namespace HomeAccountant.AccountingService.Controllers
                 if (entryModels is null)
                     return NotFound(new ServiceResponse("Entries not found"));
 
+                var userData = await GetUserData(
+                    entryModels
+                    .Select(x => x.CreatedBy)
+                    .Distinct()
+                    .ToArray());
+
                 List<EntryReadDto> result = new List<EntryReadDto>();
 
                 foreach (var item in entryModels)
@@ -86,6 +96,7 @@ namespace HomeAccountant.AccountingService.Controllers
                         continue;
 
                     model.Category = _mapper.Map<CategoryReadDto>(categoryModel);
+                    model.Creator = userData?.FirstOrDefault(x => x.UserId == item.CreatedBy)?.UserName ?? string.Empty;
                     result.Add(model);
                 }
 
@@ -95,6 +106,16 @@ namespace HomeAccountant.AccountingService.Controllers
             {
                 return BadRequest(new ServiceResponse(ex.Message));
             }
+        }
+
+        private async Task<UserUsernameReadDto[]?> GetUserData(string[] userIds)
+        {
+            var userInfoResponse = await _accountInfoService.GetUsersData(userIds);
+
+            if (!userInfoResponse.Result)
+                return null;
+
+            return userInfoResponse.Value;
         }
 
         [HttpPost]

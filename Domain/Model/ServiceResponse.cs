@@ -2,6 +2,12 @@
 {
     public class ServiceResponse<T> : ServiceResponse
     {
+        public ServiceResponse()
+            : base(false)
+        {
+            
+        }
+
         public ServiceResponse(T value)
             : base(true)
         {
