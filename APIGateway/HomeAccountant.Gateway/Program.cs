@@ -1,6 +1,6 @@
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
-using Ocelot.Values;
+using System.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,8 +11,9 @@ builder.Configuration.SetBasePath(builder.Environment.ContentRootPath)
 
 builder.Services.AddCors(options =>
 {
+    var corsOrigin = builder.Configuration["CorsOrigin"] ?? string.Empty;
     options.AddPolicy("CorsPolicy",
-        builder => builder.WithOrigins("http://localhost:5225")
+        builder => builder.WithOrigins(corsOrigin)
             .AllowAnyMethod()
             .AllowAnyHeader());
 });

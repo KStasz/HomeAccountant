@@ -1,12 +1,25 @@
 version: '3.4'
-name: homeaccountant
+name: homeaccountant_with_frontend
 networks:
     dev:
         driver: bridge
 services:
+    homeaccountant.frontend:
+        image: krz123/homeaccountant.frontend
+        container_name: HomeAccountant.Frontend
+        ports:
+            - '8081:80'
+        build:
+            context: .
+            dockerfile: Dockerfile
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Development
+        networks:
+            - dev
+
     homeaccountant.gateway:
         image: krz123/homeaccountant.gateway
-        container_name: gateway
+        container_name: HomeAccountant.Gateway
         ports:
             - '8080:80'
         build:
@@ -14,13 +27,13 @@ services:
             dockerfile: Dockerfile
         environment:
             - ASPNETCORE_URLS=http://+:80
-            - CorsOrigin=http://localhost:5225
+            - CorsOrigin=http://localhost:8081
         networks:
             - dev
 
     identity_platform:
         image: krz123/homeaccountant.identityplatform
-        container_name: identity_platform
+        container_name: HomeAccountant.Identity_platform
         build:
             context: .
             dockerfile: Dockerfile
@@ -32,7 +45,7 @@ services:
 
     homeaccountant_categoriesservice:
         image: krz123/homeaccountant.categoriesservice
-        container_name: CategoriesService
+        container_name: HomeAccountant.CategoriesService
         build:
             context: .
             dockerfile: Dockerfile
@@ -44,7 +57,7 @@ services:
 
     homeaccountant_friendsservice:
         image: krz123/homeaccountant.friendsservice
-        container_name: FriendsService
+        container_name: HomeAccountant.FriendsService
         build:
             context: .
             dockerfile: Dockerfile
@@ -56,7 +69,7 @@ services:
 
     homeaccountant_accountingservice:
         image: krz123/homeaccountant.accountingservice
-        container_name: AccountingService
+        container_name: HomeAccountant.AccountingService
         build:
             context: .
             dockerfile: Dockerfile
@@ -69,7 +82,7 @@ services:
     
     ItentityPlatform_SqlServer:
         image: mcr.microsoft.com/mssql/server
-        container_name: ItentityPlatformDb
+        container_name: HomeAccountant.ItentityPlatformDb
         environment:
             - ACCEPT_EULA=Y
             - MSSQL_SA_PASSWORD=1qazXSW@3edc
@@ -81,7 +94,7 @@ services:
 
     CategoriesService_SqlServer:
         image: mcr.microsoft.com/mssql/server
-        container_name: CategoriesServiceDb
+        container_name: HomeAccountant.CategoriesServiceDb
         environment:
             - ACCEPT_EULA=Y
             - MSSQL_SA_PASSWORD=1qazXSW@3edc
@@ -93,7 +106,7 @@ services:
 
     FriendsService_SqlServer:
         image: mcr.microsoft.com/mssql/server
-        container_name: FriendsServiceDb
+        container_name: HomeAccountant.FriendsServiceDb
         environment:
             - ACCEPT_EULA=Y
             - MSSQL_SA_PASSWORD=1qazXSW@3edc
@@ -105,7 +118,7 @@ services:
 
     AccountingService_SqlServer:
         image: mcr.microsoft.com/mssql/server
-        container_name: AccountingServiceDb
+        container_name: HomeAccountant.AccountingServiceDb
         environment:
             - ACCEPT_EULA=Y
             - MSSQL_SA_PASSWORD=1qazXSW@3edc
