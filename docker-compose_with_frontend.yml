@@ -27,6 +27,7 @@ services:
             dockerfile: Dockerfile
         environment:
             - ASPNETCORE_URLS=http://+:80
+            - CorsOrigin=http://localhost:8081
         networks:
             - dev
 
