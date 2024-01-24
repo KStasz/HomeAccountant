@@ -54,6 +54,13 @@ builder.Services.AddHttpClient<ICategoriesService, CategoriesService>((service, 
     client.BaseAddress = new Uri(builder.Configuration["CategoriesServiceBaseUri"] ?? throw new ArgumentNullException(nameof(client.BaseAddress)));
     client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", authHader.Replace("Bearer ", string.Empty));
 });
+builder.Services.AddHttpClient<IAccountInfoService, AccountInfoService>((service, client) =>
+{
+    var contextAccessor = service.GetRequiredService<IHttpContextAccessor>();
+    var authHader = contextAccessor.HttpContext?.Request.Headers.Authorization.ToString() ?? string.Empty;
+    client.BaseAddress = new Uri(builder.Configuration["IdentityServiceBaseUri"] ?? throw new ArgumentNullException(nameof(client.BaseAddress)));
+    client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", authHader.Replace("Bearer ", string.Empty));
+});
 
 
 var app = builder.Build();
