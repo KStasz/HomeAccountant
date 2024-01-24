@@ -27,6 +27,11 @@ namespace HomeAccountant.Components.Modal
             { ModalPosition.Centered, "modal-dialog-centered" }
         };
 
+        protected override void OnInitialized()
+        {   
+            base.OnInitialized();
+        }
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await ModalService.InitializeModalAsync(ModalIdentifier);

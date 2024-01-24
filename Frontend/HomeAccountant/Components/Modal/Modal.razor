@@ -2,7 +2,7 @@
     <div class="modal-dialog @_positionsDictionary[Position]">
         @if (_isVisible)
         {
-            <CascadingValue Name="HideModal" Value="HideModalAsync">
+            <CascadingValue Name="Modal" Value="this">
                 @ChildContent
             </CascadingValue>
         }

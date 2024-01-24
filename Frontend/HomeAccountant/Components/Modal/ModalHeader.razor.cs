@@ -7,14 +7,14 @@ namespace HomeAccountant.Components.Modal
         [Parameter]
         public string ModalTitle { get; set; } = "Modal title";
 
-        [CascadingParameter(Name = "HideModal")]
-        public Func<Task>? HideModal { get; set; }
+        [CascadingParameter(Name = "Modal")]
+        public Modal? Modal { get; set; }
 
         private async Task HideModal_Clicked()
         {
-            if (HideModal != null)
+            if (Modal != null)
             {
-                await HideModal.Invoke();
+                await Modal.HideModalAsync();
             }
         }
     }

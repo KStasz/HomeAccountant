@@ -6,6 +6,7 @@ namespace HomeAccountant.Core.DTOs.Register
     {
         [Required(ErrorMessage = "Nazwa księgi jest wymagana")]
         public string? Name { get; set; }
+        public string? Description { get; set; }
 
         public void ClearModel()
         {
