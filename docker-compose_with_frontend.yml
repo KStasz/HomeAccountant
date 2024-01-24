@@ -1,0 +1,128 @@
+version: '3.4'
+name: homeaccountant_with_frontend
+networks:
+    dev:
+        driver: bridge
+services:
+    homeaccountant.frontend:
+        image: krz123/homeaccountant.frontend
+        container_name: HomeAccountant.Frontend
+        ports:
+            - '8081:80'
+        build:
+            context: .
+            dockerfile: Dockerfile
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Development
+        networks:
+            - dev
+
+    homeaccountant.gateway:
+        image: krz123/homeaccountant.gateway
+        container_name: HomeAccountant.Gateway
+        ports:
+            - '8080:80'
+        build:
+            context: .
+            dockerfile: Dockerfile
+        environment:
+            - ASPNETCORE_URLS=http://+:80
+        networks:
+            - dev
+
+    identity_platform:
+        image: krz123/homeaccountant.identityplatform
+        container_name: HomeAccountant.Identity_platform
+        build:
+            context: .
+            dockerfile: Dockerfile
+        environment:
+            - ASPNETCORE_URLS=http://+:80
+            - ConnectionStrings__SqlServer=Server=ItentityPlatform_SqlServer;Database=IdentityPlatform;User Id=sa;Password=1qazXSW@3edc;TrustServerCertificate=True;
+        networks:
+            - dev
+
+    homeaccountant_categoriesservice:
+        image: krz123/homeaccountant.categoriesservice
+        container_name: HomeAccountant.CategoriesService
+        build:
+            context: .
+            dockerfile: Dockerfile
+        environment:
+            - ASPNETCORE_URLS=http://+:80
+            - ConnectionStrings__DefaultConnection=Server=CategoriesService_SqlServer;Database=CategoriesDb;User Id=sa;Password=1qazXSW@3edc;TrustServerCertificate=True;
+        networks:
+            - dev
+
+    homeaccountant_friendsservice:
+        image: krz123/homeaccountant.friendsservice
+        container_name: HomeAccountant.FriendsService
+        build:
+            context: .
+            dockerfile: Dockerfile
+        environment:
+            - ASPNETCORE_URLS=http://+:80
+            - ConnectionStrings__DefaultConnection=Server=FriendsService_SqlServer;Database=FriendsDb;User Id=sa;Password=1qazXSW@3edc;TrustServerCertificate=True;
+        networks:
+            - dev
+
+    homeaccountant_accountingservice:
+        image: krz123/homeaccountant.accountingservice
+        container_name: HomeAccountant.AccountingService
+        build:
+            context: .
+            dockerfile: Dockerfile
+        environment:
+            - ASPNETCORE_URLS=http://+:80
+            - ConnectionStrings__DefaultConnection=Server=AccountingService_SqlServer;Database=AccountingDb;User Id=sa;Password=1qazXSW@3edc;TrustServerCertificate=True;
+            - CategoriesServiceBaseUri=http://homeaccountant_categoriesservice:80
+        networks:
+            - dev
+    
+    ItentityPlatform_SqlServer:
+        image: mcr.microsoft.com/mssql/server
+        container_name: HomeAccountant.ItentityPlatformDb
+        environment:
+            - ACCEPT_EULA=Y
+            - MSSQL_SA_PASSWORD=1qazXSW@3edc
+            - MSSQL_PID=Express
+        volumes:
+            - .\IdentityPlatformDb:/var/opt/mssql/data
+        networks:
+            - dev
+
+    CategoriesService_SqlServer:
+        image: mcr.microsoft.com/mssql/server
+        container_name: HomeAccountant.CategoriesServiceDb
+        environment:
+            - ACCEPT_EULA=Y
+            - MSSQL_SA_PASSWORD=1qazXSW@3edc
+            - MSSQL_PID=Express
+        volumes:
+            - .\CategoriesServiceDb:/var/opt/mssql/data
+        networks:
+            - dev
+
+    FriendsService_SqlServer:
+        image: mcr.microsoft.com/mssql/server
+        container_name: HomeAccountant.FriendsServiceDb
+        environment:
+            - ACCEPT_EULA=Y
+            - MSSQL_SA_PASSWORD=1qazXSW@3edc
+            - MSSQL_PID=Express
+        volumes:
+            - .\FriendsServiceDb:/var/opt/mssql/data
+        networks:
+            - dev
+
+    AccountingService_SqlServer:
+        image: mcr.microsoft.com/mssql/server
+        container_name: HomeAccountant.AccountingServiceDb
+        environment:
+            - ACCEPT_EULA=Y
+            - MSSQL_SA_PASSWORD=1qazXSW@3edc
+            - MSSQL_PID=Express
+        volumes:
+            - .\AccountingServiceDb:/var/opt/mssql/data
+        networks:
+            - dev

@@ -1,6 +1,6 @@
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
-using Ocelot.Values;
+using System.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,10 +9,16 @@ builder.Configuration.SetBasePath(builder.Environment.ContentRootPath)
     .AddJsonFile($"ocelot.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
 
+Debug.WriteLine("Aaaaa");
+
 builder.Services.AddCors(options =>
 {
+    //options.AddPolicy("CorsPolicy",
+    //    builder => builder.WithOrigins("http://localhost:5225")
+    //        .AllowAnyMethod()
+    //        .AllowAnyHeader());
     options.AddPolicy("CorsPolicy",
-        builder => builder.WithOrigins("http://localhost:5225")
+        builder => builder.WithOrigins("http://localhost:8081")
             .AllowAnyMethod()
             .AllowAnyHeader());
 });
