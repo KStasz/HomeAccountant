@@ -20,14 +20,12 @@ services:
     homeaccountant.gateway:
         image: krz123/homeaccountant.gateway
         container_name: HomeAccountant.Gateway
-        ports:
-            - '8080:80'
         build:
             context: .
             dockerfile: Dockerfile
         environment:
             - ASPNETCORE_URLS=http://+:80
-            - CorsOrigin=http://localhost:8081
+            - UseCors=False
         networks:
             - dev
 

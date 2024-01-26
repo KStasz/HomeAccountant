@@ -9,14 +9,21 @@ builder.Configuration.SetBasePath(builder.Environment.ContentRootPath)
     .AddJsonFile($"ocelot.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
 
-builder.Services.AddCors(options =>
+var useCors = builder.Configuration.GetSection("UseCors").Get<bool>();
+
+Console.WriteLine($"--> UseCors: {useCors}");
+
+if (useCors)
 {
-    var corsOrigin = builder.Configuration["CorsOrigin"] ?? string.Empty;
-    options.AddPolicy("CorsPolicy",
-        builder => builder.WithOrigins(corsOrigin)
-            .AllowAnyMethod()
-            .AllowAnyHeader());
-});
+    builder.Services.AddCors(options =>
+    {
+        var corsOrigin = builder.Configuration["CorsOrigin"] ?? string.Empty;
+        options.AddPolicy("CorsPolicy",
+            builder => builder.WithOrigins(corsOrigin)
+                .AllowAnyMethod()
+                .AllowAnyHeader());
+    });
+}
 
 builder.Services.AddOcelot(builder.Configuration);
 builder.Services.AddControllers();
@@ -26,7 +33,8 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-app.UseCors("CorsPolicy");
+if (useCors)
+    app.UseCors("CorsPolicy");
 
 app.Map("/swagger/v1/swagger.json", b =>
 {
