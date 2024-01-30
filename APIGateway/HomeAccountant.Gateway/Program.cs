@@ -17,9 +17,9 @@ if (useCors)
 {
     builder.Services.AddCors(options =>
     {
-        var corsOrigin = builder.Configuration["CorsOrigin"] ?? string.Empty;
+        var corsOrigins = builder.Configuration.GetSection("CorsOrigin").Get<string[]>() ?? new string[] { string.Empty };
         options.AddPolicy("CorsPolicy",
-            builder => builder.WithOrigins(corsOrigin)
+            builder => builder.WithOrigins(corsOrigins)
                 .AllowAnyMethod()
                 .AllowAnyHeader());
     });

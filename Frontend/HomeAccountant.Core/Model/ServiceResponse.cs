@@ -4,7 +4,10 @@
     {
         public ServiceResponse() : base(false)
         {
-
+            Errors = new List<string>()
+            {
+                "Wystąpił błąd"
+            };
         }
 
         public ServiceResponse(T result) : base(true)

@@ -1,36 +1,35 @@
-﻿<EditForm Model="ViewModel.LoginData" OnValidSubmit="ViewModel.Login">
-    <DataAnnotationsValidator />
-    <div class="modal-content">
-        <div class="modal-header">
-            <h1 class="modal-title fs-5" id="exampleModalLabel">Zaloguj się do swojego konta</h1>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-            <div class="row row-cols-1 g-3">
-                <div class="col">
-                    <div class="col-12 col-md-9 col-lg-6">
-                        <label for="emailInput">Email:</label>
-                        <InputText id="emailInput" class="form-control" @bind-Value="ViewModel.LoginData.Email" />
-                        <ValidationMessage For="() => ViewModel.LoginData.Email" />
-                    </div>
+﻿<Modal @ref="_modal" Position="ModalPosition.Centered">
+    <ModalContent>
+        <EditForm EditContext="_editContext" OnSubmit="Submit">
+            <DataAnnotationsValidator />
+            <ModalHeader ModalTitle="Logowanie" />
+            <ModalBody>
+                <Alert @ref="_alert" />
+                <div class="col-12 col-md-9 mb-3">
+                    <label for="emailInput">Email:</label>
+                    <InputText id="emailInput" class="form-control" @bind-Value="_loginData!.Email" />
+                    <ValidationMessage For="() => _loginData.Email" />
                 </div>
-                <div class="col">
-                    <div class="col-12 col-md-9 col-lg-6">
-                        <label for="passwordInput">Hasło:</label>
-                        <InputText type="password" id="passwordInput" class="form-control" @bind-Value="ViewModel.LoginData.Password" />
-                        <ValidationMessage For="() => ViewModel.LoginData.Password" />
-                    </div>
+                <div class="col-12 col-md-9">
+                    <label for="passwordInput">Hasło:</label>
+                    <InputText type="password" id="passwordInput" class="form-control" @bind-Value="_loginData!.Password" />
+                    <ValidationMessage For="() => _loginData.Password" />
                 </div>
-            </div>
-            <div class="row col-12">
-                <ErrorMessage Message="ViewModel.ErrorMessage" />
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
-            <button type="submit" class="btn btn-success">Zaloguj</button>
-        </div>
-    </div>
-</EditForm>
-
-
+            </ModalBody>
+            <ModalFooter>
+                <button type="button" class="btn btn-secondary" @onclick="Cancel">Anuluj</button>
+                @if (_isBusy)
+                {
+                    <button type="submit" class="btn btn-success" disabled>
+                        <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                        <span role="status">Logowanie...</span>
+                    </button>
+                }
+                else
+                {
+                    <button type="submit" class="btn btn-success">Zaloguj się</button>
+                }
+            </ModalFooter>
+        </EditForm>
+    </ModalContent>
+</Modal>

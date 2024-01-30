@@ -1,5 +1,8 @@
 using HomeAccountant;
 using HomeAccountant.Core.Authentication;
+using HomeAccountant.Core.DTOs.Authentication;
+using HomeAccountant.Core.Mapper;
+using HomeAccountant.Core.Model;
 using HomeAccountant.Core.Services;
 using HomeAccountant.Core.ViewModels;
 using HomeAccountant.Services;
@@ -15,7 +18,6 @@ builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<JwtAuthenticationStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<JwtAuthenticationStateProvider>());
 builder.Services.AddScoped<IJsCodeExecutor, JsCodeExecutor>();
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddSingleton<ITokenStorageAccessor, TokenStorageAccessor>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 
@@ -25,8 +27,9 @@ builder.Services.AddScoped<ICategoriesService, CategoriesService>();
 builder.Services.AddScoped<IModalService, ModalService>();
 builder.Services.AddScoped<IJwtTokenParser, JwtTokenParser>();
 builder.Services.AddScoped<IBillingPeriodService, BillingPeriodService>();
+builder.Services.AddScoped<ITypeMapper<TokenAuthenticationModel, LoginResponseDTO>, TokenAuthenticationMapper>();
 
-builder.Services.AddHttpClient("UnauhorizedHttpClient", 
+builder.Services.AddHttpClient("UnauhorizedHttpClient",
     client => client.BaseAddress = new Uri(GetBaseAddress()));
 
 builder.Services.AddHttpClient<AuthorizableHttpClient>(

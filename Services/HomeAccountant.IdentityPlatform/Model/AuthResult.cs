@@ -6,23 +6,8 @@ public class AuthResult
     {
         Token = token;
         RefreshToken = refreshToken;
-        Result = true;
     }
 
-    public AuthResult(params string[] errors)
-    {
-        Result = false;
-        Errors = new List<string>(errors);
-    }
-
-    public AuthResult(IEnumerable<string> errors)
-    {
-        Result = false;
-        Errors = new List<string>(errors);
-    }
-
-    public string? Token { get; set; }
-    public string? RefreshToken { get; set; }
-    public bool Result { get; set; }
-    public List<string>? Errors { get; set; }
+    public string Token { get; set; }
+    public string RefreshToken { get; set; }
 }

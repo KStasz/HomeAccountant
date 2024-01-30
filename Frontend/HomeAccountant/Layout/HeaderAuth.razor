@@ -1,4 +1,8 @@
-﻿<ul class="navbar-nav mb-2 mb-lg-0 d-lg-inline-flex mt-2 mt-md-0 ms-md-auto">
+﻿@using HomeAccountant.Pages
+@inherits MvvmComponent<LoginViewModel>
+
+
+<ul class="navbar-nav mb-2 mb-lg-0 d-lg-inline-flex mt-2 mt-md-0 ms-md-auto">
     <AuthorizeView>
         <Authorized>
             <li class="nav-item">
@@ -12,12 +16,12 @@
         </Authorized>
         <NotAuthorized>
             <li class="nav-item">
-                <button type="button" class="nav-link" data-bs-toggle="modal" data-bs-target="#authenticationModal" @onclick="@SetLogin">
+                <button type="button" class="nav-link" data-bs-toggle="modal" data-bs-target="#authenticationModal" @onclick="ViewModel.Login">
                     Logowanie
                 </button>
             </li>
             <li class="nav-item">
-                <button type="button" class="nav-link" data-bs-toggle="modal" data-bs-target="#authenticationModal" @onclick="@SetRegister">
+                <button type="button" class="nav-link" data-bs-toggle="modal" data-bs-target="#authenticationModal" @onclick="ViewModel.Register">
                     Rejestracja
                 </button>
             </li>
@@ -25,16 +29,6 @@
     </AuthorizeView>
 </ul>
 
-<div class="modal fade" id="authenticationModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        @switch (Action)
-        {
-            case HeaderAction.Login:
-                <LoginPage />
-                break;
-            case HeaderAction.Register:
-                <RegisterPage />
-                break;
-        }
-    </div>
-</div>
+<LoginPage @ref="ViewModel.LoginDialog" AuthService="ViewModel.AuthenticationService"/>
+
+<RegisterPage @ref="ViewModel.RegisterDialog" AuthService="ViewModel.AuthenticationService" />

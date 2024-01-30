@@ -10,6 +10,5 @@
 
         public string Token { get; private set; }
         public string RefreshToken { get; private set; }
-
     }
 }

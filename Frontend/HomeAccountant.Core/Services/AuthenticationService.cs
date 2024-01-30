@@ -1,7 +1,8 @@
-﻿using AutoMapper;
-using HomeAccountant.Core.DTOs.Authentication;
+﻿using HomeAccountant.Core.DTOs.Authentication;
+using HomeAccountant.Core.Exceptions;
+using HomeAccountant.Core.Extensions;
+using HomeAccountant.Core.Mapper;
 using HomeAccountant.Core.Model;
-using Microsoft.Extensions.Logging;
 using System.Net.Http.Json;
 
 namespace HomeAccountant.Core.Services
@@ -11,19 +12,18 @@ namespace HomeAccountant.Core.Services
         private const string LOGIN_ENDPOINT = "api/Authentication/Login";
         private const string REGISTER_ENDPOINT = "api/Authentication/Register";
         private readonly HttpClient _httpClient;
-        private readonly IMapper _mapper;
-        private readonly ILogger<AuthenticationService> _logger;
+        private ITypeMapper<TokenAuthenticationModel, LoginResponseDTO> _mapper;
 
-        public AuthenticationService(IHttpClientFactory httpClientFactory,
-            IMapper mapper,
-            ILogger<AuthenticationService> logger)
+        public AuthenticationService(
+            IHttpClientFactory httpClientFactory,
+            ITypeMapper<TokenAuthenticationModel, LoginResponseDTO> mapper
+            )
         {
             _httpClient = httpClientFactory.CreateClient("UnauhorizedHttpClient");
             _mapper = mapper;
-            _logger = logger;
         }
 
-        public async Task<ServiceResponse<TokenAuthenticationModel>> LoginAsync(string email, string password, CancellationToken cancellationToken = default)
+        public async Task<ServiceResponse<LoginResponseDTO>> LoginAsync(string email, string password, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -33,61 +33,56 @@ namespace HomeAccountant.Core.Services
                     password,
                 }, cancellationToken);
 
-                var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponseDTO>(cancellationToken);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    if (!loginResponse?.Result ?? false)
-                    {
-                        return new ServiceResponse<TokenAuthenticationModel>(false, loginResponse?.Errors);
-                    }
-
-                    return new ServiceResponse<TokenAuthenticationModel>(false);
-                }
-
-                var tokenAuthentication = _mapper.Map<TokenAuthenticationModel>(loginResponse);
-
-                return new ServiceResponse<TokenAuthenticationModel>(tokenAuthentication);
+                var loginResponse = await response.Content.ReadFromJsonAsync<ServiceResponse<LoginResponseDTO>>();
+                
+                return loginResponse.Protect();
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(ex, ex.Message);
-
-                return new ServiceResponse<TokenAuthenticationModel>(false, new List<string>()
-                {
-                    "Wystąpił błąd"
-                });
+                return new ServiceResponse<LoginResponseDTO>(
+                    false,
+                    new List<string>()
+                    {
+                        ex.Message
+                    });
             }
         }
 
         public async Task<ServiceResponse<TokenAuthenticationModel>> RefreshTokenAsync(string token, string refreshToken, CancellationToken cancellationToken = default)
         {
-            var url = "/api/Authentication/RefreshToken";
-
-            var response = await _httpClient.PostAsJsonAsync(url, new
+            try
             {
-                token,
-                refreshToken
-            }, cancellationToken);
+                var url = "/api/Authentication/RefreshToken";
 
-            var responseContent = await response.Content.ReadFromJsonAsync<LoginResponseDTO>(cancellationToken);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                if (responseContent?.Result ?? false)
+                var response = await _httpClient.PostAsJsonAsync(url, new
                 {
-                    return new ServiceResponse<TokenAuthenticationModel>(false, responseContent?.Errors);
+                    token,
+                    refreshToken
+                }, cancellationToken);
+
+                var responseContent = await response.Content.ReadFromJsonAsync<ServiceResponse<LoginResponseDTO>>(cancellationToken);
+
+                if (responseContent is null)
+                {
+                    throw new ServiceException("Wystąpił problem z połączeniem");
                 }
 
-                return new ServiceResponse<TokenAuthenticationModel>(false);
+                var tokenAuthentication = _mapper.Map(responseContent.Value!);
+
+                return new ServiceResponse<TokenAuthenticationModel>(tokenAuthentication.Protect());
             }
-
-            var tokenAuthentication = _mapper.Map<TokenAuthenticationModel>(responseContent);
-
-            return new ServiceResponse<TokenAuthenticationModel>(tokenAuthentication);
+            catch (Exception ex)
+            {
+                return new ServiceResponse<TokenAuthenticationModel>(
+                    false,
+                    new List<string>()
+                    {
+                        ex.Message
+                    });
+            }
         }
 
-        public async Task<ServiceResponse<TokenAuthenticationModel>> RegisterAsync(string email, string username, string password, CancellationToken cancellationToken = default)
+        public async Task<ServiceResponse<LoginResponseDTO>> RegisterAsync(string email, string username, string password, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -98,30 +93,18 @@ namespace HomeAccountant.Core.Services
                     password
                 }, cancellationToken);
 
-                var registerResponse = await response.Content.ReadFromJsonAsync<LoginResponseDTO>(cancellationToken);
+                var registerResponse = await response.Content.ReadFromJsonAsync<ServiceResponse<LoginResponseDTO>>(cancellationToken);
 
-                if (!response.IsSuccessStatusCode)
-                {
-                    if (!registerResponse?.Result ?? false)
-                    {
-                        return new ServiceResponse<TokenAuthenticationModel>(false, registerResponse?.Errors);
-                    }
-
-                    return new ServiceResponse<TokenAuthenticationModel>(false);
-                }
-
-                var tokenAuthentication = _mapper.Map<TokenAuthenticationModel>(registerResponse);
-
-                return new ServiceResponse<TokenAuthenticationModel>(tokenAuthentication);
+                return registerResponse.Protect();
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(ex, ex.Message);
-
-                return new ServiceResponse<TokenAuthenticationModel>(false, new List<string>()
-                {
-                    "Wystąpił błąd"
-                });
+                return new ServiceResponse<LoginResponseDTO>(
+                    false,
+                    new List<string>()
+                    {
+                        ex.Message
+                    });
             }
         }
     }

@@ -1,45 +1,53 @@
-﻿<EditForm Model="ViewModel.RegisterData" OnValidSubmit="ViewModel.Register">
-    <DataAnnotationsValidator />
-    <div class="modal-content">
-        <div class="modal-header">
-            <h1 class="modal-title fs-5" id="exampleModalLabel">Utwórz swoje konto</h1>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-            <div class="row row-cols-1 g-3">
-                <div class="col">
-                    <div class="col-12 col-md-9 col-lg-6">
+﻿<Modal @ref="_modal" Position="ModalPosition.Centered">
+    <ModalContent>
+        <EditForm EditContext="_editContext" OnSubmit="Submit">
+            <DataAnnotationsValidator />
+            <ModalHeader ModalTitle="Utwórz nowe konto" />
+            <ModalBody>
+                <Alert @ref="_alert" />
+                <div class="col mb-3">
+                    <div class="col-12 col-md-9">
                         <label for="emailInput">Email:</label>
-                        <InputText type="email" id="emailInput" class="form-control" @bind-Value="ViewModel.RegisterData.Email" />
-                        <ValidationMessage For="() => ViewModel.RegisterData.Email" />
+                        <InputText type="email" id="emailInput" class="form-control" @bind-Value="_registerUserDto!.Email" />
+                        <ValidationMessage For="() => _registerUserDto.Email" />
                     </div>
                 </div>
-                <div class="col">
-                    <div class="col-12 col-md-9 col-lg-6">
+                <div class="col mb-3">
+                    <div class="col-12 col-md-9">
                         <label for="username">Nazwa użytkownika:</label>
-                        <InputText type="text" id="username" class="form-control" @bind-Value="ViewModel.RegisterData.UserName" />
-                        <ValidationMessage For="() => ViewModel.RegisterData.UserName" />
+                        <InputText type="text" id="username" class="form-control" @bind-Value="_registerUserDto!.UserName" />
+                        <ValidationMessage For="() => _registerUserDto.UserName" />
                     </div>
                 </div>
-                <div class="col">
-                    <div class="col-12 col-md-9 col-lg-6">
+                <div class="col mb-3">
+                    <div class="col-12 col-md-9">
                         <label for="passwordInput">Hasło:</label>
-                        <InputText type="password" id="passwordInput" class="form-control" @bind-Value="ViewModel.RegisterData.Password" />
-                        <ValidationMessage For="() => ViewModel.RegisterData.Password" />
+                        <InputText type="password" id="passwordInput" class="form-control" @bind-Value="_registerUserDto!.Password" />
+                        <ValidationMessage For="() => _registerUserDto.Password" />
                     </div>
                 </div>
                 <div class="col">
-                    <div class="col-12 col-md-9 col-lg-6">
+                    <div class="col-12 col-md-9">
                         <label for="repeatedPasswordInput">Powtórz hasło:</label>
-                        <InputText type="password" id="repeatedPasswordInput" class="form-control" @bind-Value="ViewModel.RegisterData.RepeatedPassword" />
-                        <ValidationMessage For="() => ViewModel.RegisterData.RepeatedPassword" />
+                        <InputText type="password" id="repeatedPasswordInput" class="form-control" @bind-Value="_registerUserDto!.RepeatedPassword" />
+                        <ValidationMessage For="() => _registerUserDto.RepeatedPassword" />
                     </div>
                 </div>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
-            <button type="submit" class="btn btn-success">Zarejestruj się</button>
-        </div>
-    </div>
-</EditForm>
+            </ModalBody>
+            <ModalFooter>
+                <button type="button" class="btn btn-secondary" @onclick="Cancel">Anuluj</button>
+                @if (_isBusy)
+                {
+                    <button type="submit" class="btn btn-success" disabled>
+                        <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                        <span role="status">Rejestrowanie...</span>
+                    </button>
+                }
+                else
+                {
+                    <button type="submit" class="btn btn-success">Zarejestruj się</button>
+                }
+            </ModalFooter>
+        </EditForm>
+    </ModalContent>
+</Modal>

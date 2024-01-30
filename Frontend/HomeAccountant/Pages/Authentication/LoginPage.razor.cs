@@ -1,36 +1,116 @@
-﻿using HomeAccountant.Core.ViewModels;
+﻿using HomeAccountant.Core.DTOs.Authentication;
+using HomeAccountant.Core.Model;
+using HomeAccountant.Core.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 
 namespace HomeAccountant.Pages.Authentication
 {
-    public partial class LoginPage : ComponentBase, IDisposable
+    public partial class LoginPage : ComponentBase, IModalDialog<LoginDTO, LoginResponseDTO>
     {
-        [Inject]
-        public required LoginViewModel ViewModel { get; set; }
+        [Parameter]
+        public IAuthenticationService? AuthService { get; set; }
 
-        protected override Task OnInitializedAsync()
+        private LoginDTO? _loginData;
+        private TaskCompletionSource<LoginResponseDTO?>? _tcs;
+        bool _isBusy = false;
+        private IModal? _modal;
+        private EditContext? _editContext;
+        private IAlert? _alert;
+
+        private void ClearModal()
         {
-            ViewModel.PropertyChangedAsync += ViewModel_PropertyChangedAsync;
-            return base.OnInitializedAsync();
+            if (_loginData is null)
+                return;
+
+            _loginData.Clear();
+            _editContext = new EditContext(_loginData);
         }
 
-        public void Dispose()
+        private async Task Cancel()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            ClearModal();
+            _tcs?.SetResult(null);
+            await HideModalAsync();
         }
 
-        private async Task ViewModel_PropertyChangedAsync(object? sender, PropertyChangedEventArgs e)
+        private async Task Submit()
         {
+            _isBusy = true;
+            if (_editContext is null)
+            {
+                _isBusy = false;
+                
+                return;
+            }
+
+            if (!_editContext.Validate())
+            {
+                _isBusy = false;
+
+                return;
+            }
+
+            if (AuthService is null)
+            {
+                _isBusy = false;
+
+                return;
+            }
+
+            var result = await AuthService.LoginAsync(
+                _loginData!.Email!,
+                _loginData!.Password!);
+
+            if (!result.Result)
+            {
+                if (_alert is null)
+                {
+                    _isBusy = false;
+
+                    return;
+                }
+
+                await _alert.ShowAlertAsync(
+                    $"Wystąpił błąd podczas logowania: " +
+                    $"{Environment.NewLine}{string.Join(Environment.NewLine, result!.Errors ?? new string[0])}",
+                    AlertType.Danger);
+
+                _isBusy = false;
+
+                return;
+            }
+
+            _tcs?.SetResult(result.Value);
+            
+            _isBusy = false;
+        }
+
+        public async Task HideModalAsync(CancellationToken cancellationToken = default)
+        {
+            if (_modal is null)
+                return;
+
+            await _modal.HideModalAsync();
+        }
+
+        public async Task InitializeDialogAsync(LoginDTO model)
+        {
+            _loginData = model;
+            _editContext = new EditContext(_loginData);
+            _tcs = new TaskCompletionSource<LoginResponseDTO?>();
+
             await InvokeAsync(StateHasChanged);
         }
 
-        protected virtual void Dispose(bool disposing) 
+        public async Task<LoginResponseDTO?> ShowModalAsync(CancellationToken cancellationToken = default)
         {
-            ViewModel.PropertyChangedAsync -= ViewModel_PropertyChangedAsync;
+            if (_modal is null || _tcs is null)
+                return null;
+
+            await _modal.ShowModalAsync();
+
+            return await _tcs.Task;
         }
     }
 }

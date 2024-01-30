@@ -1,10 +1,10 @@
-﻿<Modal @ref="_modal">
+﻿<Modal @ref="_modal" Position="ModalPosition.Centered">
     <ModalContent>
         <EditForm EditContext="_editContext" OnValidSubmit="Create">
             <DataAnnotationsValidator />
             <ModalHeader ModalTitle="Utwórz nowy okres" />
             <ModalBody>
-                <div class="mb-3">
+                <div class="col-12 mb-3">
                     <label for="billingPeriodName" class="form-label">Nazwa</label>
                     <InputText type="text" class="form-control" id="billingPeriodName" @bind-Value="_model!.Name"/>
                     <ValidationMessage For="() => _model.Name" />

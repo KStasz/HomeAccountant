@@ -1,120 +1,76 @@
 ﻿using HomeAccountant.Core.Authentication;
 using HomeAccountant.Core.DTOs.Authentication;
+using HomeAccountant.Core.Mapper;
+using HomeAccountant.Core.Model;
 using HomeAccountant.Core.Services;
 
 namespace HomeAccountant.Core.ViewModels
 {
-    public class LoginViewModel : BaseViewModel
+    public class LoginViewModel : MvvmViewModel
     {
-        private readonly IAuthenticationService _authenticationService;
         private readonly JwtAuthenticationStateProvider _jwtAuthenticationStateProvider;
-        private readonly IJsCodeExecutor _jsCodeExecutor;
         private readonly ITokenStorageAccessor _tokenStorage;
+        private readonly ITypeMapper<TokenAuthenticationModel, LoginResponseDTO> _mapper;
 
         public LoginViewModel(IAuthenticationService authenticationService,
             JwtAuthenticationStateProvider jwtAuthenticationStateProvider,
-            IJsCodeExecutor jsCodeExecutor,
-            ITokenStorageAccessor tokenStorage)
+            ITokenStorageAccessor tokenStorage,
+            ITypeMapper<TokenAuthenticationModel, LoginResponseDTO> mapper)
         {
-            _authenticationService = authenticationService;
+            AuthenticationService = authenticationService;
             _jwtAuthenticationStateProvider = jwtAuthenticationStateProvider;
-            _jsCodeExecutor = jsCodeExecutor;
             _tokenStorage = tokenStorage;
-            _loginData = new LoginDTO();
-            _registerData = new RegisterUserDto();
+            _mapper = mapper;
         }
 
-        private LoginDTO _loginData;
-        public LoginDTO LoginData
-        {
-            get => _loginData; 
-            set => SetValue(ref  _loginData, value);
-        }
-
-        private RegisterUserDto _registerData;
-        public RegisterUserDto RegisterData
-        {
-            get => _registerData; 
-            set  => SetValue(ref _registerData, value);
-        }
+        public IAuthenticationService AuthenticationService { get; private set; }
+        public IModalDialog<LoginDTO, LoginResponseDTO>? LoginDialog { get; set; }
+        public IModalDialog<RegisterUserDto, LoginResponseDTO>? RegisterDialog { get; set; }
 
         public async Task Login()
         {
-            ClearErrorMessage();
-
-            var result = await _authenticationService.LoginAsync(LoginData.Email!, LoginData.Password!);
-
-            if (!result.Result)
-            {
-                if (result.Errors is null)
-                {
-                    SetErrorMessage("Wystpił błąd podczas logowania");
-                    
-                    return;
-                }
-
-                SetErrorMessage(result.Errors?.ToArray() ?? new string[0]);
-
+            if (LoginDialog is null)
                 return;
-            }
 
-            if (result.Value is null)
-            {
-                SetErrorMessage("Wystpił błąd podczas logowania");
+            await LoginDialog.InitializeDialogAsync(new LoginDTO());
 
+            var result = await LoginDialog.ShowModalAsync();
+
+            if (result is null)
                 return;
-            }
 
-            await _tokenStorage.SetTokenAsync(result.Value);
+            await LoginDialog.HideModalAsync();
+
+            var tokenAuthentication = _mapper.Map(result);
+
+            await _tokenStorage.SetTokenAsync(tokenAuthentication);
             _jwtAuthenticationStateProvider.StateChanged();
-            
-            await _jsCodeExecutor.ExecuteFunctionAsync("HideModal");
         }
 
         public void Logout()
         {
             _tokenStorage.RemoveTokenAsync();
             _jwtAuthenticationStateProvider?.StateChanged();
-
-            ClearLoginData();
         }
 
         public async Task Register()
         {
-            ClearErrorMessage();
-            var result = await _authenticationService.RegisterAsync(
-                RegisterData.Email!,
-                RegisterData.UserName!,
-                RegisterData.Password!);
-
-            if (!result.Result)
-            {
-                if (result.Errors is null)
-                {
-                    SetErrorMessage("Wystąpił błąd podczas rejestracji");
-                }
-
-                SetErrorMessage(result.Errors?.ToArray() ?? new string[0]);
-                
+            if (RegisterDialog is null)
                 return;
-            }
 
-            if (result.Value is null)
-            {
-                SetErrorMessage("Wystąpił błąd podczas rejestracji");
-                
+            await RegisterDialog.InitializeDialogAsync(new RegisterUserDto());
+
+            var result = await RegisterDialog.ShowModalAsync();
+
+            if (result is null)
                 return;
-            }
 
-            await _tokenStorage.SetTokenAsync(result.Value);
+            await RegisterDialog.HideModalAsync();
+
+            var tokenAuthentication = _mapper.Map(result);
+
+            await _tokenStorage.SetTokenAsync(tokenAuthentication);
             _jwtAuthenticationStateProvider.StateChanged();
-
-            await _jsCodeExecutor.ExecuteFunctionAsync("HideModal");
-        }
-
-        private void ClearLoginData()
-        {
-            LoginData = new LoginDTO();
         }
     }
 }

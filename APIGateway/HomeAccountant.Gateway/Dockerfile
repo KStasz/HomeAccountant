@@ -11,6 +11,7 @@ COPY ["APIGateway/HomeAccountant.Gateway/HomeAccountant.Gateway.csproj", "APIGat
 RUN dotnet restore "APIGateway/HomeAccountant.Gateway/HomeAccountant.Gateway.csproj"
 COPY . .
 WORKDIR "/src/APIGateway/HomeAccountant.Gateway"
+RUN dotnet clean "HomeAccountant.Gateway.csproj"
 RUN dotnet build "HomeAccountant.Gateway.csproj" -c Release -o /app/build
 
 FROM build AS publish

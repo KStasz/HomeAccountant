@@ -1,4 +1,5 @@
 ﻿using Domain.Dtos.IdentityPlatform;
+using Domain.Model;
 using JwtAuthenticationManager;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -21,15 +22,25 @@ public class AuthenticationController : ControllerBase
 
     [HttpPost]
     [Route("Register")]
-    public async Task<IActionResult> Register([FromBody] UserRegistrationRequestDto userRegistrationRequestDto)
+    public async Task<ActionResult<ServiceResponse<AuthResult>>> Register([FromBody] UserRegistrationRequestDto userRegistrationRequestDto)
     {
         if (!ModelState.IsValid)
-            return BadRequest();
+            return BadRequest(
+                new ServiceResponse<AuthResult>(
+                    new List<string>()
+                    {
+                        "Przesłano niepoprawne dane"
+                    }));
 
         var userExists = await _userManager.FindByEmailAsync(userRegistrationRequestDto.Email);
 
         if (userExists is not null)
-            return BadRequest(new AuthResult(errors: "User already exists"));
+            return BadRequest(
+                new ServiceResponse<AuthResult>(
+                    new List<string>()
+                    {
+                        "Użytkownik o podanym adresie Email już istnieje"
+                    }));
 
         var newUser = new IdentityUser()
         {
@@ -40,48 +51,76 @@ public class AuthenticationController : ControllerBase
         var isUserCreated = await _userManager.CreateAsync(newUser, userRegistrationRequestDto.Password);
 
         if (!isUserCreated.Succeeded)
-            return BadRequest(new AuthResult(isUserCreated.Errors.Select(x => x.Description)));
+            return BadRequest(
+                new ServiceResponse<AuthResult>(
+                    new List<string>(isUserCreated.Errors.Select(x => x.Description))));
 
         var token = await _jwtTokenProvider.GenerateJwtToken(newUser);
 
-        return Ok(new AuthResult(token: token.Token, refreshToken: token.RefreshToken));
+        return Ok(new ServiceResponse<AuthResult>(
+            new AuthResult(token: token.Token, refreshToken: token.RefreshToken)));
     }
 
     [Route("Login")]
     [HttpPost]
-    public async Task<IActionResult> Login([FromBody] UserLoginRequestDto userLoginRequestDto)
+    public async Task<ActionResult<ServiceResponse<AuthResult>>> Login([FromBody] UserLoginRequestDto userLoginRequestDto)
     {
         if (!ModelState.IsValid)
-            return BadRequest();
+            return BadRequest(
+                new ServiceResponse<AuthResult>(
+                    new List<string>()
+                    {
+                        "Przesłano niepoprawne dane"
+                    }));
 
         var existingUser = await _userManager.FindByEmailAsync(userLoginRequestDto.Email);
 
         if (existingUser is null)
-            return BadRequest(new AuthResult(errors: "Password is not correct or user doesn't exist"));
+            return BadRequest(
+                new ServiceResponse<AuthResult>(
+                    new List<string>()
+                    {
+                        "Hasło jest niepoprawne lub użytkownik nie istnieje"
+                    }));
 
         bool isCorrect = await _userManager.CheckPasswordAsync(existingUser, userLoginRequestDto.Password);
 
         if (!isCorrect)
-            return BadRequest(new AuthResult(errors: "Password is not correct or user doesn't exist"));
+            return BadRequest(
+                new ServiceResponse<AuthResult>(
+                    new List<string>()
+                    {
+                        "Hasło jest niepoprawne lub użytkownik nie istnieje"
+                    }));
 
         var token = await _jwtTokenProvider.GenerateJwtToken(existingUser);
 
-        return Ok(new AuthResult(token: token.Token, refreshToken: token.RefreshToken));
+        return Ok(
+            new ServiceResponse<AuthResult>(
+                new AuthResult(token: token.Token, refreshToken: token.RefreshToken)));
     }
 
     [Route("RefreshToken")]
     [HttpPost]
-    public async Task<IActionResult> Refreshtoken([FromBody] TokenRequestDto tokenRequest)
+    public async Task<ActionResult<ServiceResponse<AuthResult>>> Refreshtoken([FromBody] TokenRequestDto tokenRequest)
     {
         if (!ModelState.IsValid)
-            return BadRequest(new AuthResult(errors: "Invalid parameters"));
-
+            return BadRequest(
+                new ServiceResponse<AuthResult>(
+                    new List<string>()
+                    {
+                        "Przesłano niepoprawne dane"
+                    }));
 
         var result = await _jwtTokenProvider.VerifyAndGenerateToken(tokenRequest.Token, tokenRequest.RefreshToken);
 
         if (result == null)
-            return BadRequest(new AuthResult(errors: "Invalid tokens"));
-
+            return BadRequest(
+                new ServiceResponse<AuthResult>(
+                    new List<string>()
+                    {
+                        "Niepoprawne tokeny"
+                    }));
 
         return Ok(result);
     }
