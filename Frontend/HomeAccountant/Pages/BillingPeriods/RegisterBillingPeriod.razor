@@ -1,4 +1,5 @@
 ﻿@page "/books/{registerId:int}"
+@attribute [Authorize]
 @inherits MvvmComponent<BillingPeriodViewModel>
 
 <Alert @ref="ViewModel.Alert" />
