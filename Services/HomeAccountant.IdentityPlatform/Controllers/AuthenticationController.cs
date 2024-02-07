@@ -122,6 +122,8 @@ public class AuthenticationController : ControllerBase
                         "Niepoprawne tokeny"
                     }));
 
-        return Ok(result);
+        return Ok(
+            new ServiceResponse<AuthResult>(
+                new AuthResult(result.Token, result.RefreshToken)));
     }
 }
