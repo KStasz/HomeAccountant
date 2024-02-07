@@ -32,7 +32,7 @@ namespace HomeAccountant.Core.Services
                     email,
                     password,
                 }, cancellationToken);
-
+                
                 var loginResponse = await response.Content.ReadFromJsonAsync<ServiceResponse<LoginResponseDTO>>();
                 
                 return loginResponse.Protect();
@@ -67,7 +67,7 @@ namespace HomeAccountant.Core.Services
                     throw new ServiceException("Wystąpił problem z połączeniem");
                 }
 
-                var tokenAuthentication = _mapper.Map(responseContent.Value!);
+                var tokenAuthentication = _mapper.Map(responseContent.Value);
 
                 return new ServiceResponse<TokenAuthenticationModel>(tokenAuthentication.Protect());
             }
