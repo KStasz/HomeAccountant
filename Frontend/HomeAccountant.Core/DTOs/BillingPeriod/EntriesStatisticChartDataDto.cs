@@ -2,7 +2,7 @@
 {
     public record EntriesStatisticChartDataDto
     {
-        public required string CategoryName { get; init; }
+        public string? CategoryName { get; init; }
         public double Sum { get; init; }
         public int ColorA { get; init; }
         public int ColorR { get; init; }

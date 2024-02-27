@@ -1,6 +1,4 @@
-﻿using HomeAccountant.Core.DTOs;
-
-namespace HomeAccountant.Core.Model
+﻿namespace HomeAccountant.Core.Model
 {
     public class BillingPeriodModel : IClearableObject
     {

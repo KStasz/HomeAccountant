@@ -1,5 +1,4 @@
-﻿using HomeAccountant.Core.DTOs;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace HomeAccountant.Core.Model
 {

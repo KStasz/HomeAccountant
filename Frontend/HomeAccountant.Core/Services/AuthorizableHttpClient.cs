@@ -1,5 +1,4 @@
 ﻿using HomeAccountant.Core.Authentication;
-using HomeAccountant.Core.DTOs.Authentication;
 using HomeAccountant.Core.Mapper;
 using HomeAccountant.Core.Model;
 using System.Net.Http.Headers;

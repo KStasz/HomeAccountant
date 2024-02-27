@@ -2,7 +2,7 @@
 {
     public class EntriesStatisticChartDataModel
     {
-        public required string CategoryName { get; set; }
+        public string? CategoryName { get; set; }
         public double Sum { get; set; }
         public int ColorA { get; set; }
         public int ColorR { get; set; }

@@ -2,7 +2,7 @@
 
 namespace HomeAccountant.Core.DTOs.Entry
 {
-    public class EntryUpdateDto
+    public record EntryUpdateDto
     {
         public int Id { get; set; }
 

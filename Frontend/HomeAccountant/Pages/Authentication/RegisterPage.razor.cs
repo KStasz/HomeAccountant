@@ -1,4 +1,5 @@
 ﻿using HomeAccountant.Core.DTOs.Authentication;
+using HomeAccountant.Core.Extensions;
 using HomeAccountant.Core.Mapper;
 using HomeAccountant.Core.Model;
 using HomeAccountant.Core.Services;
@@ -13,7 +14,7 @@ namespace HomeAccountant.Pages.Authentication
         public IAuthenticationService? AuthService { get; set; }
 
         private IAlert? _alert;
-        private RegisterUserModel? _registerUserDto;
+        private RegisterUserModel? _registerUser;
         private TaskCompletionSource<LoginResponseModel?>? _tcs;
         private bool _isBusy;
         private EditContext? _editContext;
@@ -22,11 +23,11 @@ namespace HomeAccountant.Pages.Authentication
 
         private void ClearModal()
         {
-            if (_registerUserDto is null)
+            if (_registerUser is null)
                 return;
 
-            _registerUserDto.Clear();
-            _editContext = new EditContext(_registerUserDto);
+            _registerUser.Clear();
+            _editContext = new EditContext(_registerUser);
         }
 
         private async Task Cancel()
@@ -39,13 +40,14 @@ namespace HomeAccountant.Pages.Authentication
         private async Task Submit()
         {
             _isBusy = true;
-            if (_editContext is null)
+            if (_editContext is null
+                || AuthService is null
+                || _registerUser is null)
             {
                 _isBusy = false;
 
                 return;
             }
-
 
             if (!_editContext.Validate())
             {
@@ -54,23 +56,20 @@ namespace HomeAccountant.Pages.Authentication
                 return;
             }
 
-            if (AuthService is null)
-            {
-                _isBusy = false;
-
-                return;
-            }
-
             var result = await AuthService.RegisterAsync(
-                _registerUserDto!.Email!,
-                _registerUserDto!.UserName!,
-                _registerUserDto!.Password!);
+                _registerUser.Email!,
+                _registerUser.UserName!,
+                _registerUser.Password!);
 
             if (!result.Result)
             {
-                await _alert!.ShowAlertAsync($"Nie udało się utworzyć konta: {Environment.NewLine}{string.Join(Environment.NewLine, result.Errors)}", AlertType.Danger);
+                await _alert!.ShowAlertAsync(
+                    $"Nie udało się utworzyć konta: " +
+                    $"{Environment.NewLine}{string.Join(Environment.NewLine, result.Errors ?? Array.Empty<string>())}",
+                    AlertType.Danger);
 
                 _isBusy = false;
+
                 return;
             }
 
@@ -88,8 +87,8 @@ namespace HomeAccountant.Pages.Authentication
 
         public async Task InitializeDialogAsync(RegisterUserModel model)
         {
-            _registerUserDto = model;
-            _editContext = new EditContext(_registerUserDto);
+            _registerUser = model;
+            _editContext = new EditContext(_registerUser);
             _tcs = new TaskCompletionSource<LoginResponseModel?>();
 
             await InvokeAsync(StateHasChanged);

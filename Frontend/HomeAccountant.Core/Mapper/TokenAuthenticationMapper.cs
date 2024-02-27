@@ -10,6 +10,9 @@ namespace HomeAccountant.Core.Mapper
         {
             value.Protect();
 
+            if (string.IsNullOrEmpty(value?.Token) || string.IsNullOrEmpty(value.RefreshToken))
+                throw new ArgumentException();
+
             return new TokenAuthenticationModel(value!.Token, value.RefreshToken);
         }
     }

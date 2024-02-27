@@ -45,7 +45,7 @@ namespace HomeAccountant.Core.ViewModels
                     _billingPeriodName ?? string.Empty,
                     BillingPeriodStatistic.ChartData
                         .Select(x => new ChartValue(
-                                x.CategoryName,
+                                x.CategoryName ?? throw new ArgumentNullException(nameof(x.CategoryName)),
                                 x.Sum,
                                 Color.FromArgb(x.ColorA, x.ColorR, x.ColorG, x.ColorB))))
             };
