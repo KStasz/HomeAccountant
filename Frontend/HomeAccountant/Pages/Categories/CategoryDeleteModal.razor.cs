@@ -1,12 +1,13 @@
 ﻿using HomeAccountant.Core.DTOs.Category;
+using HomeAccountant.Core.Model;
 using HomeAccountant.Core.Services;
 using Microsoft.AspNetCore.Components;
 
 namespace HomeAccountant.Pages.Categories
 {
-    public partial class CategoryDeleteModal : ComponentBase, IModalDialog<CategoryReadDto>
+    public partial class CategoryDeleteModal : ComponentBase, IModalDialog<CategoryModel>
     {
-        private CategoryReadDto? _model;
+        private CategoryModel? _model;
         private TaskCompletionSource<ModalResult>? _tcs;
         private IModal? _modal;
 
@@ -32,7 +33,7 @@ namespace HomeAccountant.Pages.Categories
             await HideModalAsync();
         }
 
-        public async Task InitializeDialogAsync(CategoryReadDto model)
+        public async Task InitializeDialogAsync(CategoryModel model)
         {
             _model = model;
             _tcs = new TaskCompletionSource<ModalResult>();

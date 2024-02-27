@@ -1,4 +1,4 @@
-﻿using HomeAccountant.Core.DTOs.BillingPeriod;
+﻿using HomeAccountant.Core.Model;
 using HomeAccountant.Core.Services;
 
 namespace HomeAccountant.Core.ViewModels
@@ -15,13 +15,12 @@ namespace HomeAccountant.Core.ViewModels
         {
             _billingPeriodService = billingPeriodService;
             _pubSubService = pubSubService;
-
             _pubSubService.MessageSender += _pubSubService_MessageSender;
         }
-        public List<BillingPeriodReadDto>? AvailableBillingPeriods { get; set; }
+        public List<BillingPeriodModel>? AvailableBillingPeriods { get; set; }
 
-        private BillingPeriodReadDto? _selectedBillingPeriod;
-        public BillingPeriodReadDto? SelectedBillingPeriod
+        private BillingPeriodModel? _selectedBillingPeriod;
+        public BillingPeriodModel? SelectedBillingPeriod
         {
             get => _selectedBillingPeriod;
             set => SetValue(ref _selectedBillingPeriod, value);
@@ -42,7 +41,7 @@ namespace HomeAccountant.Core.ViewModels
             set => SetValue(ref _isChartVisible, value);
         }
 
-        public IModalDialog<BillingPeriodCreateDto, BillingPeriodCreateDto>? BillingCreateDialog { get; set; }
+        public IModalDialog<BillingPeriodModel, BillingPeriodModel>? BillingCreateDialog { get; set; }
         public IAlert? Alert { get; set; }
 
         public Dictionary<string, object> IsOpenClosePeriodEnabled
@@ -98,14 +97,20 @@ namespace HomeAccountant.Core.ViewModels
             if (BillingCreateDialog is null)
                 return;
 
-            await BillingCreateDialog.InitializeDialogAsync(new BillingPeriodCreateDto());
+            await BillingCreateDialog.InitializeDialogAsync(new BillingPeriodModel());
             var result = await BillingCreateDialog.ShowModalAsync(CancellationToken);
 
             if (result is null)
                 return;
 
-            await _billingPeriodService.CreateBillingPeriodAsync(_registerId, result, CancellationToken);
-            await ReadInitialDataAsync(_registerId, CancellationToken);
+            await _billingPeriodService.CreateBillingPeriodAsync(
+                _registerId,
+                result,
+                CancellationToken);
+
+            await ReadInitialDataAsync(
+                _registerId,
+                CancellationToken);
         }
 
         public override async Task PageParameterSetAsync(Dictionary<string, object?> parameters)

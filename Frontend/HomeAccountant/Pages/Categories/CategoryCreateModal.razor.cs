@@ -1,14 +1,14 @@
-﻿using HomeAccountant.Core.DTOs.Category;
+﻿using HomeAccountant.Core.Model;
 using HomeAccountant.Core.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 
 namespace HomeAccountant.Pages.Categories
 {
-    public partial class CategoryCreateModal : ComponentBase, IModalDialog<CategoryCreateDto, CategoryCreateDto>
+    public partial class CategoryCreateModal : ComponentBase, IModalDialog<CategoryModel, CategoryModel>
     {
-        private CategoryCreateDto? _model;
-        private TaskCompletionSource<CategoryCreateDto?>? _tcs;
+        private CategoryModel? _model;
+        private TaskCompletionSource<CategoryModel?>? _tcs;
         private IModal? _modal;
         private EditContext? _editContext;
 
@@ -46,16 +46,16 @@ namespace HomeAccountant.Pages.Categories
             await HideModalAsync();
         }
 
-        public async Task InitializeDialogAsync(CategoryCreateDto model)
+        public async Task InitializeDialogAsync(CategoryModel model)
         {
             _model = model;
-            _tcs = new TaskCompletionSource<CategoryCreateDto?>();
+            _tcs = new TaskCompletionSource<CategoryModel?>();
             _editContext = new EditContext(_model);
 
             await InvokeAsync(StateHasChanged);
         }
 
-        public async Task<CategoryCreateDto?> ShowModalAsync(CancellationToken cancellationToken = default)
+        public async Task<CategoryModel?> ShowModalAsync(CancellationToken cancellationToken = default)
         {
             if (_modal is null || _tcs is null)
                 return null;

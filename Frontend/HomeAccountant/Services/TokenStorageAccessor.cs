@@ -36,7 +36,7 @@ namespace HomeAccountant.Services
             await _jSRuntime.InvokeVoidAsync("removeToken", cancellationToken);
         }
 
-        public async Task SetTokenAsync(TokenAuthenticationModel tokenAuthenticationModel, CancellationToken cancellationToken = default)
+        public async Task SetTokenAsync(LoginResponseModel tokenAuthenticationModel, CancellationToken cancellationToken = default)
         {
             var token = JsonSerializer.Serialize(tokenAuthenticationModel);
             await _jSRuntime.InvokeVoidAsync("setToken", cancellationToken, token);

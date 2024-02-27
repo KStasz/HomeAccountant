@@ -2,7 +2,7 @@
 
 namespace HomeAccountant.Core.DTOs.Authentication
 {
-    public class RegisterUserDto : IClearableObject
+    public record RegisterUserDto
     {
         [EmailAddress(ErrorMessage = "Email jest niepoprawny")]
         [Required(ErrorMessage = "Email jest wymagany")]
@@ -17,13 +17,5 @@ namespace HomeAccountant.Core.DTOs.Authentication
 
         [Required(ErrorMessage = "Hasło jest wymagane")]
         public string? RepeatedPassword { get; set; }
-
-        public void Clear()
-        {
-            Email = null;
-            UserName = null;
-            Password = null;
-            RepeatedPassword = null;
-        }
     }
 }

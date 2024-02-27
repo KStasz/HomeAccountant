@@ -1,4 +1,5 @@
 ﻿using HomeAccountant.Core.DTOs.Authentication;
+using HomeAccountant.Core.Mapper;
 using HomeAccountant.Core.Model;
 using HomeAccountant.Core.Services;
 using Microsoft.AspNetCore.Components;
@@ -6,14 +7,14 @@ using Microsoft.AspNetCore.Components.Forms;
 
 namespace HomeAccountant.Pages.Authentication
 {
-    public partial class RegisterPage : ComponentBase, IModalDialog<RegisterUserDto, LoginResponseDTO>
+    public partial class RegisterPage : ComponentBase, IModalDialog<RegisterUserModel, LoginResponseModel>
     {
         [Parameter]
         public IAuthenticationService? AuthService { get; set; }
 
         private IAlert? _alert;
-        private RegisterUserDto? _registerUserDto;
-        private TaskCompletionSource<LoginResponseDTO?>? _tcs;
+        private RegisterUserModel? _registerUserDto;
+        private TaskCompletionSource<LoginResponseModel?>? _tcs;
         private bool _isBusy;
         private EditContext? _editContext;
         private IModal? _modal;
@@ -85,16 +86,16 @@ namespace HomeAccountant.Pages.Authentication
             await _modal.HideModalAsync();
         }
 
-        public async Task InitializeDialogAsync(RegisterUserDto model)
+        public async Task InitializeDialogAsync(RegisterUserModel model)
         {
             _registerUserDto = model;
             _editContext = new EditContext(_registerUserDto);
-            _tcs = new TaskCompletionSource<LoginResponseDTO?>();
+            _tcs = new TaskCompletionSource<LoginResponseModel?>();
 
             await InvokeAsync(StateHasChanged);
         }
 
-        public async Task<LoginResponseDTO?> ShowModalAsync(CancellationToken cancellationToken = default)
+        public async Task<LoginResponseModel?> ShowModalAsync(CancellationToken cancellationToken = default)
         {
             if (_modal is null || _tcs is null)
                 return null;

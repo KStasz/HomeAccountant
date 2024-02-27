@@ -1,18 +1,17 @@
 ﻿using HomeAccountant.Core.DTOs.BillingPeriod;
 using HomeAccountant.Core.DTOs.Category;
-using HomeAccountant.Core.DTOs.Register;
 
 namespace HomeAccountant.Core.DTOs.Entry
 {
-    public class EntryReadDto
+    public record EntryReadDto
     {
-        public int Id { get; set; }
-        public required string Name { get; set; }
-        public required CategoryReadDto Category { get; set; }
-        public required BillingPeriodReadDto Period { get; set; }
-        public decimal Price { get; set; }
-        public required string Creator { get; set; }
-        public DateTime CreatedDate { get; set; }
+        public int Id { get; init; }
+        public required string Name { get; init; }
+        public CategoryReadDto? Category { get; init; }
+        public BillingPeriodReadDto? Period { get; init; }
+        public decimal Price { get; init; }
+        public required string Creator { get; init; }
+        public DateTime CreatedDate { get; init; }
 
     }
 }

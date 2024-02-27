@@ -2,14 +2,9 @@
 
 namespace HomeAccountant.Core.DTOs.BillingPeriod
 {
-    public class BillingPeriodCreateDto : IClearableObject
+    public record BillingPeriodCreateDto
     {
         [Required(ErrorMessage = "Nazwa jest wymagana")]
         public string? Name { get; set; }
-
-        public void Clear()
-        {
-            Name = null;
-        }
     }
 }

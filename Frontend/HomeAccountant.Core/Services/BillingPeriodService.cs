@@ -1,5 +1,7 @@
 ﻿using HomeAccountant.Core.DTOs.BillingPeriod;
+using HomeAccountant.Core.Exceptions;
 using HomeAccountant.Core.Extensions;
+using HomeAccountant.Core.Mapper;
 using HomeAccountant.Core.Model;
 using System.Drawing;
 using System.Net.Http.Json;
@@ -11,10 +13,19 @@ namespace HomeAccountant.Core.Services
     public class BillingPeriodService : IBillingPeriodService
     {
         private readonly AuthorizableHttpClient _httpClient;
+        private readonly ITypeMapper<BillingPeriodCreateDto, BillingPeriodModel> _mapper;
+        private readonly ITypeMapper<BillingPeriodModel, BillingPeriodReadDto> _billingPeriodMapper;
+        private readonly ITypeMapper<BillingPeriodStatisticModel, BillingPeriodStatisticDto> _billingPeriodStatisticMapper;
 
-        public BillingPeriodService(AuthorizableHttpClient httpClient)
+        public BillingPeriodService(AuthorizableHttpClient httpClient,
+            ITypeMapper<BillingPeriodCreateDto, BillingPeriodModel> mapper,
+            ITypeMapper<BillingPeriodModel, BillingPeriodReadDto> billingPeriodMapper,
+            ITypeMapper<BillingPeriodStatisticModel, BillingPeriodStatisticDto> billingPeriodStatisticMapper)
         {
             _httpClient = httpClient;
+            _mapper = mapper;
+            _billingPeriodMapper = billingPeriodMapper;
+            _billingPeriodStatisticMapper = billingPeriodStatisticMapper;
         }
 
         public async Task<ServiceResponse> CloseBillingPeriodAsync(int registerId, int billingPeriodId, CancellationToken cancellationToken = default)
@@ -26,7 +37,15 @@ namespace HomeAccountant.Core.Services
                 var response = await _httpClient.PutAsync(url, cancellationToken);
                 var responseContent = await response.Content.ReadFromJsonAsync<ServiceResponse>(cancellationToken);
 
-                return responseContent.Protect();
+                if (responseContent is null)
+                    throw new ServiceException();
+
+                if (!responseContent.Result)
+                    return new ServiceResponse(
+                        responseContent.Result,
+                        responseContent.Errors);
+
+                return new ServiceResponse(true);
             }
             catch (Exception ex)
             {
@@ -39,15 +58,24 @@ namespace HomeAccountant.Core.Services
             }
         }
 
-        public async Task<ServiceResponse> CreateBillingPeriodAsync(int registerId, BillingPeriodCreateDto createDto, CancellationToken cancellationToken = default)
+        public async Task<ServiceResponse> CreateBillingPeriodAsync(int registerId, BillingPeriodModel billingPeriod, CancellationToken cancellationToken = default)
         {
             try
             {
                 var url = $"/api/Register/{registerId}/BillingPeriod";
-                var response = await _httpClient.PostAsJsonAsync(url, createDto, cancellationToken);
+                var model = _mapper.Map(billingPeriod);
+                var response = await _httpClient.PostAsJsonAsync(url, model, cancellationToken);
                 var responseContent = await response.Content.ReadFromJsonAsync<ServiceResponse>(cancellationToken);
 
-                return responseContent.Protect();
+                if (responseContent is null)
+                    throw new ServiceException();
+
+                if (!responseContent.Result)
+                    return new ServiceResponse(
+                        responseContent.Result,
+                        responseContent.Errors);
+
+                return new ServiceResponse(true);
             }
             catch (Exception ex)
             {
@@ -68,7 +96,15 @@ namespace HomeAccountant.Core.Services
                 var response = await _httpClient.DeleteAsync(url, cancellationToken);
                 var responseContent = await response.Content.ReadFromJsonAsync<ServiceResponse>(cancellationToken);
 
-                return responseContent.Protect();
+                if (responseContent is null)
+                    throw new ServiceException();
+
+                if (!responseContent.Result)
+                    return new ServiceResponse(
+                        responseContent.Result,
+                        responseContent.Errors);
+
+                return new ServiceResponse(true);
             }
             catch (Exception ex)
             {
@@ -82,7 +118,7 @@ namespace HomeAccountant.Core.Services
 
         }
 
-        public async Task<ServiceResponse<IEnumerable<BillingPeriodReadDto>>> GetBiilingPeriodsAsync(int registerId, CancellationToken cancellationToken = default)
+        public async Task<ServiceResponse<IEnumerable<BillingPeriodModel>?>> GetBiilingPeriodsAsync(int registerId, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -91,11 +127,20 @@ namespace HomeAccountant.Core.Services
                 var responseContent = await response.Content
                     .ReadFromJsonAsync<ServiceResponse<IEnumerable<BillingPeriodReadDto>>>(cancellationToken);
 
-                return responseContent.Protect();
+                if (responseContent is null)
+                    throw new ServiceException();
+
+                if (!responseContent.Result)
+                    return new ServiceResponse<IEnumerable<BillingPeriodModel>?>(
+                        responseContent.Result,
+                        responseContent.Errors);
+
+                return new ServiceResponse<IEnumerable<BillingPeriodModel>?>(
+                    responseContent.Value?.Select(_billingPeriodMapper.Map));
             }
             catch (Exception ex)
             {
-                return new ServiceResponse<IEnumerable<BillingPeriodReadDto>>(
+                return new ServiceResponse<IEnumerable<BillingPeriodModel>?>(
                     false,
                     new List<string>()
                     {
@@ -104,7 +149,7 @@ namespace HomeAccountant.Core.Services
             }
         }
 
-        public async Task<ServiceResponse<BillingPeriodStatisticDto>> GetBillingPeriodStatisticAsync(int registerId, int billingPeriodId, CancellationToken cancellationToken = default)
+        public async Task<ServiceResponse<BillingPeriodStatisticModel?>> GetBillingPeriodStatisticAsync(int registerId, int billingPeriodId, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -112,11 +157,20 @@ namespace HomeAccountant.Core.Services
                 var response = await _httpClient.GetAsync(url, cancellationToken);
                 var responseContent = await response.Content.ReadFromJsonAsync<ServiceResponse<BillingPeriodStatisticDto>>();
 
-                return responseContent.Protect();
+                if (responseContent is null)
+                    throw new ServiceException();
+
+                if (!responseContent.Result)
+                    return new ServiceResponse<BillingPeriodStatisticModel?>(
+                        responseContent.Result,
+                        responseContent.Errors);
+
+                return new ServiceResponse<BillingPeriodStatisticModel?>(
+                    _billingPeriodStatisticMapper.Map(responseContent.Value));
             }
             catch (Exception ex)
             {
-                return new ServiceResponse<BillingPeriodStatisticDto>(
+                return new ServiceResponse<BillingPeriodStatisticModel?>(
                     false,
                     new List<string>()
                     {
@@ -133,7 +187,15 @@ namespace HomeAccountant.Core.Services
                 var response = await _httpClient.PutAsync(url, cancellationToken);
                 var responseContent = await response.Content.ReadFromJsonAsync<ServiceResponse>(cancellationToken);
 
-                return responseContent.Protect();
+                if (responseContent is null)
+                    throw new ServiceException();
+
+                if (!responseContent.Result)
+                    return new ServiceResponse(
+                        responseContent.Result,
+                        responseContent.Errors);
+
+                return new ServiceResponse(true);
             }
             catch (Exception ex)
             {

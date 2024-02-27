@@ -1,15 +1,16 @@
 ﻿using HomeAccountant.Core.DTOs.BillingPeriod;
+using HomeAccountant.Core.Model;
 using HomeAccountant.Core.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 
 namespace HomeAccountant.Pages.BillingPeriods
 {
-    public partial class CreateBillingPeriodDialog : ComponentBase, IModalDialog<BillingPeriodCreateDto, BillingPeriodCreateDto>
+    public partial class CreateBillingPeriodDialog : ComponentBase, IModalDialog<BillingPeriodModel, BillingPeriodModel>
     {
         private IModal? _modal;
-        private BillingPeriodCreateDto? _model;
-        private TaskCompletionSource<BillingPeriodCreateDto?>? _tcs;
+        private BillingPeriodModel? _model;
+        private TaskCompletionSource<BillingPeriodModel?>? _tcs;
         private EditContext? _editContext;
 
         public Task HideModalAsync(CancellationToken cancellationToken = default)
@@ -20,16 +21,16 @@ namespace HomeAccountant.Pages.BillingPeriods
             return _modal.HideModalAsync();
         }
 
-        public async Task InitializeDialogAsync(BillingPeriodCreateDto model)
+        public async Task InitializeDialogAsync(BillingPeriodModel model)
         {
             _model = model;
-            _tcs = new TaskCompletionSource<BillingPeriodCreateDto?>();
+            _tcs = new TaskCompletionSource<BillingPeriodModel?>();
             _editContext = new EditContext(_model);
 
             await InvokeAsync(StateHasChanged);
         }
 
-        public async Task<BillingPeriodCreateDto?> ShowModalAsync(CancellationToken cancellationToken = default)
+        public async Task<BillingPeriodModel?> ShowModalAsync(CancellationToken cancellationToken = default)
         {
             if (_modal is null || _tcs is null)
                 return null;

@@ -10,29 +10,26 @@ namespace HomeAccountant.Core.ViewModels
     {
         private readonly JwtAuthenticationStateProvider _jwtAuthenticationStateProvider;
         private readonly ITokenStorageAccessor _tokenStorage;
-        private readonly ITypeMapper<TokenAuthenticationModel, LoginResponseDTO> _mapper;
 
         public LoginViewModel(IAuthenticationService authenticationService,
             JwtAuthenticationStateProvider jwtAuthenticationStateProvider,
-            ITokenStorageAccessor tokenStorage,
-            ITypeMapper<TokenAuthenticationModel, LoginResponseDTO> mapper)
+            ITokenStorageAccessor tokenStorage)
         {
             AuthenticationService = authenticationService;
             _jwtAuthenticationStateProvider = jwtAuthenticationStateProvider;
             _tokenStorage = tokenStorage;
-            _mapper = mapper;
         }
 
         public IAuthenticationService AuthenticationService { get; private set; }
-        public IModalDialog<LoginDTO, LoginResponseDTO>? LoginDialog { get; set; }
-        public IModalDialog<RegisterUserDto, LoginResponseDTO>? RegisterDialog { get; set; }
+        public IModalDialog<LoginModel, LoginResponseModel>? LoginDialog { get; set; }
+        public IModalDialog<RegisterUserModel, LoginResponseModel>? RegisterDialog { get; set; }
 
         public async Task Login()
         {
             if (LoginDialog is null)
                 return;
 
-            await LoginDialog.InitializeDialogAsync(new LoginDTO());
+            await LoginDialog.InitializeDialogAsync(new LoginModel());
 
             var result = await LoginDialog.ShowModalAsync();
 
@@ -41,9 +38,7 @@ namespace HomeAccountant.Core.ViewModels
 
             await LoginDialog.HideModalAsync();
 
-            var tokenAuthentication = _mapper.Map(result);
-
-            await _tokenStorage.SetTokenAsync(tokenAuthentication);
+            await _tokenStorage.SetTokenAsync(result);
             _jwtAuthenticationStateProvider.StateChanged();
         }
 
@@ -58,7 +53,7 @@ namespace HomeAccountant.Core.ViewModels
             if (RegisterDialog is null)
                 return;
 
-            await RegisterDialog.InitializeDialogAsync(new RegisterUserDto());
+            await RegisterDialog.InitializeDialogAsync(new RegisterUserModel());
 
             var result = await RegisterDialog.ShowModalAsync();
 
@@ -67,9 +62,7 @@ namespace HomeAccountant.Core.ViewModels
 
             await RegisterDialog.HideModalAsync();
 
-            var tokenAuthentication = _mapper.Map(result);
-
-            await _tokenStorage.SetTokenAsync(tokenAuthentication);
+            await _tokenStorage.SetTokenAsync(result);
             _jwtAuthenticationStateProvider.StateChanged();
         }
     }

@@ -93,14 +93,14 @@ namespace HomeAccountant.AccountingService.Controllers
             {
                 var category = await _categoriesService.GetCategoryAsync(item.CategoryId);
 
-                if (category is null)
+                if (!category.Result)
                     continue;
 
                 var selectedColor = _colorPallete[counter++];
 
                 chartData.Add(new EntriesStatisticChartData()
                 {
-                    CategoryName = category.Name,
+                    CategoryName = category.Value?.Name ?? string.Empty,
                     Sum = (double)item.Sum,
                     ColorA = selectedColor.A,
                     ColorR = selectedColor.R,

@@ -1,8 +1,6 @@
-﻿using System.Drawing;
-
-namespace HomeAccountant.Core.DTOs.BillingPeriod
+﻿namespace HomeAccountant.Core.Model
 {
-    public class EntriesStatisticChartData
+    public class EntriesStatisticChartDataModel
     {
         public required string CategoryName { get; set; }
         public double Sum { get; set; }

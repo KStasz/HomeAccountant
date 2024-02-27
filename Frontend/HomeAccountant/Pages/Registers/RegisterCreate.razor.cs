@@ -1,14 +1,14 @@
-﻿using HomeAccountant.Core.DTOs.Register;
+﻿using HomeAccountant.Core.Model;
 using HomeAccountant.Core.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 
 namespace HomeAccountant.Pages.Registers
 {
-    public partial class RegisterCreate : ComponentBase, IModalDialog<RegisterCreateDto, RegisterCreateDto>
+    public partial class RegisterCreate : ComponentBase, IModalDialog<RegisterModel, RegisterModel>
     {
-        private RegisterCreateDto? _registerModel;
-        private TaskCompletionSource<RegisterCreateDto?>? _tcs;
+        private RegisterModel? _registerModel;
+        private TaskCompletionSource<RegisterModel?>? _tcs;
 
         private EditContext? _editContext;
 
@@ -19,7 +19,7 @@ namespace HomeAccountant.Pages.Registers
             if (_registerModel is null)
                 return;
 
-            _registerModel.ClearModel();
+            _registerModel.Clear();
             _editContext = new EditContext(_registerModel);
         }
 
@@ -44,16 +44,16 @@ namespace HomeAccountant.Pages.Registers
             await HideModalAsync();
         }
 
-        public async Task InitializeDialogAsync(RegisterCreateDto model)
+        public async Task InitializeDialogAsync(RegisterModel model)
         {
             _registerModel = model;
             _editContext = new EditContext(_registerModel);
-            _tcs = new TaskCompletionSource<RegisterCreateDto?>();
+            _tcs = new TaskCompletionSource<RegisterModel?>();
 
             await InvokeAsync(StateHasChanged);
         }
 
-        public async Task<RegisterCreateDto?> ShowModalAsync(CancellationToken cancellationToken = default)
+        public async Task<RegisterModel?> ShowModalAsync(CancellationToken cancellationToken = default)
         {
             if (_modal is null || _tcs is null)
                 return null;

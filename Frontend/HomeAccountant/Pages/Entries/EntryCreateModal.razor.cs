@@ -1,20 +1,20 @@
-﻿using HomeAccountant.Core.DTOs.Category;
-using HomeAccountant.Core.DTOs.Entry;
+﻿using HomeAccountant.Core.DTOs.Entry;
+using HomeAccountant.Core.Model;
 using HomeAccountant.Core.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 
 namespace HomeAccountant.Pages.Entries
 {
-    public partial class EntryCreateModal : ComponentBase, IModalDialog<EntryCreateDto, EntryCreateDto>
+    public partial class EntryCreateModal : ComponentBase, IModalDialog<EntryModel, EntryModel>
     {
         private IModal? _modal;
-        private EntryCreateDto? _model;
-        private TaskCompletionSource<EntryCreateDto?>? _tcs;
+        private EntryModel? _model;
+        private TaskCompletionSource<EntryModel?>? _tcs;
         private EditContext? _editContext;
 
         [Parameter]
-        public IEnumerable<CategoryReadDto>? Categories { get; set; }
+        public IEnumerable<CategoryModel>? Categories { get; set; }
 
         public async Task HideModalAsync(CancellationToken cancellationToken = default)
         {
@@ -50,16 +50,16 @@ namespace HomeAccountant.Pages.Entries
             _editContext = new EditContext(_model);
         }
 
-        public async Task InitializeDialogAsync(EntryCreateDto model)
+        public async Task InitializeDialogAsync(EntryModel model)
         {
             _model = model;
-            _tcs = new TaskCompletionSource<EntryCreateDto?>();
+            _tcs = new TaskCompletionSource<EntryModel?>();
             _editContext = new EditContext(_model);
 
             await InvokeAsync(StateHasChanged);
         }
 
-        public async Task<EntryCreateDto?> ShowModalAsync(CancellationToken cancellationToken = default)
+        public async Task<EntryModel?> ShowModalAsync(CancellationToken cancellationToken = default)
         {
             if (_modal is null || _tcs is null)
                 return null;

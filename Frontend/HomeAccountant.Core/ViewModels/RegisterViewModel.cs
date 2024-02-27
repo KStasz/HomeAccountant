@@ -1,4 +1,6 @@
 ﻿using HomeAccountant.Core.DTOs.Register;
+using HomeAccountant.Core.Mapper;
+using HomeAccountant.Core.Model;
 using HomeAccountant.Core.Services;
 
 namespace HomeAccountant.Core.ViewModels
@@ -12,11 +14,11 @@ namespace HomeAccountant.Core.ViewModels
             _registerService = registerService;
         }
 
-        public IModalDialog<RegisterReadDto>? DeleteRegisterDialog { get; set; }
-        public IModalDialog<RegisterCreateDto, RegisterCreateDto>? CreateRegisterDialog { get; set; }
+        public IModalDialog<RegisterModel>? DeleteRegisterDialog { get; set; }
+        public IModalDialog<RegisterModel, RegisterModel>? CreateRegisterDialog { get; set; }
 
-        private IEnumerable<RegisterReadDto>? _availableRegisters;
-        public IEnumerable<RegisterReadDto>? AvailableRegisters
+        private IEnumerable<RegisterModel>? _availableRegisters;
+        public IEnumerable<RegisterModel>? AvailableRegisters
         {
             get => _availableRegisters;
             set => SetValue(ref _availableRegisters, value);
@@ -34,7 +36,7 @@ namespace HomeAccountant.Core.ViewModels
             if (CreateRegisterDialog is null)
                 return;
 
-            await CreateRegisterDialog.InitializeDialogAsync(new RegisterCreateDto());
+            await CreateRegisterDialog.InitializeDialogAsync(new RegisterModel());
 
             var result = await CreateRegisterDialog.ShowModalAsync(CancellationToken);
 
@@ -51,12 +53,12 @@ namespace HomeAccountant.Core.ViewModels
             await ReadRegistersAsync(CancellationToken);
         }
 
-        public async Task DeleteRegisterAsync(RegisterReadDto registerReadDto)
+        public async Task DeleteRegisterAsync(RegisterModel registerModel)
         {
             if (DeleteRegisterDialog is null)
                 return;
 
-            await DeleteRegisterDialog.InitializeDialogAsync(registerReadDto);
+            await DeleteRegisterDialog.InitializeDialogAsync(registerModel);
 
             var result = await DeleteRegisterDialog.ShowModalAsync(CancellationToken);
 
@@ -65,7 +67,7 @@ namespace HomeAccountant.Core.ViewModels
                 return;
             }
 
-            await _registerService.DeleteRegisterAsync(registerReadDto, CancellationToken);
+            await _registerService.DeleteRegisterAsync(registerModel.Id, CancellationToken);
 
             await ReadRegistersAsync(CancellationToken);
         }

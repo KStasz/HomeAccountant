@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace HomeAccountant.Core.DTOs.Authentication
+﻿namespace HomeAccountant.Core.DTOs.Authentication
 {
-    public class LoginResponseDTO
+    public record LoginResponseDto
     {
-        public required string Token { get; set; }
-        public required string RefreshToken { get; set; }
+        public required string Token { get; init; }
+        public required string RefreshToken { get; init; }
     }
 }

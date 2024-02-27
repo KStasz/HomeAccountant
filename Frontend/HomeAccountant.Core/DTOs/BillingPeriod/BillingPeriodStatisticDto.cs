@@ -2,9 +2,9 @@
 
 namespace HomeAccountant.Core.DTOs.BillingPeriod
 {
-    public class BillingPeriodStatisticDto
+    public record BillingPeriodStatisticDto
     {
         public double TotalSum { get; set; }
-        public IEnumerable<EntriesStatisticChartData>? ChartData { get; set; }
+        public IEnumerable<EntriesStatisticChartDataDto>? ChartData { get; set; }
     }
 }

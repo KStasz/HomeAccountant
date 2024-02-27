@@ -1,4 +1,4 @@
-﻿using HomeAccountant.Core.DTOs.Category;
+﻿using HomeAccountant.Core.Model;
 using HomeAccountant.Core.Services;
 
 namespace HomeAccountant.Core.ViewModels
@@ -12,11 +12,11 @@ namespace HomeAccountant.Core.ViewModels
             _categoriesService = categoriesService;
         }
 
-        public IModalDialog<CategoryReadDto>? DeleteCategoryDialog { get; set; }
-        public IModalDialog<CategoryCreateDto, CategoryCreateDto>? CreateCategoryDialog { get; set; }
+        public IModalDialog<CategoryModel>? DeleteCategoryDialog { get; set; }
+        public IModalDialog<CategoryModel, CategoryModel>? CreateCategoryDialog { get; set; }
 
-        private IEnumerable<CategoryReadDto>? _categories;
-        public IEnumerable<CategoryReadDto>? Categories
+        private IEnumerable<CategoryModel>? _categories;
+        public IEnumerable<CategoryModel>? Categories
         {
             get => _categories;
             set => SetValue(ref _categories, value);
@@ -34,19 +34,21 @@ namespace HomeAccountant.Core.ViewModels
             if (CreateCategoryDialog is null)
                 return;
 
-            await CreateCategoryDialog.InitializeDialogAsync(new CategoryCreateDto());
+            await CreateCategoryDialog.InitializeDialogAsync(new CategoryModel());
 
             var result = await CreateCategoryDialog.ShowModalAsync(CancellationToken);
 
             if (result is null)
                 return;
 
-            await _categoriesService.CreateCategoryAsync(result, CancellationToken);
+            await _categoriesService.CreateCategoryAsync(
+                result,
+                CancellationToken);
 
             await ReadCategoriesAsync(CancellationToken);
         }
 
-        public async Task DeleteCategoryAsync(CategoryReadDto categoryReadDto)
+        public async Task DeleteCategoryAsync(CategoryModel categoryReadDto)
         {
             if (DeleteCategoryDialog is null)
                 return;
@@ -67,9 +69,9 @@ namespace HomeAccountant.Core.ViewModels
             var response = await _categoriesService.GetCategoriesAsync(cancellationToken);
 
             if (!response.Result)
-                Categories = new List<CategoryReadDto>();
+                Categories = new List<CategoryModel>();
 
-            Categories = response.Value;
+            Categories = response.Value!;
         }
     }
 }

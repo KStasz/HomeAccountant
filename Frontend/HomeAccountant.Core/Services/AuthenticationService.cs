@@ -1,6 +1,5 @@
 ﻿using HomeAccountant.Core.DTOs.Authentication;
 using HomeAccountant.Core.Exceptions;
-using HomeAccountant.Core.Extensions;
 using HomeAccountant.Core.Mapper;
 using HomeAccountant.Core.Model;
 using System.Net.Http.Json;
@@ -12,18 +11,20 @@ namespace HomeAccountant.Core.Services
         private const string LOGIN_ENDPOINT = "api/Authentication/Login";
         private const string REGISTER_ENDPOINT = "api/Authentication/Register";
         private readonly HttpClient _httpClient;
-        private ITypeMapper<TokenAuthenticationModel, LoginResponseDTO> _mapper;
+        private ITypeMapper<TokenAuthenticationModel, LoginResponseDto> _mapper;
+        private readonly ITypeMapper<LoginResponseModel, LoginResponseDto> _loginResponseMapper;
 
         public AuthenticationService(
             IHttpClientFactory httpClientFactory,
-            ITypeMapper<TokenAuthenticationModel, LoginResponseDTO> mapper
-            )
+            ITypeMapper<TokenAuthenticationModel, LoginResponseDto> mapper,
+            ITypeMapper<LoginResponseModel, LoginResponseDto> loginResponseMapper)
         {
             _httpClient = httpClientFactory.CreateClient("UnauhorizedHttpClient");
             _mapper = mapper;
+            _loginResponseMapper = loginResponseMapper;
         }
 
-        public async Task<ServiceResponse<LoginResponseDTO>> LoginAsync(string email, string password, CancellationToken cancellationToken = default)
+        public async Task<ServiceResponse<LoginResponseModel?>> LoginAsync(string email, string password, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -32,14 +33,22 @@ namespace HomeAccountant.Core.Services
                     email,
                     password,
                 }, cancellationToken);
-                
-                var loginResponse = await response.Content.ReadFromJsonAsync<ServiceResponse<LoginResponseDTO>>();
-                
-                return loginResponse.Protect();
+
+                var loginResponse = await response.Content.ReadFromJsonAsync<ServiceResponse<LoginResponseDto>>();
+
+                if (loginResponse is null)
+                    throw new ServiceException("Wystąpił problem podczas odczytywania danych");
+
+                if (!loginResponse.Result)
+                    return new ServiceResponse<LoginResponseModel?>(
+                        loginResponse.Result,
+                        loginResponse?.Errors);
+
+                return new ServiceResponse<LoginResponseModel?>(_loginResponseMapper.Map(loginResponse.Value));
             }
             catch (Exception ex)
             {
-                return new ServiceResponse<LoginResponseDTO>(
+                return new ServiceResponse<LoginResponseModel?>(
                     false,
                     new List<string>()
                     {
@@ -48,7 +57,7 @@ namespace HomeAccountant.Core.Services
             }
         }
 
-        public async Task<ServiceResponse<TokenAuthenticationModel>> RefreshTokenAsync(string token, string refreshToken, CancellationToken cancellationToken = default)
+        public async Task<ServiceResponse<TokenAuthenticationModel?>> RefreshTokenAsync(string token, string refreshToken, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -60,20 +69,21 @@ namespace HomeAccountant.Core.Services
                     refreshToken
                 }, cancellationToken);
 
-                var responseContent = await response.Content.ReadFromJsonAsync<ServiceResponse<LoginResponseDTO>>(cancellationToken);
+                var responseContent = await response.Content.ReadFromJsonAsync<ServiceResponse<LoginResponseDto>>(cancellationToken);
 
                 if (responseContent is null)
-                {
-                    throw new ServiceException("Wystąpił problem z połączeniem");
-                }
+                    throw new ServiceException("Wystąpił problem podczas odczytywania danych");
 
-                var tokenAuthentication = _mapper.Map(responseContent.Value);
+                if (!responseContent.Result)
+                    return new ServiceResponse<TokenAuthenticationModel?>(
+                        responseContent.Result,
+                        responseContent.Errors);
 
-                return new ServiceResponse<TokenAuthenticationModel>(tokenAuthentication.Protect());
+                return new ServiceResponse<TokenAuthenticationModel?>(_mapper.Map(responseContent.Value));
             }
             catch (Exception ex)
             {
-                return new ServiceResponse<TokenAuthenticationModel>(
+                return new ServiceResponse<TokenAuthenticationModel?>(
                     false,
                     new List<string>()
                     {
@@ -82,7 +92,7 @@ namespace HomeAccountant.Core.Services
             }
         }
 
-        public async Task<ServiceResponse<LoginResponseDTO>> RegisterAsync(string email, string username, string password, CancellationToken cancellationToken = default)
+        public async Task<ServiceResponse<LoginResponseModel?>> RegisterAsync(string email, string username, string password, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -93,13 +103,21 @@ namespace HomeAccountant.Core.Services
                     password
                 }, cancellationToken);
 
-                var registerResponse = await response.Content.ReadFromJsonAsync<ServiceResponse<LoginResponseDTO>>(cancellationToken);
+                var registerResponse = await response.Content.ReadFromJsonAsync<ServiceResponse<LoginResponseDto>>(cancellationToken);
 
-                return registerResponse.Protect();
+                if (registerResponse is null)
+                    throw new ServiceException("Wystąpił problem podczas odczytywania danych");
+
+                if (!registerResponse.Result)
+                    return new ServiceResponse<LoginResponseModel?>(
+                        false,
+                        registerResponse?.Errors);
+
+                return new ServiceResponse<LoginResponseModel?>(_loginResponseMapper.Map(registerResponse.Value));
             }
             catch (Exception ex)
             {
-                return new ServiceResponse<LoginResponseDTO>(
+                return new ServiceResponse<LoginResponseModel?>(
                     false,
                     new List<string>()
                     {
