@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Domain.Controller;
 using Domain.Dtos.CategoryService;
+using Domain.Model;
 using Domain.Services;
 using HomeAccountant.CategoriesService.Data;
 using HomeAccountant.CategoriesService.Model;
@@ -30,58 +31,58 @@ namespace HomeAccountant.CategoriesService.Controllers
         }
 
         [HttpGet("{id:int}", Name = "GetById")]
-        public IActionResult GetById(int id)
+        public ActionResult<ServiceResponse<CategoryReadDto>> GetById(int id)
         {
             CategoryModel? categoryModel = _categoriesService.Get(x => x.Id == id);
 
             if (categoryModel is null)
             {
-                return NotFound();
+                return NotFound(new ServiceResponse("Unable to find specific category"));
             }
 
             var categoryRead = _mapper.Map<CategoryReadDto>(categoryModel);
 
-            return Ok(categoryRead);
+            return Ok(new ServiceResponse<CategoryReadDto>(categoryRead));
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        public ActionResult<ServiceResponse<IEnumerable<CategoryReadDto>>> GetAll()
         {
             var userId = GetUserId();
             if (userId is null)
-                return BadRequest("Invalid payload");
+                return BadRequest(new ServiceResponse("Invalid payload"));
 
             var categories = _categoriesService.GetAll(x => x.CreatedBy == userId);
 
-            return Ok(_mapper.Map<IEnumerable<CategoryReadDto>>(categories));
+            return Ok(new ServiceResponse<IEnumerable<CategoryReadDto>>(
+                _mapper.Map<IEnumerable<CategoryReadDto>>(categories)));
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update([FromBody] CategoryUpdateDto categoryUpdateDto)
+        public async Task<ActionResult<ServiceResponse>> Update([FromBody] CategoryUpdateDto categoryUpdateDto)
         {
             var categoryModel = _categoriesService.Get(x => x.Id == categoryUpdateDto.Id);
 
             if (categoryModel is null)
-                return NotFound();
+                return NotFound(new ServiceResponse("Unable to find specific category"));
 
             categoryModel.Name = categoryUpdateDto.Name;
 
             _categoriesService.Update(categoryModel);
             await _categoriesService.SaveChangesAsync();
 
-            return Ok();
+            return Ok(new ServiceResponse(true));
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add([FromBody] CategoryCreateDto categoryCreateDto)
+        public async Task<ActionResult<ServiceResponse<CategoryReadDto>>> Add([FromBody] CategoryCreateDto categoryCreateDto)
         {
             var categoryModel = _mapper.Map<CategoryModel>(categoryCreateDto);
-
             var userId = GetUserId();
 
             if (userId is null)
             {
-                return BadRequest("Invalid payload");
+                return BadRequest(new ServiceResponse("Invalid payload"));
             }
 
             categoryModel.CreatedBy = userId;
@@ -91,23 +92,26 @@ namespace HomeAccountant.CategoriesService.Controllers
 
             var categoryRead = _mapper.Map<CategoryReadDto>(categoryModel);
 
-            return CreatedAtRoute(nameof(GetById), new { id = categoryModel.Id }, categoryRead);
+            return CreatedAtRoute(
+                nameof(GetById),
+                new { id = categoryModel.Id },
+                new ServiceResponse<CategoryReadDto>(categoryRead));
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<ActionResult<ServiceResponse>> Delete(int id)
         {
             var categoryModel = _categoriesService.Get(x => x.Id == id);
 
             if (categoryModel is null)
-                return NotFound();
+                return NotFound(new ServiceResponse("Unable to find specific category"));
 
             await _registerService.DeleteEntriesByCategoryId(categoryModel.Id);
 
             _categoriesService.Remove(categoryModel);
             await _categoriesService.SaveChangesAsync();
 
-            return Ok();
+            return Ok(new ServiceResponse(true));
         }
     }
 }

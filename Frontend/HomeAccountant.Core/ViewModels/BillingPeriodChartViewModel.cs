@@ -1,5 +1,4 @@
-﻿using HomeAccountant.Core.DTOs.BillingPeriod;
-using HomeAccountant.Core.Model;
+﻿using HomeAccountant.Core.Model;
 using HomeAccountant.Core.Services;
 using System.Drawing;
 
@@ -8,7 +7,6 @@ namespace HomeAccountant.Core.ViewModels
     public class BillingPeriodChartViewModel : MvvmViewModel
     {
         private readonly IBillingPeriodService _billingPeriodService;
-
         private int _billingPeriodId;
         private int _registerid;
         private string? _billingPeriodName;
@@ -18,8 +16,8 @@ namespace HomeAccountant.Core.ViewModels
             _billingPeriodService = billingPeriodService;
         }
 
-        private BillingPeriodStatisticDto? _billingPeriodStatistic;
-        public BillingPeriodStatisticDto? BillingPeriodStatistic
+        private BillingPeriodStatisticModel? _billingPeriodStatistic;
+        public BillingPeriodStatisticModel? BillingPeriodStatistic
         {
             get => _billingPeriodStatistic;
             set => SetValue(ref _billingPeriodStatistic, value);
@@ -47,7 +45,7 @@ namespace HomeAccountant.Core.ViewModels
                     _billingPeriodName ?? string.Empty,
                     BillingPeriodStatistic.ChartData
                         .Select(x => new ChartValue(
-                                x.CategoryName,
+                                x.CategoryName ?? throw new ArgumentNullException(nameof(x.CategoryName)),
                                 x.Sum,
                                 Color.FromArgb(x.ColorA, x.ColorR, x.ColorG, x.ColorB))))
             };

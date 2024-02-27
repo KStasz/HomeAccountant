@@ -1,6 +1,8 @@
 ﻿using HomeAccountant.Core.DTOs.BillingPeriod;
 using HomeAccountant.Core.DTOs.Category;
 using HomeAccountant.Core.DTOs.Entry;
+using HomeAccountant.Core.Mapper;
+using HomeAccountant.Core.Model;
 using HomeAccountant.Core.Services;
 using Microsoft.AspNetCore.Components;
 
@@ -24,18 +26,18 @@ namespace HomeAccountant.Core.ViewModels
             _pubSubService = pubSubService;
         }
 
-        public IModalDialog<EntryCreateDto, EntryCreateDto>? EntryCreateDialog { get; set; }
-        public IModalDialog<EntryReadDto>? EntryDeleteDialog { get; set; }
+        public IModalDialog<EntryModel, EntryModel>? EntryCreateDialog { get; set; }
+        public IModalDialog<EntryModel>? EntryDeleteDialog { get; set; }
 
-        private IEnumerable<EntryReadDto>? _entries;
-        public IEnumerable<EntryReadDto>? Entries
+        private IEnumerable<EntryModel>? _entries;
+        public IEnumerable<EntryModel>? Entries
         {
             get => _entries;
             set => SetValue(ref _entries, value);
         }
 
-        private IEnumerable<CategoryReadDto>? _availableCategories;
-        public IEnumerable<CategoryReadDto>? AvailableCategories
+        private IEnumerable<CategoryModel>? _availableCategories;
+        public IEnumerable<CategoryModel>? AvailableCategories
         {
             get => _availableCategories;
             set => SetValue(ref _availableCategories, value);
@@ -138,7 +140,7 @@ namespace HomeAccountant.Core.ViewModels
                 return;
             }
 
-            await EntryCreateDialog.InitializeDialogAsync(new EntryCreateDto());
+            await EntryCreateDialog.InitializeDialogAsync(new EntryModel());
 
             var result = await EntryCreateDialog.ShowModalAsync(CancellationToken);
 
@@ -152,7 +154,7 @@ namespace HomeAccountant.Core.ViewModels
             await _pubSubService.Send(this);
         }
 
-        public async Task DeleteEntry(EntryReadDto entryReadDto)
+        public async Task DeleteEntry(EntryModel entryReadDto)
         {
             if (EntryDeleteDialog is null)
                 return;

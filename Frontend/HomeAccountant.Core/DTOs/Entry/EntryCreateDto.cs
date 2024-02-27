@@ -2,24 +2,17 @@
 
 namespace HomeAccountant.Core.DTOs.Entry
 {
-    public class EntryCreateDto : IClearableObject
+    public record EntryCreateDto
     {
         [Required(ErrorMessage = "Nazwa jest wymagana")]
-        public string? Name { get; set; }
+        public string? Name { get; init; }
 
         [Required]
         [Range(1, int.MaxValue, ErrorMessage = "Kategoria jest wymagana")]
-        public int CategoryId { get; set; }
+        public int CategoryId { get; init; }
 
         [Required(ErrorMessage = "Cena jest wymagana")]
         [Range(0.01d, double.MaxValue, ErrorMessage = "Cena jest wymagana")]
-        public decimal Price { get; set; }
-
-        public void Clear()
-        {
-            Name = null;
-            CategoryId = 0;
-            Price = 0;
-        }
+        public decimal Price { get; init; }
     }
 }

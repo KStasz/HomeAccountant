@@ -2,12 +2,12 @@
 
 namespace HomeAccountant.Core.DTOs.Entry
 {
-    public class EntryUpdateDto
+    public record EntryUpdateDto
     {
         public int Id { get; set; }
 
         [Required]
-        public required string Name { get; set; }
+        public string? Name { get; set; }
 
         [Required]
         public int CategoryId { get; set; }

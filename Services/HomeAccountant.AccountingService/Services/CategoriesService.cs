@@ -1,5 +1,6 @@
 ﻿
 using Domain.Dtos.CategoryService;
+using Domain.Model;
 
 namespace HomeAccountant.AccountingService.Services
 {
@@ -21,18 +22,39 @@ namespace HomeAccountant.AccountingService.Services
             return response.IsSuccessStatusCode;
         }
 
-        public async Task<CategoryReadDto?> GetCategoryAsync(int id)
+        public async Task<ServiceResponse<CategoryReadDto?>> GetCategoryAsync(int id)
         {
-            var url = $"/api/Categories/{id}";
+            try
+            {
+                var url = $"/api/Categories/{id}";
+                var response = await _httpClient.GetAsync(url);
+                var responseContent = await response.Content.ReadFromJsonAsync<ServiceResponse<CategoryReadDto?>>();
 
-            var response = await _httpClient.GetAsync(url);
+                if (responseContent is null)
+                    throw new Exception("Unable to read category");
 
-            if (!response.IsSuccessStatusCode) 
-                return null;
-            
-            var result = await response.Content.ReadFromJsonAsync<CategoryReadDto?>();
+                if (!responseContent.Result)
+                    return new ServiceResponse<CategoryReadDto?>()
+                    {
+                        Result = responseContent.Result,
+                        Errors = responseContent.Errors
+                    };
 
-            return result;
+                return new ServiceResponse<CategoryReadDto?>(responseContent.Value);
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponse<CategoryReadDto?>()
+                {
+                    Result = false,
+                    Errors = new List<string>()
+                    {
+                        ex.Message
+                    }
+                };
+            }
+
+
         }
     }
 }

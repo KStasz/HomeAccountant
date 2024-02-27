@@ -1,13 +1,14 @@
 ﻿using HomeAccountant.Core.DTOs.Register;
+using HomeAccountant.Core.Model;
 using HomeAccountant.Core.Services;
 using Microsoft.AspNetCore.Components;
 
 namespace HomeAccountant.Pages.Registers
 {
-    public partial class RegisterDelete : ComponentBase, IModalDialog<RegisterReadDto>
+    public partial class RegisterDelete : ComponentBase, IModalDialog<RegisterModel>
     {
         private IModal? _modalReference;
-        private RegisterReadDto? _registerModel;
+        private RegisterModel? _registerModel;
         private TaskCompletionSource<ModalResult>? _tcs;
 
         public async Task HideModalAsync(CancellationToken cancellationToken = default)
@@ -24,7 +25,7 @@ namespace HomeAccountant.Pages.Registers
             await HideModalAsync();
         }
 
-        public async Task InitializeDialogAsync(RegisterReadDto model)
+        public async Task InitializeDialogAsync(RegisterModel model)
         {
             _registerModel = model;
             _tcs = new TaskCompletionSource<ModalResult>();

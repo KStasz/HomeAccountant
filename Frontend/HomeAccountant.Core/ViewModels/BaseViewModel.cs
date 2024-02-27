@@ -21,7 +21,7 @@ namespace HomeAccountant.Core.ViewModels
             NotifyPropertyChangedSync(propertyName);
         }
 
-        protected void SetValue<T>(ref T backingFiled, T value, [CallerMemberName] string propertyName = null)
+        protected void SetValue<T>(ref T backingFiled, T value, [CallerMemberName] string propertyName = "")
         {
             if (EqualityComparer<T>.Default.Equals(backingFiled, value)) return;
             backingFiled = value;

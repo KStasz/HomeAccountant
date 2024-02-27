@@ -1,4 +1,5 @@
 ﻿using HomeAccountant.Core.Authentication;
+using HomeAccountant.Core.Mapper;
 using HomeAccountant.Core.Model;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -12,6 +13,7 @@ namespace HomeAccountant.Core.Services
         private readonly IAuthenticationService _authenticationService;
         private readonly IJwtTokenParser _jwtTokenParser;
         private readonly JwtAuthenticationStateProvider _jwtAuthenticationStateProvider;
+        private readonly ITypeMapper<LoginResponseModel, TokenAuthenticationModel> _loginResponseMapper;
         private const string AUTHORIZATION_SCHEMA = "Bearer";
 
 
@@ -19,13 +21,15 @@ namespace HomeAccountant.Core.Services
             ITokenStorageAccessor tokenStorageAccessor,
             IAuthenticationService authenticationService,
             IJwtTokenParser jwtTokenParser,
-            JwtAuthenticationStateProvider jwtAuthenticationStateProvider)
+            JwtAuthenticationStateProvider jwtAuthenticationStateProvider,
+            ITypeMapper<LoginResponseModel, TokenAuthenticationModel> loginResponseMapper)
         {
             _client = client;
             _tokenStorageAccessor = tokenStorageAccessor;
             _authenticationService = authenticationService;
             _jwtTokenParser = jwtTokenParser;
             _jwtAuthenticationStateProvider = jwtAuthenticationStateProvider;
+            _loginResponseMapper = loginResponseMapper;
         }
 
         public async Task<HttpResponseMessage> PostAsJsonAsync<T>(string uri, T value, CancellationToken cancellationToken = default)
@@ -106,7 +110,7 @@ namespace HomeAccountant.Core.Services
                 return false;
             }
 
-            await _tokenStorageAccessor.SetTokenAsync(result.Value, cancellationToken);
+            await _tokenStorageAccessor.SetTokenAsync(_loginResponseMapper.Map(result.Value), cancellationToken);
             return true;
         }
     }

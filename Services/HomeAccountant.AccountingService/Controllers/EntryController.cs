@@ -48,11 +48,16 @@ namespace HomeAccountant.AccountingService.Controllers
 
             var categoryModel = await _categoriesService.GetCategoryAsync(entryModel.CategoryId);
 
-            if (categoryModel is null)
-                return NotFound(new ServiceResponse("Category not found"));
+            if (!categoryModel.Result)
+                return NotFound(
+                    new ServiceResponse()
+                    {
+                        Result = categoryModel.Result,
+                        Errors = categoryModel.Errors
+                    });
 
             var entryRead = _mapper.Map<EntryReadDto>(entryModel);
-            entryRead.Category = categoryModel;
+            entryRead.Category = categoryModel.Value;
 
             return Ok(new ServiceResponse<EntryReadDto>(entryRead));
         }
@@ -92,10 +97,7 @@ namespace HomeAccountant.AccountingService.Controllers
                     var model = _mapper.Map<EntryReadDto>(item);
                     var categoryModel = await _categoriesService.GetCategoryAsync(item.CategoryId);
 
-                    if (categoryModel is null)
-                        continue;
-
-                    model.Category = _mapper.Map<CategoryReadDto>(categoryModel);
+                    model.Category = _mapper.Map<CategoryReadDto>(categoryModel.Value);
                     model.Creator = userData?.FirstOrDefault(x => x.UserId == item.CreatedBy)?.UserName ?? string.Empty;
                     result.Add(model);
                 }

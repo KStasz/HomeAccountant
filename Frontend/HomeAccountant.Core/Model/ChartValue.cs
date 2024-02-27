@@ -4,10 +4,11 @@ namespace HomeAccountant.Core.Model
 {
     public class ChartValue
     {
-        public ChartValue()
-        {
+        //Commented because of no references
+        //public ChartValue()
+        //{
             
-        }
+        //}
 
         public ChartValue(string label, double value, Color color)
         {

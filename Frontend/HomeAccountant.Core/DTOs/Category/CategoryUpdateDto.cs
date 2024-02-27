@@ -2,7 +2,7 @@
 
 namespace HomeAccountant.Core.DTOs.Category
 {
-    public class CategoryUpdateDto
+    public record CategoryUpdateDto
     {
         public int Id { get; set; }
 

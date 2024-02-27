@@ -1,30 +1,60 @@
 ﻿using HomeAccountant.Core.DTOs.Category;
+using HomeAccountant.Core.Exceptions;
+using HomeAccountant.Core.Mapper;
 using HomeAccountant.Core.Model;
 using System.Net.Http.Json;
+
+
 
 namespace HomeAccountant.Core.Services
 {
     public class CategoriesService : ICategoriesService
     {
         private readonly AuthorizableHttpClient _httpClient;
+        private readonly ITypeMapper<CategoryCreateDto, CategoryModel> _categoryCreateMapper;
+        private readonly ITypeMapper<CategoryUpdateDto, CategoryModel> _categoryUpdateMapper;
+        private readonly ITypeMapper<CategoryModel, CategoryReadDto> _categoryMapper;
 
-        public CategoriesService(AuthorizableHttpClient httpClient)
+        public CategoriesService(AuthorizableHttpClient httpClient,
+            ITypeMapper<CategoryCreateDto, CategoryModel> categoryCreateMapper,
+            ITypeMapper<CategoryUpdateDto, CategoryModel> categoryUpdateMapper,
+            ITypeMapper<CategoryModel, CategoryReadDto> categoryMapper)
         {
             _httpClient = httpClient;
+            _categoryCreateMapper = categoryCreateMapper;
+            _categoryUpdateMapper = categoryUpdateMapper;
+            _categoryMapper = categoryMapper;
         }
 
-        public async Task<ServiceResponse<CategoryReadDto?>> CreateCategoryAsync(CategoryCreateDto categoryCreateDto, CancellationToken cancellationToken = default)
+        public async Task<ServiceResponse<CategoryModel?>> CreateCategoryAsync(CategoryModel categoryModel, CancellationToken cancellationToken = default)
         {
-            var url = "/api/Categories";
+            try
+            {
+                var url = "/api/Categories";
+                var model = _categoryCreateMapper.Map(categoryModel);
+                var response = await _httpClient.PostAsJsonAsync(url, model, cancellationToken);
 
-            var response = await _httpClient.PostAsJsonAsync(url, categoryCreateDto, cancellationToken);
+                var categoryResponse = await response.Content.ReadFromJsonAsync<ServiceResponse<CategoryReadDto>>(cancellationToken);
 
-            if (!response.IsSuccessStatusCode)
-                return new ServiceResponse<CategoryReadDto?>(false);
+                if (categoryResponse is null)
+                    throw new ServiceException();
 
-            var category = await response.Content.ReadFromJsonAsync<CategoryReadDto>(cancellationToken);
+                if (!categoryResponse.Result)
+                    return new ServiceResponse<CategoryModel?>(
+                        categoryResponse.Result,
+                        categoryResponse.Errors);
 
-            return new ServiceResponse<CategoryReadDto?>(category);
+                return new ServiceResponse<CategoryModel?>(_categoryMapper.Map(categoryResponse.Value));
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponse<CategoryModel?>(
+                    false,
+                    new List<string>
+                    {
+                        ex.Message
+                    });
+            }
         }
 
         public async Task<ServiceResponse> DeleteCategoryAsync(int categoryId, CancellationToken cancellationToken = default)
@@ -39,25 +69,42 @@ namespace HomeAccountant.Core.Services
             return new ServiceResponse(true);
         }
 
-        public async Task<ServiceResponse<IEnumerable<CategoryReadDto>?>> GetCategoriesAsync(CancellationToken cancellationToken = default)
+        public async Task<ServiceResponse<IEnumerable<CategoryModel>?>> GetCategoriesAsync(CancellationToken cancellationToken = default)
         {
-            var url = "/api/Categories";
+            try
+            {
+                var url = "/api/Categories";
 
-            var response = await _httpClient.GetAsync(url, cancellationToken);
+                var response = await _httpClient.GetAsync(url, cancellationToken);
+                var categoryResponse = await response.Content.ReadFromJsonAsync<ServiceResponse<IEnumerable<CategoryReadDto>>>(cancellationToken);
 
-            if (!response.IsSuccessStatusCode)
-                return new ServiceResponse<IEnumerable<CategoryReadDto>?>(false);
+                if (categoryResponse is null)
+                    throw new ServiceException();
 
-            var result = await response.Content.ReadFromJsonAsync<IEnumerable<CategoryReadDto>>(cancellationToken);
+                if (!categoryResponse.Result)
+                    return new ServiceResponse<IEnumerable<CategoryModel>?>(
+                        categoryResponse.Result,
+                        categoryResponse?.Errors);
 
-            return new ServiceResponse<IEnumerable<CategoryReadDto>?>(result);
+                return new ServiceResponse<IEnumerable<CategoryModel>?>(
+                    categoryResponse.Value?.Select(_categoryMapper.Map));
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponse<IEnumerable<CategoryModel>?>(
+                    false,
+                    new List<string>()
+                    {
+                        ex.Message
+                    });
+            }
         }
 
-        public async Task<ServiceResponse> UpdateCategoryAsync(CategoryUpdateDto categoryUpdateDto, CancellationToken cancellationToken = default)
+        public async Task<ServiceResponse> UpdateCategoryAsync(CategoryModel categoryModel, CancellationToken cancellationToken = default)
         {
             var url = "/api/Categories";
-
-            var response = await _httpClient.PutAsJsonAsync(url, categoryUpdateDto, cancellationToken);
+            var model = _categoryUpdateMapper.Map(categoryModel);
+            var response = await _httpClient.PutAsJsonAsync(url, model, cancellationToken);
 
             if (!response.IsSuccessStatusCode)
                 return new ServiceResponse(false);

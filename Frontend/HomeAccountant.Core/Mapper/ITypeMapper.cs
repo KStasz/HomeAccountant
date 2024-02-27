@@ -2,6 +2,6 @@
 {
     public interface ITypeMapper<TDestination, TSource>
     {
-        public TDestination? Map (TSource? value);
+        public TDestination Map(TSource? value);
     }
 }
