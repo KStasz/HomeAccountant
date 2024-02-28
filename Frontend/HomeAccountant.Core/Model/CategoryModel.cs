@@ -14,5 +14,17 @@ namespace HomeAccountant.Core.Model
             Id = 0;
             Name = null;
         }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is CategoryModel model &&
+                   Id == model.Id &&
+                   Name == model.Name;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Id, Name);
+        }
     }
 }

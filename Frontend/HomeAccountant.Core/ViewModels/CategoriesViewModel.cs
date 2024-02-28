@@ -12,6 +12,7 @@ namespace HomeAccountant.Core.ViewModels
             _categoriesService = categoriesService;
         }
 
+        public IAlert? PageAlerts { get; set; }
         public IModalDialog<CategoryModel>? DeleteCategoryDialog { get; set; }
         public IModalDialog<CategoryModel, CategoryModel>? CreateCategoryDialog { get; set; }
 
@@ -41,9 +42,22 @@ namespace HomeAccountant.Core.ViewModels
             if (result is null)
                 return;
 
-            await _categoriesService.CreateCategoryAsync(
-                result,
-                CancellationToken);
+            var response = await _categoriesService.CreateCategoryAsync(result, CancellationToken);
+
+            if (!response.Result)
+            {
+                if (PageAlerts is null)
+                    return;
+
+                await PageAlerts!.ShowAlertAsync(
+                    string.Join(
+                        Environment.NewLine,
+                        response.Errors ?? Array.Empty<string>()),
+                    AlertType.Danger,
+                    CancellationToken);
+
+                return;
+            }
 
             await ReadCategoriesAsync(CancellationToken);
         }
@@ -59,7 +73,22 @@ namespace HomeAccountant.Core.ViewModels
             if (result == ModalResult.Cancel)
                 return;
 
-            await _categoriesService.DeleteCategoryAsync(categoryReadDto.Id, CancellationToken);
+            var response = await _categoriesService.DeleteCategoryAsync(categoryReadDto.Id, CancellationToken);
+
+            if (!response.Result)
+            {
+                if (PageAlerts is null)
+                    return;
+
+                await PageAlerts.ShowAlertAsync(
+                    string.Join(
+                        Environment.NewLine,
+                        response.Errors ?? Array.Empty<string>()),
+                    AlertType.Danger,
+                    CancellationToken);
+                
+                return;
+            }
 
             await ReadCategoriesAsync(CancellationToken);
         }
@@ -69,7 +98,21 @@ namespace HomeAccountant.Core.ViewModels
             var response = await _categoriesService.GetCategoriesAsync(cancellationToken);
 
             if (!response.Result)
+            {
+                if (PageAlerts is null)
+                    return;
+
+                await PageAlerts.ShowAlertAsync(
+                    string.Join(
+                        Environment.NewLine,
+                        response.Errors ?? Array.Empty<string>()),
+                    AlertType.Danger,
+                    cancellationToken);
+
                 Categories = new List<CategoryModel>();
+                
+                return;
+            }
 
             Categories = response.Value!;
         }
