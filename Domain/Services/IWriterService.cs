@@ -4,9 +4,9 @@ namespace Domain.Services
 {
     public interface IWriterService<T> where T : class
     {
-        void Add(T entity);
-        EntityEntry Update(T entity);
-        void Remove(T entity);
+        EntityEntry<T>? Add(T entity);
+        EntityEntry<T>? Update(T entity);
+        EntityEntry<T>? Remove(T entity);
         void RemoveMany(IEnumerable<T> entities);
     }
 }

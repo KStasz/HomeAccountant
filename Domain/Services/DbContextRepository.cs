@@ -13,9 +13,12 @@ namespace Domain.Services
             _applicationDbContext = applicationDbContext;
         }
 
-        public void Add(T entity)
+        public EntityEntry<T>? Add(T entity)
         {
-            _applicationDbContext.Set<T>().Add(entity);
+            if (entity is null)
+                return null;
+
+            return _applicationDbContext.Set<T>().Add(entity);
         }
 
         public T? Get(Func<T, bool> predicate)
@@ -46,9 +49,9 @@ namespace Domain.Services
             return newQuery.Where(predicate);
         }
 
-        public void Remove(T entity)
+        public EntityEntry<T>? Remove(T entity)
         {
-            _applicationDbContext.Set<T>().Remove(entity);
+            return _applicationDbContext.Set<T>().Remove(entity);
         }
 
         public void RemoveMany(IEnumerable<T> entities)
@@ -56,12 +59,12 @@ namespace Domain.Services
             _applicationDbContext.Set<T>().RemoveRange(entities);
         }
 
-        public async Task SaveChangesAsync()
+        public async Task<int> SaveChangesAsync()
         {
-            await _applicationDbContext.SaveChangesAsync();
+            return await _applicationDbContext.SaveChangesAsync();
         }
 
-        public EntityEntry Update(T entity)
+        public EntityEntry<T>? Update(T entity)
         {
             return _applicationDbContext.Set<T>().Update(entity);
         }
