@@ -102,7 +102,9 @@ namespace HomeAccountant.Core.Services
         {
             var result = await _authenticationService.RefreshTokenAsync(token.Token, token.RefreshToken, cancellationToken);
 
-            if (!result.Result || result.Value is null)
+            if (result is null
+                || !result.Result
+                || result.Value is null)
             {
                 await _tokenStorageAccessor.RemoveTokenAsync(cancellationToken);
                 _jwtAuthenticationStateProvider.StateChanged();

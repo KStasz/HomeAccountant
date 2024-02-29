@@ -85,8 +85,11 @@ namespace HomeAccountant.AccountingService.Controllers
             var registerModel = _mapper.Map<Register>(registerUpdateDto);
             registerModel.CreatorId = userId;
 
-            EntityEntry entity = _repository.Update(registerModel);
-            entity.Property(nameof(Register.CreatedDate)).IsModified = false;
+            EntityEntry<Register>? entity = _repository.Update(registerModel);
+            
+            if (entity is not null)
+                entity.Property(nameof(Register.CreatedDate)).IsModified = false;
+
             await _repository.SaveChangesAsync();
 
             return Ok(new ServiceResponse(true));

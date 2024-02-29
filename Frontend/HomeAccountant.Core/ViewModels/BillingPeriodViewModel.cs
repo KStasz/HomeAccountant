@@ -1,9 +1,10 @@
 ﻿using HomeAccountant.Core.Model;
 using HomeAccountant.Core.Services;
+using System.Reflection.Metadata.Ecma335;
 
 namespace HomeAccountant.Core.ViewModels
 {
-    public class BillingPeriodViewModel : MvvmViewModel, IRefreshBillingService
+    public class BillingPeriodViewModel : MvvmViewModel
     {
         private readonly IBillingPeriodService _billingPeriodService;
         private readonly IPubSubService _pubSubService;
@@ -73,13 +74,28 @@ namespace HomeAccountant.Core.ViewModels
             if (SelectedBillingPeriod is null)
                 return;
 
+            ServiceResponse? togglingResponse;
+
             if (SelectedBillingPeriod.IsOpen)
             {
-                await _billingPeriodService.CloseBillingPeriodAsync(_registerId, SelectedBillingPeriod.Id, CancellationToken);
+                togglingResponse = await _billingPeriodService.CloseBillingPeriodAsync(_registerId, SelectedBillingPeriod.Id, CancellationToken);
             }
             else
             {
-                await _billingPeriodService.OpenBillingPeriodAsync(_registerId, SelectedBillingPeriod.Id, CancellationToken);
+                togglingResponse = await _billingPeriodService.OpenBillingPeriodAsync(_registerId, SelectedBillingPeriod.Id, CancellationToken);
+            }
+
+            if (!togglingResponse.Result)
+            {
+                if (Alert is not null)
+                {
+                    await Alert.ShowAlertAsync(
+                        string.Join(
+                            Environment.NewLine,
+                            togglingResponse.Errors ?? Array.Empty<string>()),
+                        AlertType.Danger,
+                        CancellationToken);
+                }
             }
 
             await RefreshBillingPeriodAsync(CancellationToken);
@@ -91,6 +107,7 @@ namespace HomeAccountant.Core.ViewModels
             {
                 if (Alert is not null)
                     await Alert.ShowAlertAsync("Przed utworzeniem zamknij inne okresy rozliczeniowe", AlertType.Danger);
+                
                 return;
             }
 
@@ -123,7 +140,7 @@ namespace HomeAccountant.Core.ViewModels
             IsBusy = false;
         }
 
-        public void PreviousPeriodAsync()
+        public void PreviousPeriod()
         {
             if ((!AvailableBillingPeriods?.Any() ?? false)
                 || _currentPeriodIndex == 0)
@@ -132,7 +149,7 @@ namespace HomeAccountant.Core.ViewModels
             SelectedBillingPeriod = AvailableBillingPeriods?[--_currentPeriodIndex];
         }
 
-        public void NextPeriodAsync()
+        public void NextPeriod()
         {
             if ((!AvailableBillingPeriods?.Any() ?? false)
                 || _currentPeriodIndex == AvailableBillingPeriodsCount - 1)
@@ -141,7 +158,7 @@ namespace HomeAccountant.Core.ViewModels
             SelectedBillingPeriod = AvailableBillingPeriods?[++_currentPeriodIndex];
         }
 
-        public async Task RefreshBillingPeriodAsync(CancellationToken cancellationToken = default)
+        private async Task RefreshBillingPeriodAsync(CancellationToken cancellationToken = default)
         {
             var result = await _billingPeriodService.GetBiilingPeriodsAsync(_registerId, cancellationToken);
 
@@ -178,7 +195,19 @@ namespace HomeAccountant.Core.ViewModels
             var result = await _billingPeriodService.GetBiilingPeriodsAsync(registerId, cancellationToken);
 
             if (!result.Result)
+            {
+                if (Alert is null)
+                    return;
+
+                await Alert.ShowAlertAsync(
+                    string.Join(
+                        Environment.NewLine,
+                        result.Errors ?? Array.Empty<string>()),
+                    AlertType.Danger,
+                    cancellationToken);
+
                 return;
+            }
 
             AvailableBillingPeriods = result.Value?.OrderBy(x => x.Id).ToList();
 
