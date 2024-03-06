@@ -1,6 +1,5 @@
 ﻿using HomeAccountant.Core.DTOs.Register;
 using HomeAccountant.Core.Exceptions;
-using HomeAccountant.Core.Extensions;
 using HomeAccountant.Core.Mapper;
 using HomeAccountant.Core.Model;
 using Microsoft.Extensions.Logging;
@@ -118,6 +117,36 @@ namespace HomeAccountant.Core.Services
                     {
                         ex.Message
                     });
+            }
+        }
+
+        public async Task<ServiceResponse<RegisterModel?>> GetRegister(int registerId, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var url = $"/api/Register/{registerId}";
+                var response = await _httpClient.GetAsync(url, cancellationToken);
+                var responseContent = await response.Content.ReadFromJsonAsync<ServiceResponse<RegisterReadDto?>>();
+
+                if (responseContent is null)
+                    return new ServiceResponse<RegisterModel?>(
+                        false,
+                        ["Unable to read specific register"]);
+
+                if (!responseContent.Result)
+                    return new ServiceResponse<RegisterModel?>(
+                        responseContent.Result,
+                        responseContent.Errors);
+
+                return new ServiceResponse<RegisterModel?>(_registerMapper.Map(responseContent.Value));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"--> {ex.Message}");
+
+                return new ServiceResponse<RegisterModel?>(
+                    false,
+                    ["Unable to read specific register"]);
             }
         }
     }

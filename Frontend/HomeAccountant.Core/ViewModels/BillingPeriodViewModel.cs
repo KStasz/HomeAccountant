@@ -1,6 +1,7 @@
-﻿using HomeAccountant.Core.Model;
+﻿using HomeAccountant.Core.Extensions;
+using HomeAccountant.Core.Model;
 using HomeAccountant.Core.Services;
-using System.Reflection.Metadata.Ecma335;
+using Microsoft.AspNetCore.Components;
 
 namespace HomeAccountant.Core.ViewModels
 {
@@ -8,14 +9,20 @@ namespace HomeAccountant.Core.ViewModels
     {
         private readonly IBillingPeriodService _billingPeriodService;
         private readonly IPubSubService _pubSubService;
+        private readonly IRegisterService _registerService;
+        private readonly NavigationManager _navManager;
         private int _registerId;
         private int _currentPeriodIndex;
 
         public BillingPeriodViewModel(IBillingPeriodService billingPeriodService,
-            IPubSubService pubSubService)
+            IPubSubService pubSubService,
+            IRegisterService registerService,
+            NavigationManager navManager)
         {
             _billingPeriodService = billingPeriodService;
             _pubSubService = pubSubService;
+            _registerService = registerService;
+            _navManager = navManager;
             _pubSubService.MessageSender += _pubSubService_MessageSender;
         }
         public List<BillingPeriodModel>? AvailableBillingPeriods { get; set; }
@@ -25,6 +32,13 @@ namespace HomeAccountant.Core.ViewModels
         {
             get => _selectedBillingPeriod;
             set => SetValue(ref _selectedBillingPeriod, value);
+        }
+
+        private RegisterModel? _register;
+        public RegisterModel? Register
+        {
+            get => _register;
+            set => SetValue(ref _register, value);
         }
 
         public int AvailableBillingPeriodsCount
@@ -107,7 +121,7 @@ namespace HomeAccountant.Core.ViewModels
             {
                 if (Alert is not null)
                     await Alert.ShowAlertAsync("Przed utworzeniem zamknij inne okresy rozliczeniowe", AlertType.Danger);
-                
+
                 return;
             }
 
@@ -135,9 +149,30 @@ namespace HomeAccountant.Core.ViewModels
             IsBusy = true;
             _registerId = GetParameter<int>(parameters["RegisterId"]);
 
+            await ReadRegister();
             await ReadInitialDataAsync(_registerId, CancellationToken);
 
             IsBusy = false;
+        }
+
+        private async Task ReadRegister(CancellationToken cancellationToken = default)
+        {
+            var response = await _registerService.GetRegister(_registerId, cancellationToken);
+
+            if (!response.Result)
+            {
+                if (Alert is not null)
+                    await Alert.ShowAlertAsync(
+                        response.Errors.JoinToString(),
+                        AlertType.Danger,
+                        cancellationToken);
+
+                Register = null;
+
+                _navManager.NavigateTo("books", false);
+            }
+
+            Register = response.Value;
         }
 
         public void PreviousPeriod()
@@ -205,6 +240,9 @@ namespace HomeAccountant.Core.ViewModels
                         result.Errors ?? Array.Empty<string>()),
                     AlertType.Danger,
                     cancellationToken);
+
+                AvailableBillingPeriods = null;
+                SelectedBillingPeriod = null;
 
                 return;
             }

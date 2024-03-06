@@ -121,7 +121,7 @@ namespace HomeAccountant.AccountingService.Controllers
                 return BadRequest(new ServiceResponse("Missing UserId"));
 
             if (registerModel.CreatorId != UserId)
-                return Unauthorized(new ServiceResponse("You don't have access to this resource"));
+                return Unauthorized(new ServiceResponse("You don't have access to this register"));
 
             var registerResponse = _mapper.Map<RegisterReadDto>(registerModel);
 

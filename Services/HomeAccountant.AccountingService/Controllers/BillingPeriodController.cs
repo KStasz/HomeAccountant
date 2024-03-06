@@ -46,6 +46,22 @@ namespace HomeAccountant.AccountingService.Controllers
         [HttpGet]
         public ActionResult<ServiceResponse<IEnumerable<BillingPeriodReadDto>>> GetAll(int registerId)
         {
+            if (UserId is null)
+                return BadRequest(
+                    new ServiceResponse<IEnumerable<BillingPeriodReadDto>>(
+                        new List<string>() { "Invalid payload" }));
+
+            var register = _registerRepository.Get(x => x.Id == registerId);
+
+            if (register is null)
+                return NotFound(
+                    new ServiceResponse<IEnumerable<BillingPeriodReadDto>>(
+                        new List<string>() { "Specified register not found" }));
+
+            if (register.CreatorId != UserId)
+                return Unauthorized(new ServiceResponse<IEnumerable<BillingPeriodReadDto>>(
+                        new List<string>() { "You don't have access to specified register" }));
+
             var result = _billingPeriodRepository
                 .GetAll(
                     x => x.RegisterId == registerId,
