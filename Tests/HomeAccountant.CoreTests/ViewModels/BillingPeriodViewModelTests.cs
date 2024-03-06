@@ -1,5 +1,6 @@
 ﻿using HomeAccountant.Core.Model;
 using HomeAccountant.Core.Services;
+using Microsoft.AspNetCore.Components;
 using Moq;
 using Xunit;
 using Assert = Xunit.Assert;
@@ -11,6 +12,8 @@ namespace HomeAccountant.Core.ViewModels.Tests
         private Mock<IAlert> _alertServiceMock;
         private Mock<IBillingPeriodService> _billingPeriodServiceMock;
         private Mock<IPubSubService> _pubSubServiceMock;
+        private readonly Mock<NavigationManager> _navManagerMock;
+        private readonly Mock<IRegisterService> _registerService;
         private BillingPeriodViewModel _viewModel;
         private Mock<IModalDialog<BillingPeriodModel, BillingPeriodModel>> _billingCreateDialogMock;
 
@@ -20,10 +23,14 @@ namespace HomeAccountant.Core.ViewModels.Tests
             _alertServiceMock = new Mock<IAlert>();
             _billingPeriodServiceMock = new Mock<IBillingPeriodService>();
             _pubSubServiceMock = new Mock<IPubSubService>();
+            _navManagerMock = new Mock<NavigationManager>();
+            _registerService = new Mock<IRegisterService>();
 
             _viewModel = new BillingPeriodViewModel(
                 _billingPeriodServiceMock.Object,
-                _pubSubServiceMock.Object);
+                _pubSubServiceMock.Object,
+                _registerService.Object,
+                _navManagerMock.Object);
             _viewModel.Alert = _alertServiceMock.Object;
             _viewModel.BillingCreateDialog = _billingCreateDialogMock.Object;
         }
@@ -121,6 +128,19 @@ namespace HomeAccountant.Core.ViewModels.Tests
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ServiceResponse(true));
 
+            _registerService.Setup(x => x.GetRegister(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ServiceResponse<RegisterModel?>()
+                {
+                    Result = true,
+                    Value = new RegisterModel()
+                    {
+                        Id = It.IsAny<int>(),
+                        Name = It.IsAny<string>(),
+                        CreatedDate = It.IsAny<DateTime>(),
+                        Description = It.IsAny<string>()
+                    }
+                });
+
             await _viewModel.PageParameterSetAsync(parameters);
             await _viewModel.ToggleBillingPeriodAsync();
 
@@ -214,6 +234,19 @@ namespace HomeAccountant.Core.ViewModels.Tests
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ServiceResponse(true));
 
+            _registerService.Setup(x => x.GetRegister(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ServiceResponse<RegisterModel?>()
+                {
+                    Result = true,
+                    Value = new RegisterModel()
+                    {
+                        Id = It.IsAny<int>(),
+                        Name = It.IsAny<string>(),
+                        CreatedDate = It.IsAny<DateTime>(),
+                        Description = It.IsAny<string>()
+                    }
+                });
+
             await _viewModel.PageParameterSetAsync(parameters);
             await _viewModel.ToggleBillingPeriodAsync();
 
@@ -281,6 +314,19 @@ namespace HomeAccountant.Core.ViewModels.Tests
                     It.IsAny<int>(),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ServiceResponse(false));
+
+            _registerService.Setup(x => x.GetRegister(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ServiceResponse<RegisterModel?>()
+                {
+                    Result = true,
+                    Value = new RegisterModel()
+                    {
+                        Id = It.IsAny<int>(),
+                        Name = It.IsAny<string>(),
+                        CreatedDate = It.IsAny<DateTime>(),
+                        Description = It.IsAny<string>()
+                    }
+                });
 
             await _viewModel.PageParameterSetAsync(parameters);
             await _viewModel.ToggleBillingPeriodAsync();
@@ -356,6 +402,19 @@ namespace HomeAccountant.Core.ViewModels.Tests
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ServiceResponse(false));
 
+            _registerService.Setup(x => x.GetRegister(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ServiceResponse<RegisterModel?>()
+                {
+                    Result = true,
+                    Value = new RegisterModel()
+                    {
+                        Id = It.IsAny<int>(),
+                        Name = It.IsAny<string>(),
+                        CreatedDate = It.IsAny<DateTime>(),
+                        Description = It.IsAny<string>()
+                    }
+                });
+
             await _viewModel.PageParameterSetAsync(parameters);
             await _viewModel.ToggleBillingPeriodAsync();
 
@@ -421,6 +480,18 @@ namespace HomeAccountant.Core.ViewModels.Tests
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(
                 new ServiceResponse<IEnumerable<BillingPeriodModel>?>(billingPeriods));
+            _registerService.Setup(x => x.GetRegister(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ServiceResponse<RegisterModel?>()
+                {
+                    Result = true,
+                    Value = new RegisterModel()
+                    {
+                        Id = It.IsAny<int>(),
+                        Name = It.IsAny<string>(),
+                        CreatedDate = It.IsAny<DateTime>(),
+                        Description = It.IsAny<string>()
+                    }
+                });
 
             await _viewModel.PageParameterSetAsync(parameters);
             await _viewModel.CreateBillingDialogAsync();
@@ -495,6 +566,18 @@ namespace HomeAccountant.Core.ViewModels.Tests
                             CreationDate = It.IsAny<DateTime>()
                         }
                     }));
+            _registerService.Setup(x => x.GetRegister(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ServiceResponse<RegisterModel?>()
+                {
+                    Result = true,
+                    Value = new RegisterModel()
+                    {
+                        Id = It.IsAny<int>(),
+                        Name = It.IsAny<string>(),
+                        CreatedDate = It.IsAny<DateTime>(),
+                        Description = It.IsAny<string>()
+                    }
+                });
 
             await _viewModel.PageParameterSetAsync(parameters);
 
@@ -513,6 +596,19 @@ namespace HomeAccountant.Core.ViewModels.Tests
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(
                 new ServiceResponse<IEnumerable<BillingPeriodModel>?>(false));
+
+            _registerService.Setup(x => x.GetRegister(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ServiceResponse<RegisterModel?>()
+                {
+                    Result = true,
+                    Value = new RegisterModel()
+                    {
+                        Id = It.IsAny<int>(),
+                        Name = It.IsAny<string>(),
+                        CreatedDate = It.IsAny<DateTime>(),
+                        Description = It.IsAny<string>()
+                    }
+                });
 
 
             await _viewModel.PageParameterSetAsync(parameters);
@@ -558,6 +654,18 @@ namespace HomeAccountant.Core.ViewModels.Tests
                     It.IsAny<int>(),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ServiceResponse<IEnumerable<BillingPeriodModel>?>(billingPeriods));
+            _registerService.Setup(x => x.GetRegister(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ServiceResponse<RegisterModel?>()
+                {
+                    Result = true,
+                    Value = new RegisterModel()
+                    {
+                        Id = It.IsAny<int>(),
+                        Name = It.IsAny<string>(),
+                        CreatedDate = It.IsAny<DateTime>(),
+                        Description = It.IsAny<string>()
+                    }
+                });
 
             await _viewModel.PageParameterSetAsync(parameters);
 
@@ -577,6 +685,18 @@ namespace HomeAccountant.Core.ViewModels.Tests
                     It.IsAny<int>(),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ServiceResponse<IEnumerable<BillingPeriodModel>?>(false));
+            _registerService.Setup(x => x.GetRegister(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ServiceResponse<RegisterModel?>()
+                {
+                    Result = true,
+                    Value = new RegisterModel()
+                    {
+                        Id = It.IsAny<int>(),
+                        Name = It.IsAny<string>(),
+                        CreatedDate = It.IsAny<DateTime>(),
+                        Description = It.IsAny<string>()
+                    }
+                });
 
             await _viewModel.PageParameterSetAsync(parameters);
 
@@ -617,7 +737,19 @@ namespace HomeAccountant.Core.ViewModels.Tests
                    It.IsAny<int>(),
                    It.IsAny<CancellationToken>()))
                .ReturnsAsync(new ServiceResponse<IEnumerable<BillingPeriodModel>?>(billingPeriods));
-            
+            _registerService.Setup(x => x.GetRegister(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ServiceResponse<RegisterModel?>()
+                {
+                    Result = true,
+                    Value = new RegisterModel()
+                    {
+                        Id = It.IsAny<int>(),
+                        Name = It.IsAny<string>(),
+                        CreatedDate = It.IsAny<DateTime>(),
+                        Description = It.IsAny<string>()
+                    }
+                });
+
             await _viewModel.PageParameterSetAsync(parameters);
 
             _viewModel.PreviousPeriod();
@@ -637,6 +769,18 @@ namespace HomeAccountant.Core.ViewModels.Tests
                     It.IsAny<int>(),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ServiceResponse<IEnumerable<BillingPeriodModel>?>(false));
+            _registerService.Setup(x => x.GetRegister(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ServiceResponse<RegisterModel?>()
+                {
+                    Result = true,
+                    Value = new RegisterModel()
+                    {
+                        Id = It.IsAny<int>(),
+                        Name = It.IsAny<string>(),
+                        CreatedDate = It.IsAny<DateTime>(),
+                        Description = It.IsAny<string>()
+                    }
+                });
 
             await _viewModel.PageParameterSetAsync(parameters);
 
