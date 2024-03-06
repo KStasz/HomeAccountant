@@ -1,0 +1,12 @@
+﻿<Modal @ref="_modal" Position="ModalPosition.Centered">
+    <ModalContent>
+        <ModalHeader ModalTitle="Czy chcesz usunąć wybraną znajomość"/>
+        <ModalBody>
+            <p>Czy na pewno chcesz usunąć wybraną znajomość?</p>
+        </ModalBody>
+        <ModalFooter>
+            <button type="button" class="btn btn-secondary" @onclick="Cancel">Anuluj</button>
+            <button type="button" class="btn btn-danger" @onclick="Delete">Usuń</button>
+        </ModalFooter>
+    </ModalContent>
+</Modal>

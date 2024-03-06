@@ -48,11 +48,10 @@ namespace HomeAccountant.CategoriesService.Controllers
         [HttpGet]
         public ActionResult<ServiceResponse<IEnumerable<CategoryReadDto>>> GetAll()
         {
-            var userId = GetUserId();
-            if (userId is null)
+            if (UserId is null)
                 return BadRequest(new ServiceResponse("Invalid payload"));
 
-            var categories = _categoriesService.GetAll(x => x.CreatedBy == userId);
+            var categories = _categoriesService.GetAll(x => x.CreatedBy == UserId);
 
             return Ok(new ServiceResponse<IEnumerable<CategoryReadDto>>(
                 _mapper.Map<IEnumerable<CategoryReadDto>>(categories)));
@@ -78,14 +77,13 @@ namespace HomeAccountant.CategoriesService.Controllers
         public async Task<ActionResult<ServiceResponse<CategoryReadDto>>> Add([FromBody] CategoryCreateDto categoryCreateDto)
         {
             var categoryModel = _mapper.Map<CategoryModel>(categoryCreateDto);
-            var userId = GetUserId();
-
-            if (userId is null)
+            
+            if (UserId is null)
             {
                 return BadRequest(new ServiceResponse("Invalid payload"));
             }
 
-            categoryModel.CreatedBy = userId;
+            categoryModel.CreatedBy = UserId;
 
             _categoriesService.Add(categoryModel);
             await _categoriesService.SaveChangesAsync();

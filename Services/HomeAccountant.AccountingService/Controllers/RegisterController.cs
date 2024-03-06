@@ -36,13 +36,11 @@ namespace HomeAccountant.AccountingService.Controllers
         [HttpPost]
         public async Task<ActionResult<ServiceResponse<RegisterReadDto>>> Add(RegisterCreateDto registerCreateDto)
         {
-            var userId = GetUserId();
-
-            if (!ModelState.IsValid || userId is null)
+            if (!ModelState.IsValid || UserId is null)
                 return BadRequest(new ServiceResponse("Invalid payload"));
 
             var registerModel = _mapper.Map<Register>(registerCreateDto);
-            registerModel.CreatorId = userId;
+            registerModel.CreatorId = UserId;
             _repository.Add(registerModel);
             await _repository.SaveChangesAsync();
 
@@ -77,13 +75,11 @@ namespace HomeAccountant.AccountingService.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(new ServiceResponse("Invalid payload"));
 
-            var userId = GetUserId();
-
-            if (userId is null)
+            if (UserId is null)
                 return BadRequest(new ServiceResponse("Invalid payload"));
 
             var registerModel = _mapper.Map<Register>(registerUpdateDto);
-            registerModel.CreatorId = userId;
+            registerModel.CreatorId = UserId;
 
             EntityEntry<Register>? entity = _repository.Update(registerModel);
             
@@ -98,9 +94,7 @@ namespace HomeAccountant.AccountingService.Controllers
         [HttpDelete("Entries/{categoryId}")]
         public async Task<ActionResult<ServiceResponse>> DeleteEntriesByCategoryId(int categoryId)
         {
-            var userId = GetUserId();
-
-            if (userId is null)
+            if (UserId is null)
                 return BadRequest(new ServiceResponse("Invalid payload"));
 
             var entries = _entryRepository.GetAll(x => x.CategoryId == categoryId);
@@ -119,15 +113,14 @@ namespace HomeAccountant.AccountingService.Controllers
         public ActionResult<ServiceResponse<RegisterReadDto>> GetRegisterById(int id)
         {
             var registerModel = _repository.Get(x => x.Id == id);
-            var userId = GetUserId();
 
             if (registerModel is null)
                 return NotFound(new ServiceResponse("Register not found"));
 
-            if (userId is null)
+            if (UserId is null)
                 return BadRequest(new ServiceResponse("Missing UserId"));
 
-            if (registerModel.CreatorId != userId)
+            if (registerModel.CreatorId != UserId)
                 return Unauthorized(new ServiceResponse("You don't have access to this resource"));
 
             var registerResponse = _mapper.Map<RegisterReadDto>(registerModel);
@@ -138,12 +131,10 @@ namespace HomeAccountant.AccountingService.Controllers
         [HttpGet]
         public ActionResult<ServiceResponse<IEnumerable<RegisterReadDto>>> Get()
         {
-            var userId = GetUserId();
-
-            if (userId is null)
+            if (UserId is null)
                 return BadRequest(new ServiceResponse("Missing UserId"));
 
-            var registers = _repository.GetAll(x => x.CreatorId == userId).OrderByDescending(x => x.CreatedDate);
+            var registers = _repository.GetAll(x => x.CreatorId == UserId).OrderByDescending(x => x.CreatedDate);
 
             return Ok(
                 new ServiceResponse<IEnumerable<RegisterReadDto>>(

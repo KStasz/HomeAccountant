@@ -1,0 +1,19 @@
+﻿<Modal @ref="_modal" Position="ModalPosition.Centered">
+    <ModalContent>
+        <EditForm EditContext="_editContext" OnValidSubmit="Accept">
+            <DataAnnotationsValidator />
+            <ModalHeader ModalTitle="Wyślij zaproszenie do znajomych" />
+            <ModalBody>
+                <div class="mb-3">
+                    <label for="recipientEmail" class="form-label">Email</label>
+                    <InputText type="text" class="form-control" id="recipientEmail" @bind-Value="_model!.Email" />
+                    <ValidationMessage For="() => _model.Email" />
+                </div>
+            </ModalBody>
+            <ModalFooter>
+                <button type="button" class="btn btn-secondary" @onclick="Cancel">Anuluj</button>
+                <button type="submit" class="btn btn-success">Wyślij</button>
+            </ModalFooter>
+        </EditForm>
+    </ModalContent>
+</Modal>

@@ -27,8 +27,8 @@
       "DownstreamPathTemplate": "/api/Categories/{id}"
     },
     {
-      "UpstreamPathTemplate": "/api/FriendRequests/CreatedRequests",
-      "UpstreamHttpMethod": [ "Get" ],
+      "UpstreamPathTemplate": "/api/Friendship",
+      "UpstreamHttpMethod": [ "Get", "Delete" ],
 
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -37,11 +37,11 @@
           "Port": 80
         }
       ],
-      "DownstreamPathTemplate": "/api/FriendRequests/CreatedRequests"
+      "DownstreamPathTemplate": "/api/Friendship"
     },
     {
-      "UpstreamPathTemplate": "/api/FriendRequests",
-      "UpstreamHttpMethod": [ "Get" ],
+      "UpstreamPathTemplate": "/api/Friendship/CreateFriendshipRequest",
+      "UpstreamHttpMethod": [ "Post" ],
 
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -50,10 +50,10 @@
           "Port": 80
         }
       ],
-      "DownstreamPathTemplate": "/api/FriendRequests"
+      "DownstreamPathTemplate": "/api/Friendship/CreateFriendshipRequest"
     },
     {
-      "UpstreamPathTemplate": "/api/FriendRequests/{requestId}/Accept",
+      "UpstreamPathTemplate": "/api/Friendship/AcceptFriendship",
       "UpstreamHttpMethod": [ "Put" ],
 
       "DownstreamScheme": "http",
@@ -63,72 +63,7 @@
           "Port": 80
         }
       ],
-      "DownstreamPathTemplate": "/api/FriendRequests/{requestId}/Accept"
-    },
-    {
-      "UpstreamPathTemplate": "/api/FriendRequests/{requestId}/Reject",
-      "UpstreamHttpMethod": [ "Put" ],
-
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "homeaccountant_friendsservice",
-          "Port": 80
-        }
-      ],
-      "DownstreamPathTemplate": "/api/FriendRequests/{requestId}/Reject"
-    },
-    {
-      "UpstreamPathTemplate": "/api/FriendRequests/{requestId}",
-      "UpstreamHttpMethod": [ "Get" ],
-
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "homeaccountant_friendsservice",
-          "Port": 80
-        }
-      ],
-      "DownstreamPathTemplate": "/api/FriendRequests/{requestId}"
-    },
-    {
-      "UpstreamPathTemplate": "/api/FriendRequests/CreateRequest",
-      "UpstreamHttpMethod": [ "Get" ],
-
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "homeaccountant_friendsservice",
-          "Port": 80
-        }
-      ],
-      "DownstreamPathTemplate": "/api/FriendRequests/CreateRequest"
-    },
-    {
-      "UpstreamPathTemplate": "/api/Friends",
-      "UpstreamHttpMethod": [ "Post", "Get" ],
-
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "homeaccountant_friendsservice",
-          "Port": 80
-        }
-      ],
-      "DownstreamPathTemplate": "/api/Friends"
-    },
-    {
-      "UpstreamPathTemplate": "/api/Friends/{id}",
-      "UpstreamHttpMethod": [ "Delete" ],
-
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "homeaccountant_friendsservice",
-          "Port": 80
-        }
-      ],
-      "DownstreamPathTemplate": "/api/Friends/{id}"
+      "DownstreamPathTemplate": "/api/Friendship/AcceptFriendship"
     },
     {
       "UpstreamPathTemplate": "/api/Account/ChangePassword",

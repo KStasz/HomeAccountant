@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Domain.Controller;
 using Domain.Dtos.IdentityPlatform;
+using Domain.Model;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -17,20 +18,22 @@ namespace HomeAccountant.IdentityPlatform.Controllers
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IMapper _mapper;
+        private readonly ILogger<AccountController> _logger;
 
-        public AccountController(UserManager<IdentityUser> userManager,
-            IMapper mapper)
+        public AccountController(
+            UserManager<IdentityUser> userManager,
+            IMapper mapper,
+            ILogger<AccountController> logger)
         {
             _userManager = userManager;
             _mapper = mapper;
+            _logger = logger;
         }
 
         [HttpPut("ChangePassword")]
         public async Task<IActionResult> ChangePassword([FromBody] UserPasswordChangeDto userPasswordChangeDto)
         {
-            string? userId = GetUserId();
-
-            if (userId is null)
+            if (UserId is null)
                 return BadRequest("Invalid payload");
 
             if (!ModelState.IsValid)
@@ -57,7 +60,7 @@ namespace HomeAccountant.IdentityPlatform.Controllers
                 });
             }
 
-            var user = await _userManager.FindByIdAsync(userId);
+            var user = await _userManager.FindByIdAsync(UserId);
 
             if (user is null)
             {
@@ -104,19 +107,74 @@ namespace HomeAccountant.IdentityPlatform.Controllers
             return Ok(user.Id);
         }
 
-        [HttpPost("[action]")]
-        [ApiExplorerSettings(IgnoreApi = true)]
-        public async Task<IActionResult> GetUsers([Required] string[] userIds)
+        [HttpGet("[action]/{userId}")]
+        public async Task<ActionResult<ServiceResponse<string?>>> GetEmailByUserId(string userId)
         {
-            List<IdentityUser?> users = new List<IdentityUser?>();
-            
-            foreach (var userId in userIds)
+            try
             {
                 var user = await _userManager.FindByIdAsync(userId);
-                users.Add(user);
-            }
 
-            return Ok(_mapper.Map<UserModelDto[]>(users.Where(x => x is not null).ToArray()));
+                if (user is null)
+                    return NotFound(
+                        new ServiceResponse(
+                            new List<string>()
+                            {
+                                "The user with the specified Id could not be found"
+                            }));
+
+                if (user.Email is null)
+                {
+                    return BadRequest(
+                        new ServiceResponse(
+                            new List<string>()
+                            {
+                                "The user didn't provide the email address"
+                            }));
+                }
+
+                return Ok(
+                    new ServiceResponse<string>(user.Email));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"{Environment.NewLine}--> {ex.Message}{Environment.NewLine}");
+
+                return BadRequest(
+                    new ServiceResponse(
+                        new List<string>()
+                        {
+                            "Unable to read user email"
+                        }));
+            }
+        }
+
+        [HttpPost("[action]")]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public async Task<ActionResult<ServiceResponse<UserModelDto[]?>>> GetUsers([Required] string[] userIds)
+        {
+            try
+            {
+                List<IdentityUser?> users = new List<IdentityUser?>();
+
+                foreach (var userId in userIds)
+                {
+                    var user = await _userManager.FindByIdAsync(userId);
+                    users.Add(user);
+                }
+
+                return Ok(
+                    new ServiceResponse<UserModelDto[]?>(
+                    _mapper.Map<UserModelDto[]>(
+                        users
+                        .Where(x => x is not null)
+                        .ToArray())));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"--> {ex.Message}");
+
+                return BadRequest(new ServiceResponse("Reading users failed"));
+            }
         }
     }
 }
