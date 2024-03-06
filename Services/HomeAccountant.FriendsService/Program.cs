@@ -21,7 +21,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddTransient<IAuthorizationTokenProvider, AuthorizationTokenProvider>();
 builder.Services.ConfigureDbContext();
-builder.Services.AddScoped<IFriendshipCreator, FriendshipCreator>();
 
 builder.Services.RegisterHttpClientServices(builder.Configuration);
 

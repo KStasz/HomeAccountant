@@ -22,14 +22,14 @@ namespace HomeAccountant.Components.Alert
             { AlertType.Dark, AlertType.Dark.ToString().ToLower() }
         };
 
-        public async Task ShowAlertAsync(string message, AlertType type, CancellationToken cancellationToken = default)
+        public async Task ShowAlertAsync(string? message, AlertType type, CancellationToken cancellationToken = default)
         {
             await JsCodeExecutor.ExecuteFunctionAsync(
                 "ShowAlert",
                 cancellationToken,
                 AlertIdentifier,
                 AlertTypesDictionary[type],
-                message);
+                message ?? string.Empty);
         }
     }
 }

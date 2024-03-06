@@ -1,0 +1,32 @@
+﻿@typeparam T
+
+@if (AlertReference is null)
+{
+    <Alert @ref="InternalAlert" />
+}
+
+@if (Collection is not null
+&& Collection.Result
+&& (Collection.Value?.Any() ?? false))
+{
+    if (ChildContent is not null)
+    {
+        @ChildContent(Collection)
+    }
+}
+else
+{
+    if (!Collection?.Result ?? false)
+    {
+        if (AlertReference is null)
+        {
+            InternalAlert?.ShowAlertAsync(Collection?.Errors.JoinToString(), AlertType.Danger);
+        }
+        else
+        {
+            AlertReference.ShowAlertAsync(Collection?.Errors.JoinToString(), AlertType.Danger);
+        }
+    }
+
+    <p>Brak danych do wyświetlenia</p>
+}

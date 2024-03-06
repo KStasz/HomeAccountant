@@ -293,9 +293,7 @@ namespace HomeAccountant.AccountingService.Controllers
 
         private Tuple<ServiceResponse, StatusCodeResult> CheckIsUserTheOwnerOfRegister(int registerId)
         {
-            var userId = GetUserId();
-
-            if (userId is null)
+            if (UserId is null)
             {
                 return new Tuple<ServiceResponse, StatusCodeResult>(
                     new ServiceResponse(
@@ -319,7 +317,7 @@ namespace HomeAccountant.AccountingService.Controllers
                     new StatusCodeResult(404));
             }
 
-            if (register.CreatorId != userId)
+            if (register.CreatorId != UserId)
             {
                 return new Tuple<ServiceResponse, StatusCodeResult>(
                     new ServiceResponse(

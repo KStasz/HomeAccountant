@@ -9,33 +9,26 @@ namespace HomeAccountant.FriendsService.Data
             : base(options)
         { }
 
-        public DbSet<Friend> Friends { get; set; }
-
-        public DbSet<FriendRequest> FriendRequests { get; set; }
+        public DbSet<Friendships> Friendships { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
             modelBuilder
-                .Entity<Friend>()
+                .Entity<Friendships>()
                 .Property(x => x.CreationDate)
                 .HasDefaultValueSql("getdate()");
 
             modelBuilder
-                .Entity<Friend>()
+                .Entity<Friendships>()
                 .Property(x => x.IsActive)
                 .HasDefaultValueSql("1");
 
             modelBuilder
-                .Entity<FriendRequest>()
-                .Property(x => x.CreationDate)
-                .HasDefaultValueSql("getdate()");
-
-            modelBuilder
-                .Entity<FriendRequest>()
-                .Property(x => x.IsActive)
-                .HasDefaultValueSql("1");
+                .Entity<Friendships>()
+                .Property(x => x.IsAccepted)
+                .HasDefaultValueSql("0");
         }
     }
 }

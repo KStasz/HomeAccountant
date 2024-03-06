@@ -126,9 +126,7 @@ namespace HomeAccountant.AccountingService.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(new ServiceResponse("Invalid payload"));
 
-            var userId = GetUserId();
-
-            if (userId is null)
+            if (UserId is null)
                 return BadRequest(new ServiceResponse("Missing UserId"));
 
             if (!CheckIfRegisterExists(registerId))
@@ -138,7 +136,7 @@ namespace HomeAccountant.AccountingService.Controllers
                 return NotFound(new ServiceResponse("Category not found"));
 
             var entryModel = _mapper.Map<Entry>(entryCreateDto);
-            entryModel.CreatedBy = userId;
+            entryModel.CreatedBy = UserId;
             entryModel.BillingPeriodId = billingPeriodId;
             _repository.Add(entryModel);
             await _repository.SaveChangesAsync();
@@ -187,15 +185,13 @@ namespace HomeAccountant.AccountingService.Controllers
 
             var entryModel = _mapper.Map<Entry>(entryUpdateDto);
 
-            var userId = GetUserId();
-
-            if (userId is null)
+            if (UserId is null)
                 return BadRequest(new ServiceResponse("Invalid payload"));
 
             if (!await _categoriesService.CategoryExists(entryUpdateDto.CategoryId))
                 return NotFound(new ServiceResponse("Category not found"));
 
-            entryModel.CreatedBy = userId;
+            entryModel.CreatedBy = UserId;
             entryModel.BillingPeriodId = billingPeriodId;
             _repository.Update(entryModel);
             await _repository.SaveChangesAsync();

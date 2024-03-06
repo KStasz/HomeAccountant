@@ -8,7 +8,7 @@
             
         }
 
-        public ServiceResponse(T value)
+        public ServiceResponse(T? value)
             : base(true)
         {
             Value = value;

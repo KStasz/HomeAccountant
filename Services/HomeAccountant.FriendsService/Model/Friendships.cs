@@ -4,7 +4,8 @@ using System.ComponentModel.DataAnnotations;
 namespace HomeAccountant.FriendsService.Model
 {
     [Index(nameof(UserId), nameof(FriendId), IsUnique = true)]
-    public class Friend
+    [Index(nameof(FriendId), nameof(UserId), IsUnique = true)]
+    public class Friendships
     {
         [Key]
         public int Id { get; set; }
@@ -16,8 +17,14 @@ namespace HomeAccountant.FriendsService.Model
         public required string FriendId { get; set; }
 
         [Required]
+        public bool IsAccepted { get; set; } = false;
+
+        [Required]
         public bool IsActive { get; set; } = true;
-        
+
+        [Required]
+        public required string CreatorId { get; set; }
+
         [Required]
         public DateTime CreationDate { get; set; } = DateTime.Now;
     }

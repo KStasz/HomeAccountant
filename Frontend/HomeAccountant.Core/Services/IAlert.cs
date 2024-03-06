@@ -2,6 +2,6 @@
 {
     public interface IAlert
     {
-        Task ShowAlertAsync(string message, AlertType type, CancellationToken cancellationToken = default);
+        Task ShowAlertAsync(string? message, AlertType type, CancellationToken cancellationToken = default);
     }
 }
