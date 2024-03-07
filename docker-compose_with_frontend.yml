@@ -25,7 +25,7 @@ services:
             dockerfile: Dockerfile
         environment:
             - ASPNETCORE_URLS=http://+:80
-            - UseCors=False
+            - UseCors=True
         networks:
             - dev
 
@@ -50,6 +50,7 @@ services:
         environment:
             - ASPNETCORE_URLS=http://+:80
             - ConnectionStrings__DefaultConnection=Server=CategoriesService_SqlServer;Database=CategoriesDb;User Id=sa;Password=1qazXSW@3edc;TrustServerCertificate=True;
+            - AccountingServiceBaseAdress=http://homeaccountant_accountingservice:80
         networks:
             - dev
 
