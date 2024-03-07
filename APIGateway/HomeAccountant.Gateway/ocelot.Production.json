@@ -40,6 +40,19 @@
       "DownstreamPathTemplate": "/api/Friendship"
     },
     {
+      "UpstreamPathTemplate": "/api/Friendship/GetFriends",
+      "UpstreamHttpMethod": [ "Get" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "homeaccountant_friendsservice",
+          "Port": 80
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Friendship/GetFriends"
+    },
+    {
       "UpstreamPathTemplate": "/api/Friendship/CreateFriendshipRequest",
       "UpstreamHttpMethod": [ "Post" ],
 
