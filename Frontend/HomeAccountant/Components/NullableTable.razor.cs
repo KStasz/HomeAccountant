@@ -16,5 +16,14 @@ namespace HomeAccountant.Components
         public IAlert? AlertReference { get; set; }
 
         private IAlert? InternalAlert;
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                await InvokeAsync(StateHasChanged);
+            }
+            await base.OnAfterRenderAsync(firstRender);
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Domain.Controller;
+using Domain.Dtos.AccountingService;
 using Domain.Dtos.CategoryService;
 using Domain.Model;
 using Domain.Services;
@@ -19,15 +20,54 @@ namespace HomeAccountant.CategoriesService.Controllers
     {
         private readonly IRepository<ApplicationDbContext, CategoryModel> _categoriesService;
         private readonly IMapper _mapper;
-        private readonly IAccountingService _registerService;
+        private readonly IAccountingService _accountingService;
+        private readonly ILogger<CategoriesController> _logger;
 
         public CategoriesController(IRepository<ApplicationDbContext, CategoryModel> categoriesService,
             IMapper mapper,
-            IAccountingService registerService)
+            IAccountingService accountingService,
+            ILogger<CategoriesController> logger)
         {
             _categoriesService = categoriesService;
             _mapper = mapper;
-            _registerService = registerService;
+            _accountingService = accountingService;
+            _logger = logger;
+        }
+
+        [HttpGet("[action]")]
+        public async Task<ActionResult<ServiceResponse<IEnumerable<CategoryReadDto>?>>> RegisterCategories(int registerId)
+        {
+            try
+            {
+                ServiceResponse<RegisterReadDto?> register = await _accountingService.GetRegister(registerId);
+
+                if (!register.Result)
+                    return BadRequest(
+                        new ServiceResponse<IEnumerable<CategoryReadDto>?>(
+                            register.Errors ?? Array.Empty<string>()));
+
+                var categories = _categoriesService.GetAll(x => x.CreatedBy == register.Value?.CreatorId);
+
+                if (categories is null)
+                    return NotFound(
+                        new ServiceResponse<IEnumerable<CategoryReadDto>?>(
+                            new string[] { "Categories not found" }));
+
+                return Ok(
+                    new ServiceResponse<IEnumerable<CategoryReadDto>?>(
+                        categories.Select(_mapper.Map<CategoryReadDto>)));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"--> {ex.Message}");
+
+                return BadRequest(
+                    new ServiceResponse<IEnumerable<CategoryReadDto>?>(
+                        new string[] 
+                        {
+                            "Reading categories failed"
+                        }));
+            }
         }
 
         [HttpGet("{id:int}", Name = "GetById")]
@@ -77,7 +117,7 @@ namespace HomeAccountant.CategoriesService.Controllers
         public async Task<ActionResult<ServiceResponse<CategoryReadDto>>> Add([FromBody] CategoryCreateDto categoryCreateDto)
         {
             var categoryModel = _mapper.Map<CategoryModel>(categoryCreateDto);
-            
+
             if (UserId is null)
             {
                 return BadRequest(new ServiceResponse("Invalid payload"));
@@ -104,7 +144,7 @@ namespace HomeAccountant.CategoriesService.Controllers
             if (categoryModel is null)
                 return NotFound(new ServiceResponse("Unable to find specific category"));
 
-            await _registerService.DeleteEntriesByCategoryId(categoryModel.Id);
+            await _accountingService.DeleteEntriesByCategoryId(categoryModel.Id);
 
             _categoriesService.Remove(categoryModel);
             await _categoriesService.SaveChangesAsync();

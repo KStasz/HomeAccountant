@@ -90,6 +90,49 @@ namespace HomeAccountant.FriendsService.Controllers
             }
         }
 
+        [HttpGet("[action]")]
+        public async Task<ActionResult<ServiceResponse<IEnumerable<UserModelDto>?>>> GetFriends()
+        {
+            try
+            {
+                if (UserId is null)
+                    return BadRequest(
+                        new ServiceResponse<IEnumerable<UserModelDto>?>(
+                            new string[] { "Invalid payload" }));
+
+                var friendships = _friendshipRepository.GetAll(x => x.UserId == UserId);
+
+                if (!friendships.Any())
+                    return NotFound(
+                        new ServiceResponse<IEnumerable<UserModelDto>?>(
+                            new string[] { "Friends not found" }));
+
+                var usersResponse = await _identityPlatformService.GetUsersAsync(
+                    friendships.Select(x => x.FriendId).ToArray());
+
+                if (usersResponse is null)
+                    return BadRequest(new ServiceResponse<IEnumerable<UserModelDto>?>(
+                            new string[] { "Unable to read users" }));
+
+                if (!usersResponse.Result)
+                    return BadRequest(
+                        new ServiceResponse<IEnumerable<UserModelDto>?>(
+                            usersResponse.Errors ?? Array.Empty<string>()));
+
+                return Ok(
+                    new ServiceResponse<IEnumerable<UserModelDto>?>(
+                        usersResponse.Value));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"--> {ex.Message}");
+
+                return BadRequest(
+                        new ServiceResponse<IEnumerable<UserModelDto>?>(
+                            new string[] { "Reading friends failed" }));
+            }
+        }
+
         [HttpPost("[action]")]
         public async Task<ActionResult<ServiceResponse>> CreateFriendshipRequest([FromBody] string recipientEmail)
         {

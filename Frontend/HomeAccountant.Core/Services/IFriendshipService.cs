@@ -8,5 +8,6 @@ namespace HomeAccountant.Core.Services
         Task<ServiceResponse> CreateFriendship(string recipientEmail, CancellationToken cancellationToken = default);
         Task<ServiceResponse> DeleteFriendship(int friendshipId, CancellationToken cancellationToken = default);
         Task<ServiceResponse> AcceptFriendship(int friendshipId, CancellationToken cancellationToken = default);
+        Task<ServiceResponse<IEnumerable<UserModel>?>> GetFriends(CancellationToken cancellationToken = default);
     }
 }

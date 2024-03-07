@@ -1,25 +1,25 @@
 ﻿<Modal @ref="_modal" Position="ModalPosition.Centered">
     <ModalContent>
-            <EditForm EditContext="_editContext"
-                      OnSubmit="Submit">
-                <DataAnnotationsValidator />
-                <ModalHeader ModalTitle="Utwórz nową księgę: " />
-                <ModalBody>
-                    <div class="col-12 mb-3">
-                        <label for="registerName">Nazwa księgi:</label>
-                        <InputText type="text" class="form-control" @bind-Value="_registerModel!.Name" />
-                        <ValidationMessage For="() => _registerModel.Name" />
-                    </div>
+        <EditForm EditContext="_editContext"
+                  OnSubmit="Submit">
+            <DataAnnotationsValidator />
+            <ModalHeader ModalTitle="Utwórz nową księgę: " />
+            <ModalBody>
+                <div class="col-12 mb-3">
+                    <label for="registerName">Nazwa księgi:</label>
+                    <InputText type="text" class="form-control" @bind-Value="_registerModel!.Name" />
+                    <ValidationMessage For="() => _registerModel.Name" />
+                </div>
                 <div class="col-12">
                     <label for="registerName">Opis księgi:</label>
                     <InputTextArea rows="3" class="form-control" @bind-Value="_registerModel!.Description" />
                     <ValidationMessage For="() => _registerModel.Description" />
                 </div>
-                </ModalBody>
-                <ModalFooter>
-                    <button type="button" class="btn btn-secondary" @onclick="Cancel">Anuluj</button>
-                    <button type="submit" class="btn btn-success">Utwórz</button>
-                </ModalFooter>
-            </EditForm>
+            </ModalBody>
+            <ModalFooter>
+                <button type="button" class="btn btn-secondary" @onclick="Cancel">Anuluj</button>
+                <button type="submit" class="btn btn-success">Utwórz</button>
+            </ModalFooter>
+        </EditForm>
     </ModalContent>
 </Modal>

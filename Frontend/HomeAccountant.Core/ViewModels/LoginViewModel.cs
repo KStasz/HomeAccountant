@@ -3,6 +3,7 @@ using HomeAccountant.Core.DTOs.Authentication;
 using HomeAccountant.Core.Mapper;
 using HomeAccountant.Core.Model;
 using HomeAccountant.Core.Services;
+using Microsoft.AspNetCore.Components;
 
 namespace HomeAccountant.Core.ViewModels
 {
@@ -10,14 +11,17 @@ namespace HomeAccountant.Core.ViewModels
     {
         private readonly JwtAuthenticationStateProvider _jwtAuthenticationStateProvider;
         private readonly ITokenStorageAccessor _tokenStorage;
+        private readonly NavigationManager _navManager;
 
         public LoginViewModel(IAuthenticationService authenticationService,
             JwtAuthenticationStateProvider jwtAuthenticationStateProvider,
-            ITokenStorageAccessor tokenStorage)
+            ITokenStorageAccessor tokenStorage,
+            NavigationManager navManager)
         {
             AuthenticationService = authenticationService;
             _jwtAuthenticationStateProvider = jwtAuthenticationStateProvider;
             _tokenStorage = tokenStorage;
+            _navManager = navManager;
         }
 
         public IAuthenticationService AuthenticationService { get; private set; }
@@ -46,6 +50,7 @@ namespace HomeAccountant.Core.ViewModels
         {
             _tokenStorage.RemoveTokenAsync();
             _jwtAuthenticationStateProvider?.StateChanged();
+            _navManager.NavigateTo("/", false);
         }
 
         public async Task Register()

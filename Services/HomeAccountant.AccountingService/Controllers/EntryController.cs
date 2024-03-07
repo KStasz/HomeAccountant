@@ -10,6 +10,7 @@ using HomeAccountant.AccountingService.Models;
 using HomeAccountant.AccountingService.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace HomeAccountant.AccountingService.Controllers
@@ -24,18 +25,21 @@ namespace HomeAccountant.AccountingService.Controllers
         private readonly IMapper _mapper;
         private readonly ICategoriesService _categoriesService;
         private readonly IAccountInfoService _accountInfoService;
+        private readonly ILogger<EntryController> _logger;
 
         public EntryController(IRepository<ApplicationDbContext, Entry> entryRepository,
             IRepository<ApplicationDbContext, Register> registerRepository,
             IMapper mapper,
             ICategoriesService categoriesService,
-            IAccountInfoService accountInfoService)
+            IAccountInfoService accountInfoService,
+            ILogger<EntryController> logger)
         {
             _repository = entryRepository;
             _registerRepository = registerRepository;
             _mapper = mapper;
             _categoriesService = categoriesService;
             _accountInfoService = accountInfoService;
+            _logger = logger;
         }
 
         [HttpGet("{entryId}", Name = "GetEntryById")]
@@ -72,6 +76,7 @@ namespace HomeAccountant.AccountingService.Controllers
                     .GetAll(
                         x => x.BillingPeriodId == billingPeriodId,
                         x => x.BillingPeriod)
+                    .OrderByDescending(x => x.CreatedDate)
                     .Chunk(recordsOnPage);
 
                 if (paggedEntryModels is null)
@@ -123,37 +128,57 @@ namespace HomeAccountant.AccountingService.Controllers
         [HttpPost]
         public async Task<ActionResult<ServiceResponse<EntryReadDto>>> Add(int registerId, int billingPeriodId, EntryCreateDto entryCreateDto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(new ServiceResponse("Invalid payload"));
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(new ServiceResponse("Invalid payload"));
 
-            if (UserId is null)
-                return BadRequest(new ServiceResponse("Missing UserId"));
+                if (UserId is null)
+                    return BadRequest(new ServiceResponse("Missing UserId"));
 
-            if (!CheckIfRegisterExists(registerId))
-                return NotFound(new ServiceResponse("Register doesn't exist"));
+                if (!CheckIfRegisterExists(registerId))
+                    return NotFound(new ServiceResponse("Register doesn't exist"));
 
-            if (!await _categoriesService.CategoryExists(entryCreateDto.CategoryId))
-                return NotFound(new ServiceResponse("Category not found"));
+                if (!await _categoriesService.CategoryExists(entryCreateDto.CategoryId))
+                    return NotFound(new ServiceResponse("Category not found"));
 
-            var entryModel = _mapper.Map<Entry>(entryCreateDto);
-            entryModel.CreatedBy = UserId;
-            entryModel.BillingPeriodId = billingPeriodId;
-            _repository.Add(entryModel);
-            await _repository.SaveChangesAsync();
+                var entryModel = _mapper.Map<Entry>(entryCreateDto);
+                entryModel.CreatedBy = UserId;
+                entryModel.BillingPeriodId = billingPeriodId;
+                _repository.Add(entryModel);
+                await _repository.SaveChangesAsync();
 
-            var categoryModel = await _categoriesService.GetCategoryAsync(entryModel.CategoryId);
+                var categoryModel = await _categoriesService.GetCategoryAsync(entryModel.CategoryId);
 
-            var entryModelRead = _mapper.Map<EntryReadDto>(entryModel);
-            entryModelRead.Category = _mapper.Map<CategoryReadDto>(categoryModel);
+                if (!categoryModel.Result)
+                    return NotFound(
+                        new ServiceResponse<EntryReadDto>(
+                            categoryModel.Errors ?? new string[] { "Reading category failed" }));
 
-            return CreatedAtRoute(
-                nameof(GetEntryById),
-                new
-                {
-                    registerId = billingPeriodId,
-                    entryId = entryModel.Id
-                },
-                new ServiceResponse<EntryReadDto>(entryModelRead));
+                var entryModelRead = _mapper.Map<EntryReadDto>(entryModel);
+                entryModelRead.Category = categoryModel.Value;
+
+                return CreatedAtRoute(
+                    nameof(GetEntryById),
+                    new
+                    {
+                        registerId,
+                        billingPeriodId,
+                        entryId = entryModelRead.Id
+                    },
+                    new ServiceResponse<EntryReadDto>(entryModelRead));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"--> {ex.Message}");
+
+                return BadRequest(
+                    new ServiceResponse<EntryReadDto>(
+                        new string[] 
+                        {
+                            "Adding entry failed"
+                        }));
+            }
         }
 
         private bool CheckIfRegisterExists(int registerId)

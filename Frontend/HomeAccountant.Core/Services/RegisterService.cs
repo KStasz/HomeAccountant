@@ -149,5 +149,66 @@ namespace HomeAccountant.Core.Services
                     ["Unable to read specific register"]);
             }
         }
+
+        public async Task<ServiceResponse<IEnumerable<RegisterModel>?>> GetSharedRegisters(CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var url = "/api/Register/SharedRegisters";
+                var response = await _httpClient.GetAsync(url, cancellationToken);
+                var responseContent = await response.Content.ReadFromJsonAsync<ServiceResponse<IEnumerable<RegisterReadDto>?>>();
+
+                if (responseContent is null)
+                    return new ServiceResponse<IEnumerable<RegisterModel>?>(
+                        false,
+                        ["Reading shared registers failed"]);
+
+                if (!responseContent.Result)
+                    return new ServiceResponse<IEnumerable<RegisterModel>?>(
+                        responseContent.Result,
+                        responseContent.Errors);
+
+                return new ServiceResponse<IEnumerable<RegisterModel>?>(
+                    responseContent.Value?.Select(_registerMapper.Map));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"--> {ex.Message}");
+
+                return new ServiceResponse<IEnumerable<RegisterModel>?>(
+                    false,
+                    ["Reading shared registers failed"]);
+            }
+        }
+
+        public async Task<ServiceResponse> ShareRegisterAsync(int registerId, string userId, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var url = "/api/Register/ShareRegister";
+                var model = new ShareRegisterCreateDto()
+                {
+                    RegisterId = registerId,
+                    UserId = userId,
+                };
+                var response = await _httpClient.PostAsJsonAsync(url, model, cancellationToken);
+                var responseContent = await response.Content.ReadFromJsonAsync<ServiceResponse>();
+
+                if (responseContent is null)
+                    return new ServiceResponse(
+                        false,
+                        ["Sharing register failed"]);
+
+                return responseContent;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"--> {ex.Message}");
+
+                return new ServiceResponse(
+                    false,
+                    ["Sharing register failed"]);
+            }
+        }
     }
 }

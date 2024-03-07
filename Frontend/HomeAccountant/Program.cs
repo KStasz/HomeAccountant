@@ -11,6 +11,8 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
+
+builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
 builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<JwtAuthenticationStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<JwtAuthenticationStateProvider>());
@@ -41,6 +43,8 @@ builder.Services.AddScoped<BillingPeriodChartViewModel>();
 builder.Services.AddScoped<FriendsPanelViewModel>();
 builder.Services.AddScoped<IMemoryStorage, MemoryStorage>();
 builder.Services.AddScoped<IPubSubService, PubSubService>();
+
+
 
 await builder.Build().RunAsync();
 

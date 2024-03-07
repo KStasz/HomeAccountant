@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Castle.Core.Logging;
 using Domain.Dtos.CategoryService;
 using Domain.Model;
 using Domain.Services;
@@ -7,6 +8,7 @@ using HomeAccountant.CategoriesService.Model;
 using HomeAccountant.CategoriesService.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Moq;
 using System.Security.Claims;
 using Xunit;
@@ -19,6 +21,7 @@ namespace HomeAccountant.CategoriesService.Controllers.Tests
         private readonly Mock<IRepository<ApplicationDbContext, CategoryModel>> _dbContext;
         private readonly Mock<IMapper> _mapperMock;
         private readonly Mock<IAccountingService> _accountingServiceMock;
+        private readonly Mock<ILogger<CategoriesController>> _logger;
         private readonly CategoriesController _categoriesController;
 
         public CategoriesControllerTests()
@@ -26,11 +29,13 @@ namespace HomeAccountant.CategoriesService.Controllers.Tests
             _dbContext = new Mock<IRepository<ApplicationDbContext, CategoryModel>>();
             _mapperMock = new Mock<IMapper>();
             _accountingServiceMock = new Mock<IAccountingService>();
+            _logger = new Mock<ILogger<CategoriesController>>();
 
             _categoriesController = new CategoriesController(
                 _dbContext.Object,
                 _mapperMock.Object,
-                _accountingServiceMock.Object);
+                _accountingServiceMock.Object,
+                _logger.Object);
         }
 
         [Fact()]

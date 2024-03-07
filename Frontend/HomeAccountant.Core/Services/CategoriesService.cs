@@ -2,9 +2,8 @@
 using HomeAccountant.Core.Exceptions;
 using HomeAccountant.Core.Mapper;
 using HomeAccountant.Core.Model;
+using Microsoft.Extensions.Logging;
 using System.Net.Http.Json;
-
-
 
 namespace HomeAccountant.Core.Services
 {
@@ -14,16 +13,19 @@ namespace HomeAccountant.Core.Services
         private readonly ITypeMapper<CategoryCreateDto, CategoryModel> _categoryCreateMapper;
         private readonly ITypeMapper<CategoryUpdateDto, CategoryModel> _categoryUpdateMapper;
         private readonly ITypeMapper<CategoryModel, CategoryReadDto> _categoryMapper;
+        private readonly ILogger<CategoriesService> _logger;
 
         public CategoriesService(AuthorizableHttpClient httpClient,
             ITypeMapper<CategoryCreateDto, CategoryModel> categoryCreateMapper,
             ITypeMapper<CategoryUpdateDto, CategoryModel> categoryUpdateMapper,
-            ITypeMapper<CategoryModel, CategoryReadDto> categoryMapper)
+            ITypeMapper<CategoryModel, CategoryReadDto> categoryMapper,
+            ILogger<CategoriesService> logger)
         {
             _httpClient = httpClient;
             _categoryCreateMapper = categoryCreateMapper;
             _categoryUpdateMapper = categoryUpdateMapper;
             _categoryMapper = categoryMapper;
+            _logger = logger;
         }
 
         public async Task<ServiceResponse<CategoryModel?>> CreateCategoryAsync(CategoryModel categoryModel, CancellationToken cancellationToken = default)
@@ -97,6 +99,37 @@ namespace HomeAccountant.Core.Services
                     {
                         ex.Message
                     });
+            }
+        }
+
+        public async Task<ServiceResponse<IEnumerable<CategoryModel>?>> GetRegisterCategories(int registerId, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var url = $"/api/Categories/RegisterCategories?registerId={registerId}";
+                var response = await _httpClient.GetAsync(url, cancellationToken);
+                var responseContent = await response.Content.ReadFromJsonAsync<ServiceResponse<IEnumerable<CategoryReadDto>?>>();
+
+                if (responseContent is null)
+                    return new ServiceResponse<IEnumerable<CategoryModel>?>(
+                        false,
+                        ["Reading categories failed"]);
+
+                if (!responseContent.Result)
+                    return new ServiceResponse<IEnumerable<CategoryModel>?>(
+                        responseContent.Result,
+                        responseContent?.Errors);
+
+                return new ServiceResponse<IEnumerable<CategoryModel>?>(
+                    responseContent.Value?.Select(_categoryMapper.Map));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"--> {ex.Message}");
+
+                return new ServiceResponse<IEnumerable<CategoryModel>?>(
+                    false,
+                    ["Reading categories failed"]);
             }
         }
 
