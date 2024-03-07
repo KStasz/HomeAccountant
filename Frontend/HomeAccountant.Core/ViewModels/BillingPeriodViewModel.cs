@@ -206,6 +206,7 @@ namespace HomeAccountant.Core.ViewModels
             {
                 SelectedBillingPeriod = null;
                 SelectedBillingPeriod = AvailableBillingPeriods?[_currentPeriodIndex];
+                NotifyPropertyChangedAsync(nameof(SelectedBillingPeriod));
             });
         }
 

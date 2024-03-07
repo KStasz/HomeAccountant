@@ -172,7 +172,7 @@ namespace HomeAccountant.Core.ViewModels
 
         private async Task ReadCategoriesAsync(CancellationToken cancellationToken)
         {
-            var result = await _categoriesService.GetCategoriesAsync();
+            var result = await _categoriesService.GetRegisterCategories(_registerId, cancellationToken);
 
             if (!result.Result)
                 return;

@@ -1,4 +1,5 @@
 ﻿using HomeAccountant.Core.DTOs.Friends;
+using HomeAccountant.Core.DTOs.Identity;
 using HomeAccountant.Core.Mapper;
 using HomeAccountant.Core.Model;
 using Microsoft.Extensions.Logging;
@@ -11,15 +12,18 @@ namespace HomeAccountant.Core.Services
         private readonly AuthorizableHttpClient _httpClient;
         private readonly ILogger<FriendshipService> _logger;
         private readonly ITypeMapper<FriendshipModel, FriendshipReadDto> _friendshipMapper;
+        private readonly ITypeMapper<UserModel, UserModelReadDto> _userMapper;
 
         public FriendshipService(
             AuthorizableHttpClient httpClient,
             ILogger<FriendshipService> logger,
-            ITypeMapper<FriendshipModel, FriendshipReadDto> friendshipMapper)
+            ITypeMapper<FriendshipModel, FriendshipReadDto> friendshipMapper,
+            ITypeMapper<UserModel, UserModelReadDto> userMapper)
         {
             _httpClient = httpClient;
             _logger = logger;
             _friendshipMapper = friendshipMapper;
+            _userMapper = userMapper;
         }
 
         public async Task<ServiceResponse<IEnumerable<FriendshipModel>?>> GetFriendships(string? email = null, string? name = null, CancellationToken cancellationToken = default)
@@ -119,7 +123,7 @@ namespace HomeAccountant.Core.Services
                 var url = $"/api/Friendship/AcceptFriendship?friendshipId={friendshipId}";
                 var response = await _httpClient.PutAsync(url, cancellationToken);
                 var responseContent = await response.Content.ReadFromJsonAsync<ServiceResponse>(cancellationToken);
-                
+
                 if (responseContent is null)
                     return new ServiceResponse(
                         false,
@@ -137,6 +141,37 @@ namespace HomeAccountant.Core.Services
                 return new ServiceResponse(
                     false,
                     ["Accepting friendship failed"]);
+            }
+        }
+
+        public async Task<ServiceResponse<IEnumerable<UserModel>?>> GetFriends(CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var url = "/api/Friendship/GetFriends";
+                var response = await _httpClient.GetAsync(url, cancellationToken);
+                var responseContent = await response.Content.ReadFromJsonAsync<ServiceResponse<IEnumerable<UserModelReadDto>>?>();
+
+                if (responseContent is null)
+                    return new ServiceResponse<IEnumerable<UserModel>?>(
+                        false,
+                        ["Reading friends failed"]);
+
+                if (!responseContent.Result)
+                    return new ServiceResponse<IEnumerable<UserModel>?>(
+                        responseContent.Result,
+                        responseContent.Errors);
+
+                return new ServiceResponse<IEnumerable<UserModel>?>(
+                    responseContent.Value?.Select(_userMapper.Map));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"--> {ex.Message}");
+
+                return new ServiceResponse<IEnumerable<UserModel>?>(
+                    false,
+                    ["Reading friends failed"]);
             }
         }
     }

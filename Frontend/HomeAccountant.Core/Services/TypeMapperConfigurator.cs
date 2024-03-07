@@ -3,6 +3,7 @@ using HomeAccountant.Core.DTOs.BillingPeriod;
 using HomeAccountant.Core.DTOs.Category;
 using HomeAccountant.Core.DTOs.Entry;
 using HomeAccountant.Core.DTOs.Friends;
+using HomeAccountant.Core.DTOs.Identity;
 using HomeAccountant.Core.DTOs.Register;
 using HomeAccountant.Core.Mapper;
 using HomeAccountant.Core.Model;
@@ -30,6 +31,7 @@ namespace HomeAccountant.Core.Services
             services.AddScoped<ITypeMapper<CategoryCreateDto, CategoryModel>, CategoryModelToCategoryCreateDtoMapper>();
             services.AddScoped<ITypeMapper<CategoryUpdateDto, CategoryModel>, CategoryModelToCategoryUpdateDtoMapper>();
             services.AddScoped<ITypeMapper<FriendshipModel, FriendshipReadDto>, FriendshipReadDtoToFriendshipModelMapper>();
+            services.AddScoped<ITypeMapper<UserModel, UserModelReadDto>, UserModelReadDtoToUserModelMapper>();
         }
     }
 }

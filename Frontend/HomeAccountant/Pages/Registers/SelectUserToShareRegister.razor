@@ -1,0 +1,49 @@
+﻿<Modal @ref="_modal" Position="ModalPosition.Centered">
+    <ModalContent>
+        <ModalHeader ModalTitle="Wybierz użytkownika" />
+        <ModalBody>
+            @if (!_isLoading)
+            {
+                <NullableTable Collection="_model" T="UserModel">
+                    <div class="table-responsive" style="max-height:250px;">
+                        <table class="table responsiveTable">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Email</th>
+                                    <th scope="col">UserName</th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+                            @{
+                                int counter = 1;
+                            }
+                            <tbody>
+                                @foreach (var item in context.Value!)
+                                {
+                                    <tr>
+                                        <td data-label="#" scope="row">@(counter++)</td>
+                                        <td data-label="Email">@item.Email</td>
+                                        <td data-label="UserName">@item.UserName</td>
+                                        <td>
+                                            <button type="button" class="btn btn-success" @onclick="() => SelectUser(item)">
+                                                Wybierz
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </NullableTable>
+            }
+            else
+            {
+                <Placeholder />
+            }
+        </ModalBody>
+        <ModalFooter>
+            <button type="button" class="btn btn-secondary" @onclick="Cancel">Anuluj</button>
+        </ModalFooter>
+    </ModalContent>
+</Modal>

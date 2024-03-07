@@ -16,6 +16,6 @@ namespace HomeAccountant.AccountingService.Models
         [Required]
         public DateTime CreatedDate { get; set; }
 
-        public required Register Register { get; set; }
+        public Register? Register { get; set; }
     }
 }

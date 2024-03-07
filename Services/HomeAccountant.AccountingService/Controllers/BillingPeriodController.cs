@@ -51,14 +51,15 @@ namespace HomeAccountant.AccountingService.Controllers
                     new ServiceResponse<IEnumerable<BillingPeriodReadDto>>(
                         new List<string>() { "Invalid payload" }));
 
-            var register = _registerRepository.Get(x => x.Id == registerId);
+            var register = _registerRepository.Get(x => x.Id == registerId, x => x.Sharings!);
 
             if (register is null)
                 return NotFound(
                     new ServiceResponse<IEnumerable<BillingPeriodReadDto>>(
                         new List<string>() { "Specified register not found" }));
 
-            if (register.CreatorId != UserId)
+            if (register.CreatorId != UserId
+                && !(register.Sharings?.Select(x => x.OwnerId).Contains(UserId) ?? false))
                 return Unauthorized(new ServiceResponse<IEnumerable<BillingPeriodReadDto>>(
                         new List<string>() { "You don't have access to specified register" }));
 

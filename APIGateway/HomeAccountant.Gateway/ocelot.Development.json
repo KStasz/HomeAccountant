@@ -40,6 +40,19 @@
       "DownstreamPathTemplate": "/api/Friendship"
     },
     {
+      "UpstreamPathTemplate": "/api/Friendship/GetFriends",
+      "UpstreamHttpMethod": [ "Get" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5095
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Friendship/GetFriends"
+    },
+    {
       "UpstreamPathTemplate": "/api/Friendship/CreateFriendshipRequest",
       "UpstreamHttpMethod": [ "Post" ],
 
@@ -129,6 +142,32 @@
         }
       ],
       "DownstreamPathTemplate": "/api/Register"
+    },
+    {
+      "UpstreamPathTemplate": "/api/Register/SharedRegisters",
+      "UpstreamHttpMethod": [ "Get" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5091
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Register/SharedRegisters"
+    },
+    {
+      "UpstreamPathTemplate": "/api/Register/ShareRegister",
+      "UpstreamHttpMethod": [ "Post" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5091
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Register/ShareRegister"
     },
     {
       "UpstreamPathTemplate": "/api/Register/{id}",

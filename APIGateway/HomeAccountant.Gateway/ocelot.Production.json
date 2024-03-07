@@ -131,6 +131,32 @@
       "DownstreamPathTemplate": "/api/Register"
     },
     {
+      "UpstreamPathTemplate": "/api/Register/SharedRegisters",
+      "UpstreamHttpMethod": [ "Get" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "homeaccountant_accountingservice",
+          "Port": 80
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Register/SharedRegisters"
+    },
+    {
+      "UpstreamPathTemplate": "/api/Register/ShareRegister",
+      "UpstreamHttpMethod": [ "Post" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "homeaccountant_accountingservice",
+          "Port": 80
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Register/ShareRegister"
+    },
+    {
       "UpstreamPathTemplate": "/api/Register/{id}",
       "UpstreamHttpMethod": [ "Delete", "Get" ],
 

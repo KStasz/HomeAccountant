@@ -1,6 +1,8 @@
 ﻿@page "/books"
 @inherits MvvmComponent<RegisterViewModel>
 @attribute [Authorize]
+
+<Alert @ref="ViewModel.Alert" />
 <h3>Dostępne księgi</h3>
 
 @if (!ViewModel.IsBusy)
@@ -23,9 +25,10 @@
                         <div class="card-body">
                             <h5 class="card-title">@item.Name</h5>
                             <h6 class="card-subtitle mb-2 text-body-secondary">Data utworzenia: @item.CreatedDate.ToString("yyyy-MM-dd")</h6>
-                            <p class="card-text">@(item.Description?.Length > 80 ? $"{item.Description?.Substring(0,80)}..." : $"{item.Description}")</p>
+                            <p class="card-text">@(item.Description?.Length > 80 ? $"{item.Description?.Substring(0, 80)}..." : $"{item.Description}")</p>
                             <NavLink role="button" class="btn btn-sm btn-primary" href="@($"/books/{item.Id}")">Pokaż pozycje</NavLink>
                             <a role="button" class="btn btn-sm btn-danger" @onclick="(() => ViewModel.DeleteRegisterAsync(item))">Usuń</a>
+                            <a role="button" class="btn btn-sm btn-info" @onclick="(() => ViewModel.ShareRegister(item))">Udostępnij</a>
                         </div>
                     </div>
                 </div>
@@ -42,7 +45,45 @@ else
     <Placeholder />
 }
 
+<div class="row accordion mt-3" id="accordionExample">
+    <div class="accordion-item">
+        <h2 class="accordion-header row">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                Udostępnione księgi
+            </button>
+        </h2>
+        <div id="collapseTwo" class="accordion-collapse row collapse show" data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+                @if (!ViewModel.SharedRegistersLoading)
+                {
+                    <NullableTable T="RegisterModel" Collection="ViewModel.SharedRegisters">
+                        <div class="row row-gap-1">
+                            @foreach (var item in context.Value!)
+                            {
+                                <div class="col-md-4 col-sm-6 px-1">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">@item.Name</h5>
+                                            <h6 class="card-subtitle mb-2 text-body-secondary">Data utworzenia: @item.CreatedDate.ToString("yyyy-MM-dd")</h6>
+                                            <p class="card-text">@(item.Description?.Length > 80 ? $"{item.Description?.Substring(0, 80)}..." : $"{item.Description}")</p>
+                                            <NavLink role="button" class="btn btn-sm btn-primary" href="@($"/books/{item.Id}")">Pokaż pozycje</NavLink>
+                                            <a role="button" class="btn btn-sm btn-danger" @onclick="(() => ViewModel.DeleteRegisterAsync(item))">Usuń</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </NullableTable>
+                }
+                else
+                {
+                    <Placeholder />
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
 <RegisterCreate @ref="ViewModel.CreateRegisterDialog" />
-
 <RegisterDelete @ref="ViewModel.DeleteRegisterDialog" />
-
+<SelectUserToShareRegister @ref="ViewModel.SelectUserDialog" />

@@ -8,5 +8,6 @@ namespace HomeAccountant.Core.Services
         Task<ServiceResponse<CategoryModel?>> CreateCategoryAsync(CategoryModel categoryModel, CancellationToken cancellationToken = default);
         Task<ServiceResponse> DeleteCategoryAsync(int categoryId, CancellationToken cancellationToken = default);
         Task<ServiceResponse> UpdateCategoryAsync(CategoryModel categoryModel, CancellationToken cancellationToken = default);
+        Task<ServiceResponse<IEnumerable<CategoryModel>?>> GetRegisterCategories(int registerId, CancellationToken cancellationToken = default);
     }
 }
