@@ -27,6 +27,19 @@
       "DownstreamPathTemplate": "/api/Categories/{id}"
     },
     {
+      "UpstreamPathTemplate": "/api/Categories/RegisterCategories",
+      "UpstreamHttpMethod": [ "Get" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5168
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Categories/RegisterCategories"
+    },
+    {
       "UpstreamPathTemplate": "/api/Friendship",
       "UpstreamHttpMethod": [ "Get", "Delete" ],
 

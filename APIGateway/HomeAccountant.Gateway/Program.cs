@@ -1,6 +1,5 @@
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
-using System.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 

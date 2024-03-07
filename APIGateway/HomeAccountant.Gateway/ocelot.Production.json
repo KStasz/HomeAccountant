@@ -27,6 +27,19 @@
       "DownstreamPathTemplate": "/api/Categories/{id}"
     },
     {
+      "UpstreamPathTemplate": "/api/Categories/RegisterCategories",
+      "UpstreamHttpMethod": [ "Get" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "homeaccountant_categoriesservice",
+          "Port": 80
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Categories/RegisterCategories"
+    },
+    {
       "UpstreamPathTemplate": "/api/Friendship",
       "UpstreamHttpMethod": [ "Get", "Delete" ],
 
