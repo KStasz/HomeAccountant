@@ -1,10 +1,5 @@
-﻿using HomeAccountant.Core.DTOs.BillingPeriod;
-using HomeAccountant.Core.DTOs.Category;
-using HomeAccountant.Core.DTOs.Entry;
-using HomeAccountant.Core.Mapper;
-using HomeAccountant.Core.Model;
+﻿using HomeAccountant.Core.Model;
 using HomeAccountant.Core.Services;
-using Microsoft.AspNetCore.Components;
 
 namespace HomeAccountant.Core.ViewModels
 {
@@ -157,7 +152,7 @@ namespace HomeAccountant.Core.ViewModels
             var creationResult = await _entryService.CreateEntryAsync(_registerId, _billingPerdiodId, result, CancellationToken);
 
             await _entriesRealTimeService.EntryCreatedAsync(CancellationToken);
-            await _pubSubService.Send(this);
+            //await _pubSubService.Send(this);
         }
 
         public async Task DeleteEntry(EntryModel entryReadDto)
@@ -175,7 +170,7 @@ namespace HomeAccountant.Core.ViewModels
             await _entryService.DeleteEntryAsync(_registerId, _billingPerdiodId, entryReadDto.Id, CancellationToken);
 
             await _entriesRealTimeService.EntryCreatedAsync(CancellationToken);
-            await _pubSubService.Send(this);
+            //await _pubSubService.Send(this);
         }
 
         private async Task ReadCategoriesAsync(CancellationToken cancellationToken)
