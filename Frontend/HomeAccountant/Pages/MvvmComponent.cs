@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace HomeAccountant.Pages
 {
-    public abstract class MvvmComponent<T> : ComponentBase, IDisposable where T : MvvmViewModel
+    public abstract class MvvmComponent<T> : ComponentBase, IDisposable, IAsyncDisposable where T : MvvmViewModel
     {
         [Inject]
         public required T ViewModel { get; set; }
@@ -80,6 +80,17 @@ namespace HomeAccountant.Pages
         {
             ViewModel.PropertyChangedAsync -= ViewModel_PropertyChangedAsync;
             ViewModel.Dispose();
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            await DisposeAsyncCore().ConfigureAwait(false);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual async ValueTask DisposeAsyncCore()
+        {
+            await ViewModel.DisposeAsync().ConfigureAwait(false);
         }
     }
 }

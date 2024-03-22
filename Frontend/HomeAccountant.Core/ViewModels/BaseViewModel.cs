@@ -1,12 +1,13 @@
 ﻿using HomeAccountant.Core.Delegates;
 using HomeAccountant.Core.Interfaces;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.SignalR.Client;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace HomeAccountant.Core.ViewModels
 {
-    public class BaseViewModel : INotifyPropertyChangedAsync, IDisposable
+    public class BaseViewModel : INotifyPropertyChangedAsync, IDisposable, IAsyncDisposable
     {
         public event PropertyChangedEventHandler? PropertyChanged;
         public event PropertyChangedEventHandlerAsync? PropertyChangedAsync;
@@ -71,6 +72,17 @@ namespace HomeAccountant.Core.ViewModels
             CancellationTokenSource?.Cancel();
             CancellationTokenSource?.Dispose();
             CancellationTokenSource = null;
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            await DisposeAsyncCore().ConfigureAwait(false);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual ValueTask DisposeAsyncCore()
+        {
+            return ValueTask.CompletedTask;
         }
     }
 }

@@ -285,6 +285,19 @@
         }
       ],
       "DownstreamPathTemplate": "/api/Register/{registerId}/BillingPeriod/{billingPeriodId}/Close"
+    },
+    {
+      "UpstreamPathTemplate": "/api/hub/{catchAll}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE", "OPTIONS" ],
+      
+      "DownstreamScheme": "ws",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5095
+        }
+      ],
+      "DownstreamPathTemplate": "/api/hub/{catchAll}"
     }
   ],
   "GlobalConfiguration": {

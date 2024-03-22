@@ -25,6 +25,7 @@ if (useCors)
 }
 
 builder.Services.AddOcelot(builder.Configuration);
+builder.Services.AddSignalR();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -57,7 +58,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
-
+app.UseWebSockets();
 await app.UseOcelot();
 
 app.Run();
