@@ -11,6 +11,7 @@ Function LogStep{
 }
 
 LogStep -step 1 -serviceName "AccountingService"
+cd ..
 docker build -t krz123/homeaccountant.accountingservice --no-cache -f .\Services\HomeAccountant.AccountingService\Dockerfile .
 LogStep -step 2 -serviceName "Gateway"
 docker build -t krz123/homeaccountant.gateway --no-cache -f .\APIGateway\HomeAccountant.Gateway\Dockerfile .
