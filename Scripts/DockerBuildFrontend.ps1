@@ -13,4 +13,5 @@ Function LogStep{
 $Environment = Read-Host -Prompt 'Podaj srodowisko(Development/Production)'
 
 LogStep -step 1 -serviceName "Frontend"
+cd ..
 docker build -t krz123/homeaccountant.frontend --no-cache --build-arg Environment=$Environment -f .\Frontend\HomeAccountant\Dockerfile .
