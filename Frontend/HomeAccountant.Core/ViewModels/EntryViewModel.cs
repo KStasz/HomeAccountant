@@ -13,17 +13,21 @@ namespace HomeAccountant.Core.ViewModels
         private readonly IEntryService _entryService;
         private readonly ICategoriesService _categoriesService;
         private readonly IPubSubService _pubSubService;
+        private readonly IEntriesRealTimeService _entriesRealTimeService;
         private int _billingPerdiodId;
         private int _registerId;
         private bool _isPeriodOpen;
 
         public EntryViewModel(IEntryService entryService,
             ICategoriesService categoriesService,
-            IPubSubService pubSubService)
+            IPubSubService pubSubService,
+            IEntriesRealTimeService entriesRealTimeService)
         {
             _entryService = entryService;
             _categoriesService = categoriesService;
             _pubSubService = pubSubService;
+            _entriesRealTimeService = entriesRealTimeService;
+            _entriesRealTimeService.EntryCreated += EntriesRealTimeService_EntryCreated;
         }
 
         public IModalDialog<EntryModel, EntryModel>? EntryCreateDialog { get; set; }
@@ -100,6 +104,7 @@ namespace HomeAccountant.Core.ViewModels
 
             await ReadEntriesAsync(CancellationToken);
             await ReadCategoriesAsync(CancellationToken);
+            await _entriesRealTimeService.InitializeAsync(CancellationToken);
             IsBusy = false;
         }
 
@@ -151,6 +156,7 @@ namespace HomeAccountant.Core.ViewModels
 
             var creationResult = await _entryService.CreateEntryAsync(_registerId, _billingPerdiodId, result, CancellationToken);
 
+            await _entriesRealTimeService.EntryCreatedAsync(CancellationToken);
             await _pubSubService.Send(this);
         }
 
@@ -167,7 +173,9 @@ namespace HomeAccountant.Core.ViewModels
                 return;
 
             await _entryService.DeleteEntryAsync(_registerId, _billingPerdiodId, entryReadDto.Id, CancellationToken);
-            await ReadEntriesAsync(CancellationToken);
+
+            await _entriesRealTimeService.EntryCreatedAsync(CancellationToken);
+            await _pubSubService.Send(this);
         }
 
         private async Task ReadCategoriesAsync(CancellationToken cancellationToken)
@@ -198,6 +206,24 @@ namespace HomeAccountant.Core.ViewModels
             CurrentPage = result.Value?.CurrentPage ?? 0;
             TotalPages = result.Value?.TotalPages ?? 0;
             CalculateAvailablePages();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+        }
+
+        protected override async ValueTask DisposeAsyncCore()
+        {
+            _entriesRealTimeService.EntryCreated -= EntriesRealTimeService_EntryCreated;
+
+            await _entriesRealTimeService.DisposeAsync().ConfigureAwait(false);
+            await base.DisposeAsyncCore();
+        }
+
+        private async Task EntriesRealTimeService_EntryCreated(object sender, RealTimeEventArgs e)
+        {
+            await _pubSubService.Send(this);
         }
     }
 }

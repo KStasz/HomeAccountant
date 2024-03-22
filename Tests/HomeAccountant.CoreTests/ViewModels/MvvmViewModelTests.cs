@@ -17,7 +17,7 @@ namespace HomeAccountant.Core.ViewModels.Tests
         {
             new object[] { typeof(int), typeof(int), "1", 1 },
             new object[] { typeof(string), typeof(string), "word", "word" },
-            new object[] { typeof(double), typeof(double), "1.2", 1.2 },
+            new object[] { typeof(double), typeof(double), "1,2", 1.2 },
             new object[] { typeof(bool), typeof(bool), "false", false },
             new object[] { typeof(bool), typeof(bool), "False", false },
             new object[] { typeof(bool), typeof(bool), "true", true },

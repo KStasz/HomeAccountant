@@ -10,13 +10,18 @@ namespace HomeAccountant.Core.ViewModels
     {
         private readonly IFriendshipService _friendsService;
         private readonly JwtAuthenticationStateProvider _jwtAuthenticationStateProvider;
+        private readonly IFriendsRealTimeService _friendsRealTimeService;
 
         public FriendsPanelViewModel(
             IFriendshipService friendsService,
-            JwtAuthenticationStateProvider jwtAuthenticationStateProvider)
+            JwtAuthenticationStateProvider jwtAuthenticationStateProvider,
+            IFriendsRealTimeService friendsRealTimeService)
         {
             _friendsService = friendsService;
             _jwtAuthenticationStateProvider = jwtAuthenticationStateProvider;
+            _friendsRealTimeService = friendsRealTimeService;
+
+            _friendsRealTimeService.FriendshipCreated += _friendsRealTimeService_FriendshipCreated;
         }
 
         public IAlert? Alert { get; set; }
@@ -47,13 +52,8 @@ namespace HomeAccountant.Core.ViewModels
             await ReadUserIdentifier();
 
             IsBusy = false;
-        }
 
-        private async Task ReadUserIdentifier()
-        {
-            var state = await _jwtAuthenticationStateProvider.GetAuthenticationStateAsync();
-            CurrentUserIdentifier = (state.User.Identity as ClaimsIdentity)?.Claims
-                .FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
+            await _friendsRealTimeService.InitializeAsync(CancellationToken);
         }
 
         public async Task CreateFriendship()
@@ -84,6 +84,7 @@ namespace HomeAccountant.Core.ViewModels
             }
 
             await ReadFriendshipCollection();
+            await _friendsRealTimeService.FriendshipCreatedAsync(CancellationToken);
         }
 
         public async Task DeleteFriendship(FriendshipModel friendship)
@@ -108,17 +109,44 @@ namespace HomeAccountant.Core.ViewModels
             }
 
             await ReadFriendshipCollection();
+            await _friendsRealTimeService.FriendshipCreatedAsync(CancellationToken);
         }
 
         public async Task AcceptFriendship(FriendshipModel friendshipModel)
         {
             await _friendsService.AcceptFriendship(friendshipModel.Id);
             await ReadFriendshipCollection();
+            await _friendsRealTimeService.FriendshipCreatedAsync(CancellationToken);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+        }
+
+        protected override async ValueTask DisposeAsyncCore()
+        {
+            _friendsRealTimeService.FriendshipCreated -= _friendsRealTimeService_FriendshipCreated;
+
+            await _friendsRealTimeService.DisposeAsync().ConfigureAwait(false);
+            await base.DisposeAsyncCore();
+        }
+
+        private async Task _friendsRealTimeService_FriendshipCreated(object sender, RealTimeEventArgs e)
+        {
+            await ReadFriendshipCollection();
         }
 
         private async Task ReadFriendshipCollection(string? email = null, string? name = null)
         {
             FriendsCollection = await _friendsService.GetFriendships(email, name);
+        }
+
+        private async Task ReadUserIdentifier()
+        {
+            var state = await _jwtAuthenticationStateProvider.GetAuthenticationStateAsync();
+            CurrentUserIdentifier = (state.User.Identity as ClaimsIdentity)?.Claims
+                .FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
         }
     }
 }

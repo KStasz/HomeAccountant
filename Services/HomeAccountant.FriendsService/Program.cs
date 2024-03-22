@@ -1,10 +1,10 @@
 using HomeAccountant.FriendsService.Data;
-using HomeAccountant.FriendsService.Service;
 using Microsoft.EntityFrameworkCore;
 using JwtAuthenticationManager;
 using HomeAccountant.FriendsService.Config;
 using Domain;
 using Domain.Data;
+using HomeAccountant.FriendsService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,12 +21,16 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddTransient<IAuthorizationTokenProvider, AuthorizationTokenProvider>();
 builder.Services.ConfigureDbContext();
+builder.Services.AddSignalR();
+builder.Services.AddResponseCompression();
 
 builder.Services.RegisterHttpClientServices(builder.Configuration);
 
 builder.Services.AddJwtAuthentication();
 
 var app = builder.Build();
+
+app.UseResponseCompression();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -44,5 +48,7 @@ app.MapControllers();
 
 if (builder.Environment.IsProduction())
     app.PrepareDatabase<ApplicationDbContext>();
+
+app.MapHub<FriendsHub>("/api/friendshub/friends");
 
 app.Run();

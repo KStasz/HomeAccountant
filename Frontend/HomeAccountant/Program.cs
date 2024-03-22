@@ -13,6 +13,8 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 
 builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
+bool isUsingLocal = GetValueResponsibleForLocalEnvironment();
+
 builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<JwtAuthenticationStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<JwtAuthenticationStateProvider>());
@@ -30,28 +32,35 @@ builder.Services.AddScoped<IBillingPeriodService, BillingPeriodService>();
 builder.Services.RegisterMappers();
 
 builder.Services.AddHttpClient("UnauhorizedHttpClient",
-    client => client.BaseAddress = new Uri(GetBaseAddress()));
+    client => client.BaseAddress = new Uri(GetBaseAddress(isUsingLocal)));
 
 builder.Services.AddHttpClient<AuthorizableHttpClient>(
-    client => client.BaseAddress = new Uri(GetBaseAddress()));
+    client => client.BaseAddress = new Uri(GetBaseAddress(isUsingLocal)));
 builder.Services.AddScoped<LoginViewModel>();
 builder.Services.AddScoped<RegisterViewModel>();
 builder.Services.AddTransient<EntryViewModel>();
 builder.Services.AddScoped<CategoriesViewModel>();
 builder.Services.AddScoped<BillingPeriodViewModel>();
 builder.Services.AddScoped<BillingPeriodChartViewModel>();
-builder.Services.AddScoped<FriendsPanelViewModel>();
+builder.Services.AddTransient<FriendsPanelViewModel>();
 builder.Services.AddScoped<IMemoryStorage, MemoryStorage>();
 builder.Services.AddScoped<IPubSubService, PubSubService>();
+builder.Services.RegisterSignalRService<IFriendsRealTimeService, FriendsRealTimeService>(isUsingLocal ? "FriendsHubAddress_local" : "FriendsHubAddress");
+builder.Services.RegisterSignalRService<IEntriesRealTimeService, EntriesRealTimeService>(isUsingLocal ? "EntriesHubAddress_local" : "EntriesHubAddress");
+
 
 
 
 await builder.Build().RunAsync();
 
-string GetBaseAddress()
+string GetBaseAddress(bool isUsingLocal)
 {
-    var useLocalBackend = builder.Configuration.GetValue<bool>("UseLocalBackend");
-    var address = useLocalBackend ? builder.Configuration["APIBaseAddress_local"] : builder.Configuration["APIBaseAddress"];
+    var address = isUsingLocal ? builder.Configuration["APIBaseAddress_local"] : builder.Configuration["APIBaseAddress"];
 
     return address ?? throw new ArgumentNullException();
+}
+
+bool GetValueResponsibleForLocalEnvironment()
+{
+    return builder.Configuration.GetValue<bool>("UseLocalBackend");
 }
