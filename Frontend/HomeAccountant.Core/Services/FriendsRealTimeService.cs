@@ -9,15 +9,12 @@ namespace HomeAccountant.Core.Services
         private const string _friendshipRequestCreatedEventName = "FriendshipRequestCreated";
 
         private readonly ISignalRHubConnection _signalRHubConnection;
-        private readonly ILogger<FriendsRealTimeService> _logger;
 
         public event IFriendsRealTimeService.FriendshipCreatedHandler? FriendshipCreated;
 
-        public FriendsRealTimeService(ISignalRHubConnection signalRHubConnection, 
-            ILogger<FriendsRealTimeService> logger)
+        public FriendsRealTimeService(ISignalRHubConnection signalRHubConnection)
         {
             _signalRHubConnection = signalRHubConnection;
-            _logger = logger;
         }
 
         public Task FriendshipCreatedAsync(CancellationToken cancellationToken = default)
@@ -32,8 +29,6 @@ namespace HomeAccountant.Core.Services
                 () => FriendshipCreated?.Invoke(this, RealTimeEventArgs.Empty));
 
             await _signalRHubConnection.StartAsync(cancellationToken);
-
-            _logger.LogInformation($"Connection State: {_signalRHubConnection.State}");
         }
 
         public async ValueTask DisposeAsync()

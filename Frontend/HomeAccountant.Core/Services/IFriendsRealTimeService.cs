@@ -2,11 +2,10 @@
 
 namespace HomeAccountant.Core.Services
 {
-    public interface IFriendsRealTimeService : IAsyncDisposable
+    public interface IFriendsRealTimeService : IRealTimeDefaults
     {
         delegate Task FriendshipCreatedHandler(object sender, RealTimeEventArgs e);
-        event FriendshipCreatedHandler FriendshipCreated;
-        Task InitializeAsync(CancellationToken cancellationToken = default);
+        event FriendshipCreatedHandler? FriendshipCreated;
         Task FriendshipCreatedAsync(CancellationToken cancellationToken = default);
     }
 }

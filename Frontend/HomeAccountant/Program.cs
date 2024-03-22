@@ -46,6 +46,7 @@ builder.Services.AddTransient<FriendsPanelViewModel>();
 builder.Services.AddScoped<IMemoryStorage, MemoryStorage>();
 builder.Services.AddScoped<IPubSubService, PubSubService>();
 builder.Services.RegisterSignalRService<IFriendsRealTimeService, FriendsRealTimeService>(isUsingLocal ? "FriendsHubAddress_local" : "FriendsHubAddress");
+builder.Services.RegisterSignalRService<IEntriesRealTimeService, EntriesRealTimeService>(isUsingLocal ? "EntriesHubAddress_local" : "EntriesHubAddress");
 
 
 

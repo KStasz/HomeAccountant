@@ -287,9 +287,9 @@
       "DownstreamPathTemplate": "/api/Register/{registerId}/BillingPeriod/{billingPeriodId}/Close"
     },
     {
-      "UpstreamPathTemplate": "/api/hub/{catchAll}",
+      "UpstreamPathTemplate": "/api/friendshub/{catchAll}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE", "OPTIONS" ],
-      
+
       "DownstreamScheme": "ws",
       "DownstreamHostAndPorts": [
         {
@@ -297,7 +297,20 @@
           "Port": 80
         }
       ],
-      "DownstreamPathTemplate": "/api/hub/{catchAll}"
+      "DownstreamPathTemplate": "/api/friendshub/{catchAll}"
+    },
+    {
+      "UpstreamPathTemplate": "/api/entrieshub/{catchAll}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE", "OPTIONS" ],
+
+      "DownstreamScheme": "ws",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "homeaccountant_accountingservice",
+          "Port": 80
+        }
+      ],
+      "DownstreamPathTemplate": "/api/entrieshub/{catchAll}"
     }
   ],
   "GlobalConfiguration": {

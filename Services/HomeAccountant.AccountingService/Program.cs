@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Domain;
 using Domain.Data;
+using HomeAccountant.AccountingService.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
@@ -62,6 +63,8 @@ builder.Services.AddHttpClient<IAccountInfoService, AccountInfoService>((service
     client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", authHader.Replace("Bearer ", string.Empty));
 });
 
+builder.Services.AddSignalR();
+builder.Services.AddResponseCompression();
 
 var app = builder.Build();
 
@@ -81,5 +84,7 @@ app.MapControllers();
 
 if (builder.Environment.IsProduction())
     app.PrepareDatabase<ApplicationDbContext>();
+
+app.MapHub<EntriesHub>("/api/entrieshub/entries");
 
 app.Run();

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace HomeAccountant.Core.Services
 {
@@ -11,7 +12,7 @@ namespace HomeAccountant.Core.Services
             where TImplementation : class, TService
         {
             serviceCollection.AddKeyedTransient<ISignalRHubConnection, SignalRHubConnection>(
-                nameof(TService),
+                typeof(TService).Name,
                 (s, k) =>
                 {
                     var config = s.GetRequiredService<IConfiguration>();
@@ -20,17 +21,19 @@ namespace HomeAccountant.Core.Services
                     var hubConnectionStateGetter = new HubConnectionStateGetter(hubConnection);
                     var hubConnectionSenderAsync = new HubConnectionSender(hubConnection);
                     var hubConnectionConfigurator = new HubConnectionConfigurator(hubConnection);
+                    var logger = s.GetRequiredService<ILogger<SignalRHubConnection>>();
 
                     return new SignalRHubConnection(
                         hubConnection,
                         hubConnectionSenderAsync,
                         hubConnectionStateGetter,
-                        hubConnectionConfigurator);
+                        hubConnectionConfigurator,
+                        logger);
                 });
 
             serviceCollection.AddTransient<TService, TImplementation>((s) =>
             {
-                var service = s.GetRequiredKeyedService<ISignalRHubConnection>(nameof(TService));
+                var service = s.GetRequiredKeyedService<ISignalRHubConnection>(typeof(TService).Name);
 
                 var serviceName = service
                 .GetType()

@@ -17,6 +17,7 @@ namespace HomeAccountant.Core.Services.Tests
         private readonly Mock<IHubConnectionSenderAsync> _hubConnectionSenderAsync;
         private readonly Mock<IHubConnectionStateGetter> _hubConnectionStateGetter;
         private readonly Mock<IHubConnectionConfigurator> _hubConnectionConfigurator;
+        private readonly Mock<ILogger<SignalRHubConnection>> _loggerMock;
         private readonly Mock<IConnectionFactory> _connectionFactory;
         private readonly Mock<IHubProtocol> _protocol;
         private readonly Mock<EndPoint> _endPoint;
@@ -39,12 +40,14 @@ namespace HomeAccountant.Core.Services.Tests
             _hubConnectionSenderAsync = new Mock<IHubConnectionSenderAsync>();
             _hubConnectionStateGetter = new Mock<IHubConnectionStateGetter>();
             _hubConnectionConfigurator = new Mock<IHubConnectionConfigurator>();
+            _loggerMock = new Mock<ILogger<SignalRHubConnection>>();
 
             _signalRHubConnection = new SignalRHubConnection(
                 _hubConnectionMock.Object,
                 _hubConnectionSenderAsync.Object,
                 _hubConnectionStateGetter.Object,
-                _hubConnectionConfigurator.Object);
+                _hubConnectionConfigurator.Object,
+                _loggerMock.Object);
         }
 
         [Fact()]

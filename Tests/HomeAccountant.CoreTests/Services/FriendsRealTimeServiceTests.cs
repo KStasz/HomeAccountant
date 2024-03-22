@@ -7,17 +7,13 @@ namespace HomeAccountant.Core.Services.Tests
     public class FriendsRealTimeServiceTests
     {
         private readonly Mock<ISignalRHubConnection> _signalRHubConnectionMock;
-        private readonly Mock<ILogger<FriendsRealTimeService>> _loggerMock;
         private readonly FriendsRealTimeService _friendsRealTimeService;
 
         public FriendsRealTimeServiceTests()
         {
             _signalRHubConnectionMock = new Mock<ISignalRHubConnection>();
-            _loggerMock = new Mock<ILogger<FriendsRealTimeService>>();
 
-            _friendsRealTimeService = new FriendsRealTimeService(
-                _signalRHubConnectionMock.Object,
-                _loggerMock.Object);
+            _friendsRealTimeService = new FriendsRealTimeService(_signalRHubConnectionMock.Object);
         }
 
         [Fact()]

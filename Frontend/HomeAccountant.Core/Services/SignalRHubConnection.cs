@@ -1,34 +1,41 @@
 ﻿using HomeAccountant.Core.Exceptions;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Logging;
 
 namespace HomeAccountant.Core.Services
 {
     public class SignalRHubConnection : ISignalRHubConnection
     {
         private const string HUB_IS_NOT_CONNECTED_EXCEPTION_MESSAGE = "Connection with hub hasn't been established";
+        private const string STATE_PATTERN = "{state}";
+        private const string CONNECTION_STATE_MESSAGE = $"Connection state: {STATE_PATTERN}";
 
         private readonly HubConnection _hubConnection;
         private readonly IHubConnectionSenderAsync _hubConnectionSenderAsync;
         private readonly IHubConnectionStateGetter _hubConnectionStateGetter;
         private readonly IHubConnectionConfigurator _hubConnectionConfigurator;
+        private readonly ILogger<SignalRHubConnection> _logger;
 
         public SignalRHubConnection(
             HubConnection hubConnection,
             IHubConnectionSenderAsync hubConnectionSenderAsync,
             IHubConnectionStateGetter hubConnectionStateGetter,
-            IHubConnectionConfigurator hubConnectionConfigurator)
+            IHubConnectionConfigurator hubConnectionConfigurator,
+            ILogger<SignalRHubConnection> logger)
         {
             _hubConnection = hubConnection;
             _hubConnectionSenderAsync = hubConnectionSenderAsync;
             _hubConnectionStateGetter = hubConnectionStateGetter;
             _hubConnectionConfigurator = hubConnectionConfigurator;
+            _logger = logger;
         }
 
         public HubConnectionState State => _hubConnectionStateGetter.State;
 
-        public Task StartAsync(CancellationToken cancellationToken = default)
+        public async Task StartAsync(CancellationToken cancellationToken = default)
         {
-            return _hubConnection.StartAsync(cancellationToken);
+            await _hubConnection.StartAsync(cancellationToken);
+            _logger.LogInformation(CONNECTION_STATE_MESSAGE.Replace(STATE_PATTERN, State.ToString()));
         }
 
         public IDisposable On<TResult>(string? methodName, Func<TResult>? handler)
@@ -64,6 +71,7 @@ namespace HomeAccountant.Core.Services
             await DisposeAsyncCore().ConfigureAwait(false);
 
             GC.SuppressFinalize(this);
+            _logger.LogInformation(CONNECTION_STATE_MESSAGE.Replace(STATE_PATTERN, State.ToString()));
         }
 
         protected virtual async ValueTask DisposeAsyncCore()

@@ -49,6 +49,6 @@ app.MapControllers();
 if (builder.Environment.IsProduction())
     app.PrepareDatabase<ApplicationDbContext>();
 
-app.MapHub<FriendsHub>("/api/hub/friends");
+app.MapHub<FriendsHub>("/api/friendshub/friends");
 
 app.Run();
