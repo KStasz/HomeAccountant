@@ -4,13 +4,11 @@ using Microsoft.AspNetCore.Components;
 
 namespace HomeAccountant.Pages.Registers
 {
-    public partial class SelectUserToShareRegister : ComponentBase, IModalDialog<Task<ServiceResponse<IEnumerable<UserModel>?>>, UserModel>
+    public partial class SelectUserToShareRegister : ComponentBase, IModalDialog<IEnumerable<UserModel>?, UserModel>
     {
         private IModal? _modal;
-        private Task<ServiceResponse<IEnumerable<UserModel>?>>? _task;
-        private ServiceResponse<IEnumerable<UserModel>?>? _model;
+        private IEnumerable<UserModel>? _model;
         private TaskCompletionSource<UserModel?>? _tcs;
-        private bool _isLoading = true;
 
         private async Task Cancel()
         {
@@ -34,9 +32,9 @@ namespace HomeAccountant.Pages.Registers
             await _modal.HideModalAsync();
         }
 
-        public async Task InitializeDialogAsync(Task<ServiceResponse<IEnumerable<UserModel>?>> model)
+        public async Task InitializeDialogAsync(IEnumerable<UserModel>? model)
         {
-            _task = model;
+            _model = model;
             _tcs = new TaskCompletionSource<UserModel?>();
 
             await InvokeAsync(StateHasChanged);
@@ -44,17 +42,13 @@ namespace HomeAccountant.Pages.Registers
 
         public async Task<UserModel?> ShowModalAsync(CancellationToken cancellationToken = default)
         {
-            if (_modal is null 
-                || _tcs is null
-                || _task is null)
+            if (_modal is null
+                || _tcs is null)
                 return null;
 
             await _modal.ShowModalAsync();
-
-            _model = await _task;
-            _isLoading = false;
             await InvokeAsync(StateHasChanged);
-
+            
             return await _tcs.Task;
         }
     }

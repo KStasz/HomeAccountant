@@ -7,5 +7,6 @@
         public string? Description { get; set; }
         public string? CreatorId { get; set; }
         public DateTime CreatedDate { get; set; }
+        public string[]? UserIds { get; set; }
     }
 }

@@ -8,23 +8,36 @@ namespace HomeAccountant.Core.ViewModels
     public class BillingPeriodViewModel : MvvmViewModel
     {
         private readonly IBillingPeriodService _billingPeriodService;
-        private readonly IPubSubService _pubSubService;
         private readonly IRegisterService _registerService;
         private readonly NavigationManager _navManager;
+        private readonly EntryViewModel _entryViewModel;
+        private readonly BillingPeriodChartViewModel _billingPeriodChartViewModel;
+        private readonly IBillingPeriodRealTimeService _billingPeriodRealTimeService;
         private int _registerId;
         private int _currentPeriodIndex;
 
         public BillingPeriodViewModel(IBillingPeriodService billingPeriodService,
-            IPubSubService pubSubService,
             IRegisterService registerService,
-            NavigationManager navManager)
+            NavigationManager navManager,
+            EntryViewModel entryViewModel,
+            BillingPeriodChartViewModel billingPeriodChartViewModel,
+            IBillingPeriodRealTimeService billingPeriodRealTimeService)
         {
             _billingPeriodService = billingPeriodService;
-            _pubSubService = pubSubService;
             _registerService = registerService;
             _navManager = navManager;
-            _pubSubService.MessageSender += _pubSubService_MessageSender;
+            _entryViewModel = entryViewModel;
+            _billingPeriodChartViewModel = billingPeriodChartViewModel;
+            _billingPeriodRealTimeService = billingPeriodRealTimeService;
+
+            _billingPeriodRealTimeService.EntryCreated += _billingPeriodRealTimeService_EntryCreated;
+            _billingPeriodRealTimeService.BillingPeriodStateChanged += BillingPeriodRealTimeService_BillingPeriodStateChanged;
+            _entryViewModel.NotifyEntryHasBeenCreated = EntryHasBeenCreated;
         }
+
+        public EntryViewModel EntriesPageViewModel => _entryViewModel;
+        public BillingPeriodChartViewModel BillingPeriodChartViewModel => _billingPeriodChartViewModel;
+
         public List<BillingPeriodModel>? AvailableBillingPeriods { get; set; }
 
         private BillingPeriodModel? _selectedBillingPeriod;
@@ -113,6 +126,15 @@ namespace HomeAccountant.Core.ViewModels
             }
 
             await RefreshBillingPeriodAsync(CancellationToken);
+            await _billingPeriodRealTimeService.BillingPeriodStateChangedAsync(SelectedBillingPeriod.Id);
+        }
+
+        public async Task EntryHasBeenCreated()
+        {
+            if (SelectedBillingPeriod is null)
+                return;
+
+            await _billingPeriodRealTimeService.EntryCreatedAsync(SelectedBillingPeriod.Id, CancellationToken);
         }
 
         public async Task CreateBillingDialogAsync()
@@ -151,8 +173,61 @@ namespace HomeAccountant.Core.ViewModels
 
             await ReadRegister();
             await ReadInitialDataAsync(_registerId, CancellationToken);
+            await _entryViewModel.SetParametersAsync(SelectedBillingPeriod?.Id ?? 0, _registerId, SelectedBillingPeriod?.IsOpen ?? false);
+            await _billingPeriodChartViewModel.SetParametersAsync(
+                SelectedBillingPeriod?.Id ?? 0,
+                _registerId,
+                SelectedBillingPeriod?.Name ?? string.Empty,
+                CancellationToken);
+            await _billingPeriodRealTimeService.InitializeAsync(CancellationToken);
 
             IsBusy = false;
+        }
+
+        public async Task PreviousPeriodAsync()
+        {
+            if ((!AvailableBillingPeriods?.Any() ?? false)
+                || _currentPeriodIndex == 0)
+                return;
+
+            SelectedBillingPeriod = AvailableBillingPeriods?[--_currentPeriodIndex];
+
+            await _entryViewModel.SetParametersAsync(
+                SelectedBillingPeriod?.Id ?? 0,
+                _registerId,
+                SelectedBillingPeriod?.IsOpen ?? false);
+            await _billingPeriodChartViewModel.SetParametersAsync(
+                SelectedBillingPeriod?.Id ?? 0,
+                _registerId,
+                SelectedBillingPeriod?.Name ?? string.Empty,
+                CancellationToken);
+        }
+
+        public async Task NextPeriodAsync()
+        {
+            if ((!AvailableBillingPeriods?.Any() ?? false)
+                || _currentPeriodIndex == AvailableBillingPeriodsCount - 1)
+                return;
+
+            SelectedBillingPeriod = AvailableBillingPeriods?[++_currentPeriodIndex];
+
+            await _entryViewModel.SetParametersAsync(
+                SelectedBillingPeriod?.Id ?? 0,
+                _registerId,
+                SelectedBillingPeriod?.IsOpen ?? false);
+            await _billingPeriodChartViewModel.SetParametersAsync(
+                SelectedBillingPeriod?.Id ?? 0,
+                _registerId,
+                SelectedBillingPeriod?.Name ?? string.Empty,
+                CancellationToken);
+        }
+
+        protected override async ValueTask DisposeAsyncCore()
+        {
+            _billingPeriodRealTimeService.EntryCreated -= _billingPeriodRealTimeService_EntryCreated;
+            await _billingPeriodRealTimeService.DisposeAsync().ConfigureAwait(false);
+            
+            await base.DisposeAsyncCore();
         }
 
         private async Task ReadRegister(CancellationToken cancellationToken = default)
@@ -175,24 +250,6 @@ namespace HomeAccountant.Core.ViewModels
             Register = response.Value;
         }
 
-        public void PreviousPeriod()
-        {
-            if ((!AvailableBillingPeriods?.Any() ?? false)
-                || _currentPeriodIndex == 0)
-                return;
-
-            SelectedBillingPeriod = AvailableBillingPeriods?[--_currentPeriodIndex];
-        }
-
-        public void NextPeriod()
-        {
-            if ((!AvailableBillingPeriods?.Any() ?? false)
-                || _currentPeriodIndex == AvailableBillingPeriodsCount - 1)
-                return;
-
-            SelectedBillingPeriod = AvailableBillingPeriods?[++_currentPeriodIndex];
-        }
-
         private async Task RefreshBillingPeriodAsync(CancellationToken cancellationToken = default)
         {
             var result = await _billingPeriodService.GetBiilingPeriodsAsync(_registerId, cancellationToken);
@@ -201,29 +258,12 @@ namespace HomeAccountant.Core.ViewModels
                 return;
 
             AvailableBillingPeriods = result.Value?.OrderBy(x => x.Id).ToList();
-
-            await Task.Run(() =>
-            {
-                SelectedBillingPeriod = null;
-                SelectedBillingPeriod = AvailableBillingPeriods?[_currentPeriodIndex];
-                NotifyPropertyChangedAsync(nameof(SelectedBillingPeriod));
-            });
+            SelectedBillingPeriod = AvailableBillingPeriods?[_currentPeriodIndex];
         }
 
         private async Task ReadInitialDataAsync(int registerId, CancellationToken cancellationToken = default)
         {
             await GetBillingPeriodAsync(registerId, cancellationToken);
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            _pubSubService.MessageSender -= _pubSubService_MessageSender;
-            base.Dispose(disposing);
-        }
-
-        private async Task _pubSubService_MessageSender(object? sender, EventArgs e)
-        {
-            await RefreshBillingPeriodAsync();
         }
 
         private async Task GetBillingPeriodAsync(int registerId, CancellationToken cancellationToken = default)
@@ -257,6 +297,25 @@ namespace HomeAccountant.Core.ViewModels
 
             _currentPeriodIndex = AvailableBillingPeriodsCount - 1;
             _selectedBillingPeriod = AvailableBillingPeriods?[_currentPeriodIndex];
+        }
+
+        private async Task _billingPeriodRealTimeService_EntryCreated(object sender, RealTimeEventArgs<int> e)
+        {
+            if (SelectedBillingPeriod is null)
+                return;
+
+            if (SelectedBillingPeriod.Id != e.Value)
+                return;
+
+            await RefreshBillingPeriodAsync();
+            await _entryViewModel.RefreshDataAsync();
+            await _billingPeriodChartViewModel.RefreshChart();
+        }
+
+        private async Task BillingPeriodRealTimeService_BillingPeriodStateChanged(object sender, RealTimeEventArgs<int> e)
+        {
+            await RefreshBillingPeriodAsync();
+            _entryViewModel.RefreshBillingPeriodState(SelectedBillingPeriod?.IsOpen ?? false);
         }
     }
 }

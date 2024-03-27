@@ -1,8 +1,7 @@
 ﻿ @page "/books/{registerId:int}/BillingPeriod/{billingPeriodId:int}" 
- @inherits MvvmComponent<EntryViewModel>
 
 <div style="min-height: 550px;">
-    @if (!ViewModel.IsBusy)
+    @if (!ViewModel!.IsBusy)
     {
         <button type="button" class="btn btn-success w-100 normalCreateButton" @onclick="ViewModel.CreateEntryAsync" @attributes="ViewModel.IsButtonBlocked">Dodaj</button>
         <button type="button" class="btn btn-success mobileCreateButton" @onclick="ViewModel.CreateEntryAsync" @attributes="ViewModel.IsButtonBlocked">
@@ -25,7 +24,7 @@
             int counter = 1;
         }
         <tbody>
-            @foreach (var item in ViewModel.Entries ?? new List<EntryModel>())
+            @foreach (var item in ViewModel.Entries)
             {
                 <tr>
                     <td data-label="#" scope="row">@(counter++)</td>

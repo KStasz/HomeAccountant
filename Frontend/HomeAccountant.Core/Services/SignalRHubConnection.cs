@@ -81,5 +81,15 @@ namespace HomeAccountant.Core.Services
                 await _hubConnection.DisposeAsync().ConfigureAwait(false);
             }
         }
+
+        public Task SendAsync(string? methodName, object? arg1, CancellationToken cancellationToken = default)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(methodName);
+
+            if (State != HubConnectionState.Connected)
+                throw new SignalRHubConnectionException(HUB_IS_NOT_CONNECTED_EXCEPTION_MESSAGE);
+
+            return _hubConnectionSenderAsync.SendAsync(methodName, arg1, cancellationToken);
+        }
     }
 }

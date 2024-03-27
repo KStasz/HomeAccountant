@@ -40,13 +40,13 @@ builder.Services.AddScoped<LoginViewModel>();
 builder.Services.AddScoped<RegisterViewModel>();
 builder.Services.AddTransient<EntryViewModel>();
 builder.Services.AddScoped<CategoriesViewModel>();
-builder.Services.AddScoped<BillingPeriodViewModel>();
+builder.Services.AddTransient<BillingPeriodViewModel>();
 builder.Services.AddScoped<BillingPeriodChartViewModel>();
 builder.Services.AddTransient<FriendsPanelViewModel>();
 builder.Services.AddScoped<IMemoryStorage, MemoryStorage>();
 builder.Services.AddScoped<IPubSubService, PubSubService>();
 builder.Services.RegisterSignalRService<IFriendsRealTimeService, FriendsRealTimeService>(isUsingLocal ? "FriendsHubAddress_local" : "FriendsHubAddress");
-builder.Services.RegisterSignalRService<IEntriesRealTimeService, EntriesRealTimeService>(isUsingLocal ? "EntriesHubAddress_local" : "EntriesHubAddress");
+builder.Services.RegisterSignalRService<IBillingPeriodRealTimeService, BillingPeriodRealTimeService>(isUsingLocal ? "EntriesHubAddress_local" : "EntriesHubAddress");
 
 await builder.Build().RunAsync();
 

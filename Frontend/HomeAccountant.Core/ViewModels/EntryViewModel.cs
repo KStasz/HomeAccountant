@@ -1,35 +1,33 @@
 ﻿using HomeAccountant.Core.Model;
 using HomeAccountant.Core.Services;
+using System.Collections.ObjectModel;
 
 namespace HomeAccountant.Core.ViewModels
 {
-    public class EntryViewModel : MvvmViewModel
+    public class EntryViewModel : BaseViewModel
     {
         private readonly IEntryService _entryService;
         private readonly ICategoriesService _categoriesService;
-        private readonly IPubSubService _pubSubService;
-        private readonly IEntriesRealTimeService _entriesRealTimeService;
-        private int _billingPerdiodId;
+        private int _billingPeriodId;
         private int _registerId;
         private bool _isPeriodOpen;
 
         public EntryViewModel(IEntryService entryService,
-            ICategoriesService categoriesService,
-            IPubSubService pubSubService,
-            IEntriesRealTimeService entriesRealTimeService)
+            ICategoriesService categoriesService)
         {
             _entryService = entryService;
             _categoriesService = categoriesService;
-            _pubSubService = pubSubService;
-            _entriesRealTimeService = entriesRealTimeService;
-            _entriesRealTimeService.EntryCreated += EntriesRealTimeService_EntryCreated;
+
+            _entries = new ObservableCollection<EntryModel>();
         }
 
         public IModalDialog<EntryModel, EntryModel>? EntryCreateDialog { get; set; }
         public IModalDialog<EntryModel>? EntryDeleteDialog { get; set; }
 
-        private IEnumerable<EntryModel>? _entries;
-        public IEnumerable<EntryModel>? Entries
+        public Func<Task>? NotifyEntryHasBeenCreated { get; set; }
+
+        private ObservableCollection<EntryModel> _entries;
+        public ObservableCollection<EntryModel> Entries
         {
             get => _entries;
             set => SetValue(ref _entries, value);
@@ -87,20 +85,30 @@ namespace HomeAccountant.Core.ViewModels
             }
         }
 
-        public override async Task PageParameterSetAsync(Dictionary<string, object?> parameters)
+        public async Task SetParametersAsync(int billingPeriodId, int registerId, bool isPeriodOpen)
         {
             IsBusy = true;
-            _billingPerdiodId = GetParameter<int>(parameters["BillingPeriodId"]);
-            _registerId = GetParameter<int>(parameters["RegisterId"]);
-            _isPeriodOpen = GetParameter<bool>(parameters["IsPeriodOpen"]);
+            _billingPeriodId = billingPeriodId;
+            _registerId = registerId;
+            _isPeriodOpen = isPeriodOpen;
             CurrentPage = 1;
             TotalPages = 0;
-            Entries = null;
 
             await ReadEntriesAsync(CancellationToken);
             await ReadCategoriesAsync(CancellationToken);
-            await _entriesRealTimeService.InitializeAsync(CancellationToken);
+
             IsBusy = false;
+        }
+
+        public async Task RefreshDataAsync()
+        {
+            await ReadEntriesAsync(CancellationToken);
+        }
+
+        public void RefreshBillingPeriodState(bool isPeriodOpen)
+        {
+            _isPeriodOpen = isPeriodOpen;
+            NotifyPropertyChangedAsync(nameof(IsButtonBlocked));
         }
 
         public async Task SetPageAsync(int page)
@@ -149,10 +157,12 @@ namespace HomeAccountant.Core.ViewModels
                 return;
             }
 
-            var creationResult = await _entryService.CreateEntryAsync(_registerId, _billingPerdiodId, result, CancellationToken);
+            var creationResult = await _entryService.CreateEntryAsync(_registerId, _billingPeriodId, result, CancellationToken);
 
-            await _entriesRealTimeService.EntryCreatedAsync(CancellationToken);
-            //await _pubSubService.Send(this);
+            if (NotifyEntryHasBeenCreated is null)
+                return;
+
+            await NotifyEntryHasBeenCreated.Invoke();
         }
 
         public async Task DeleteEntry(EntryModel entryReadDto)
@@ -167,10 +177,12 @@ namespace HomeAccountant.Core.ViewModels
             if (result == ModalResult.Cancel)
                 return;
 
-            await _entryService.DeleteEntryAsync(_registerId, _billingPerdiodId, entryReadDto.Id, CancellationToken);
+            await _entryService.DeleteEntryAsync(_registerId, _billingPeriodId, entryReadDto.Id, CancellationToken);
 
-            await _entriesRealTimeService.EntryCreatedAsync(CancellationToken);
-            //await _pubSubService.Send(this);
+            if (NotifyEntryHasBeenCreated is null)
+                return;
+
+            await NotifyEntryHasBeenCreated.Invoke();
         }
 
         private async Task ReadCategoriesAsync(CancellationToken cancellationToken)
@@ -192,33 +204,16 @@ namespace HomeAccountant.Core.ViewModels
 
         private async Task ReadEntriesAsync(CancellationToken cancellationToken)
         {
-            var result = await _entryService.GetEntriesAsync(_registerId, _billingPerdiodId, CurrentPage, cancellationToken: cancellationToken);
+            var result = await _entryService.GetEntriesAsync(_registerId, _billingPeriodId, CurrentPage, cancellationToken: cancellationToken);
 
             if (!result.Result)
                 return;
 
-            Entries = result.Value?.Result;
+            Entries = new ObservableCollection<EntryModel>(result.Value?.Result ?? Array.Empty<EntryModel>());
             CurrentPage = result.Value?.CurrentPage ?? 0;
             TotalPages = result.Value?.TotalPages ?? 0;
             CalculateAvailablePages();
         }
 
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-        }
-
-        protected override async ValueTask DisposeAsyncCore()
-        {
-            _entriesRealTimeService.EntryCreated -= EntriesRealTimeService_EntryCreated;
-
-            await _entriesRealTimeService.DisposeAsync().ConfigureAwait(false);
-            await base.DisposeAsyncCore();
-        }
-
-        private async Task EntriesRealTimeService_EntryCreated(object sender, RealTimeEventArgs e)
-        {
-            await _pubSubService.Send(this);
-        }
     }
 }

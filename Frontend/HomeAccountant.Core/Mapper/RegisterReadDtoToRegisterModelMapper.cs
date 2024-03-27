@@ -15,7 +15,8 @@ namespace HomeAccountant.Core.Mapper
                 Id = value!.Id,
                 Name = value.Name,
                 Description = value.Description,
-                CreatedDate = value.CreatedDate
+                CreatedDate = value.CreatedDate,
+                UserIds = value.UserIds
             };
         }
     }

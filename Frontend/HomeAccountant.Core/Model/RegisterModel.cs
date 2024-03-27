@@ -9,6 +9,8 @@ namespace HomeAccountant.Core.Model
         public string? Name { get; set; }
         public string? Description { get; set; }
         public DateTime CreatedDate { get; set; }
+        public string[]? UserIds { get; set; }
+        public bool AreFriendsLoading { get; set; }
 
         public void Clear()
         {
@@ -21,7 +23,8 @@ namespace HomeAccountant.Core.Model
             return obj is RegisterModel dto &&
                    Id == dto.Id &&
                    Name == dto.Name &&
-                   Description == dto.Description;
+                   Description == dto.Description &&
+                   (UserIds ?? Array.Empty<string>()).SequenceEqual(dto.UserIds ?? Array.Empty<string>());
         }
 
         public override int GetHashCode()

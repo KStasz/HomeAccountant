@@ -1,4 +1,5 @@
-﻿using HomeAccountant.Core.Extensions;
+﻿using System.Collections.ObjectModel;
+using HomeAccountant.Core.Extensions;
 using HomeAccountant.Core.Model;
 using HomeAccountant.Core.Services;
 using Microsoft.Extensions.Logging;
@@ -26,10 +27,10 @@ namespace HomeAccountant.Core.ViewModels
         public IAlert? Alert { get; set; }
         public IModalDialog<RegisterModel>? DeleteRegisterDialog { get; set; }
         public IModalDialog<RegisterModel, RegisterModel>? CreateRegisterDialog { get; set; }
-        public IModalDialog<Task<ServiceResponse<IEnumerable<UserModel>?>>, UserModel>? SelectUserDialog { get; set; }
+        public IModalDialog<IEnumerable<UserModel>?, UserModel>? SelectUserDialog { get; set; }
 
-        private IEnumerable<RegisterModel>? _availableRegisters;
-        public IEnumerable<RegisterModel>? AvailableRegisters
+        private ObservableCollection<RegisterModel>? _availableRegisters;
+        public ObservableCollection<RegisterModel>? AvailableRegisters
         {
             get => _availableRegisters;
             set => SetValue(ref _availableRegisters, value);
@@ -91,7 +92,9 @@ namespace HomeAccountant.Core.ViewModels
             if (SelectUserDialog is null)
                 return;
 
-            await SelectUserDialog.InitializeDialogAsync(_friendshipService.GetFriends());
+            IEnumerable<UserModel>? friends = await LoadFriendsCollection(registerModel);
+
+            await SelectUserDialog.InitializeDialogAsync(friends?.ExceptBy(registerModel.UserIds ?? Array.Empty<string>(), x => x.Id));
             var selectedUser = await SelectUserDialog.ShowModalAsync();
 
             if (selectedUser is null
@@ -113,6 +116,16 @@ namespace HomeAccountant.Core.ViewModels
                     AlertType.Danger,
                     CancellationToken);
             }
+        }
+
+        private async Task<IEnumerable<UserModel>?> LoadFriendsCollection(RegisterModel registerModel)
+        {
+            registerModel.AreFriendsLoading = true;
+            var friendsResponse = await _friendshipService.GetFriendsAsync();;
+            registerModel.AreFriendsLoading = false;
+            NotifyPropertyChangedAsync(nameof(registerModel.AreFriendsLoading));
+            
+            return await friendsResponse.GetValue(Alert);
         }
 
         public async Task DeleteRegisterAsync(RegisterModel registerModel)
@@ -143,7 +156,7 @@ namespace HomeAccountant.Core.ViewModels
                 return;
             }
 
-            AvailableRegisters = result.Value;
+            AvailableRegisters = new ObservableCollection<RegisterModel>(result.Value ?? Array.Empty<RegisterModel>());
         }
     }
 }

@@ -1,16 +1,18 @@
-﻿@inherits MvvmComponent<BillingPeriodChartViewModel>
-<PieChart Dataset="(ViewModel.GetChartDataset())" />
-<div class="card mb-3">
-    <div class="card-body p-0">
-        <div class="col-md-12 mx-auto">
-            <table class="table m-0 table-borderless">
-                <thead>
-                    <tr>
-                        <th scope="col" width="50%" class="text-center">Suma</th>
-                        <th scope="col">@(ViewModel.BillingPeriodStatistic?.TotalSum)</th>
-                    </tr>
-                </thead>
-            </table>
+﻿@if (ViewModel is not null)
+{
+    <PieChart Dataset="(ViewModel.ChartDatasets)" PropertyChangedAsync="ViewModel" />
+    <div class="card mb-3">
+        <div class="card-body p-0">
+            <div class="col-md-12 mx-auto">
+                <table class="table m-0 table-borderless">
+                    <thead>
+                        <tr>
+                            <th scope="col" width="50%" class="text-center">Suma</th>
+                            <th scope="col">@(ViewModel.BillingPeriodStatistic?.TotalSum)</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
         </div>
     </div>
-</div>
+}

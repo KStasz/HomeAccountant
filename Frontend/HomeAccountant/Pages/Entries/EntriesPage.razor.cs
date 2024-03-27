@@ -1,16 +1,54 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using HomeAccountant.Core.ViewModels;
+using Microsoft.AspNetCore.Components;
 
 namespace HomeAccountant.Pages.Entries
 {
-    partial class EntriesPage
+    partial class EntriesPage : ComponentBase, IDisposable, IAsyncDisposable
     {
         [Parameter]
-        public int BillingPeriodId { get; set; } = 3;
+        public EntryViewModel? ViewModel { get; set; }
 
-        [Parameter]
-        public bool IsPeriodOpen { get; set; } = true;
+        protected override async Task OnInitializedAsync()
+        {
+            if (ViewModel is null)
+                return;
 
-        [Parameter]
-        public int RegisterId { get; set; } = 13;
+            ViewModel.PropertyChangedAsync += ViewModel_PropertyChangedAsync;
+            await base.OnInitializedAsync();
+        }
+
+        private async Task ViewModel_PropertyChangedAsync(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            await InvokeAsync(StateHasChanged);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (ViewModel is null)
+                return;
+
+            ViewModel.PropertyChangedAsync -= ViewModel_PropertyChangedAsync;
+            ViewModel.Dispose();
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            await DisposeAsyncCore().ConfigureAwait(false);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual async ValueTask DisposeAsyncCore()
+        {
+            if (ViewModel is null)
+                return;
+
+            await ViewModel.DisposeAsync().ConfigureAwait(false);
+        }
     }
 }

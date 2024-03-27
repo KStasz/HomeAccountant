@@ -321,7 +321,7 @@ namespace HomeAccountant.AccountingService.Controllers
                     new StatusCodeResult(404));
             }
 
-            var register = _registerRepository.Get(x => x.Id == registerId);
+            var register = _registerRepository.Get(x => x.Id == registerId, x => x.Sharings!);
 
             if (register is null)
             {
@@ -334,7 +334,8 @@ namespace HomeAccountant.AccountingService.Controllers
                     new StatusCodeResult(404));
             }
 
-            if (register.CreatorId != UserId)
+            if (register.CreatorId != UserId
+                && (!register.Sharings?.Select(x => x.OwnerId).Contains(UserId) ?? true))
             {
                 return new Tuple<ServiceResponse, StatusCodeResult>(
                     new ServiceResponse(

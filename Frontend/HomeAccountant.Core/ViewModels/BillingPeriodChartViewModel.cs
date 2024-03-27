@@ -4,7 +4,7 @@ using System.Drawing;
 
 namespace HomeAccountant.Core.ViewModels
 {
-    public class BillingPeriodChartViewModel : MvvmViewModel
+    public class BillingPeriodChartViewModel : BaseViewModel
     {
         private readonly IBillingPeriodService _billingPeriodService;
         private int _billingPeriodId;
@@ -14,6 +14,8 @@ namespace HomeAccountant.Core.ViewModels
         public BillingPeriodChartViewModel(IBillingPeriodService billingPeriodService)
         {
             _billingPeriodService = billingPeriodService;
+
+            _chartDatasets = new List<ChartDataset>();
         }
 
         private BillingPeriodStatisticModel? _billingPeriodStatistic;
@@ -23,13 +25,28 @@ namespace HomeAccountant.Core.ViewModels
             set => SetValue(ref _billingPeriodStatistic, value);
         }
 
-        public override async Task PageParameterSetAsync(Dictionary<string, object?> parameters)
+        private List<ChartDataset> _chartDatasets;
+        public List<ChartDataset> ChartDatasets
         {
-            _billingPeriodId = GetParameter<int>(parameters["BillingPeriodId"]);
-            _registerid = GetParameter<int>(parameters["Registerid"]);
-            _billingPeriodName = GetParameter<string>(parameters["BillingPeriodName"]);
+            get => _chartDatasets;
+            set => SetValue(ref _chartDatasets, value);
+        }
+        
+        public async Task SetParametersAsync(int billingPeriodId, int registerid, string billingPeriodName, CancellationToken cancellationToken)
+        {
+            _billingPeriodId = billingPeriodId;
+            _registerid = registerid;
+            _billingPeriodName = billingPeriodName;
 
-            await GetBillingPeriodStatistic(CancellationToken);
+            await GetBillingPeriodStatistic(cancellationToken);
+            ChartDatasets = GetChartDataset() ?? new List<ChartDataset>();
+        }
+
+        public async Task RefreshChart(CancellationToken cancellationToken = default)
+        {
+            await GetBillingPeriodStatistic(cancellationToken);
+            ChartDatasets = GetChartDataset() ?? new List<ChartDataset>();
+            NotifyPropertyChangedAsync(nameof(BillingPeriodStatistic));
         }
 
         public List<ChartDataset>? GetChartDataset()

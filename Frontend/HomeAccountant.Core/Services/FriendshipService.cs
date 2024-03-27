@@ -144,7 +144,7 @@ namespace HomeAccountant.Core.Services
             }
         }
 
-        public async Task<ServiceResponse<IEnumerable<UserModel>?>> GetFriends(CancellationToken cancellationToken = default)
+        public async Task<ServiceResponse<IEnumerable<UserModel>?>> GetFriendsAsync(CancellationToken cancellationToken = default)
         {
             try
             {
