@@ -13,7 +13,12 @@ namespace HomeAccountant.Core.ViewModels.Tests
         private Mock<IBillingPeriodService> _billingPeriodServiceMock;
         private Mock<IPubSubService> _pubSubServiceMock;
         private readonly Mock<NavigationManager> _navManagerMock;
-        private readonly Mock<IRegisterService> _registerService;
+        private readonly Mock<IRegisterService> _registerServiceMock;
+        private readonly Mock<IEntryService> _entryServiceMock;
+        private readonly Mock<ICategoriesService> _categoriesServiceMock;
+        private readonly Mock<EntryViewModel> _entryViewModelMock;
+        private readonly Mock<BillingPeriodChartViewModel> _billingPeriodChartViewModelMock;
+        private readonly Mock<IBillingPeriodRealTimeService> _billingPeriodRealTimeServiceMock;
         private BillingPeriodViewModel _viewModel;
         private Mock<IModalDialog<BillingPeriodModel, BillingPeriodModel>> _billingCreateDialogMock;
 
@@ -24,13 +29,21 @@ namespace HomeAccountant.Core.ViewModels.Tests
             _billingPeriodServiceMock = new Mock<IBillingPeriodService>();
             _pubSubServiceMock = new Mock<IPubSubService>();
             _navManagerMock = new Mock<NavigationManager>();
-            _registerService = new Mock<IRegisterService>();
+            _registerServiceMock = new Mock<IRegisterService>();
+            _entryServiceMock = new Mock<IEntryService>();
+            _categoriesServiceMock = new Mock<ICategoriesService>();
+            _entryViewModelMock = new Mock<EntryViewModel>(_entryServiceMock.Object, _categoriesServiceMock.Object);
+            _billingPeriodChartViewModelMock = new Mock<BillingPeriodChartViewModel>(_billingPeriodServiceMock.Object);
+            _billingPeriodRealTimeServiceMock = new Mock<IBillingPeriodRealTimeService>();
+            SetupEntryViewModelMocks();
 
             _viewModel = new BillingPeriodViewModel(
                 _billingPeriodServiceMock.Object,
-                _pubSubServiceMock.Object,
-                _registerService.Object,
-                _navManagerMock.Object);
+                _registerServiceMock.Object,
+                _navManagerMock.Object,
+                _entryViewModelMock.Object,
+                _billingPeriodChartViewModelMock.Object,
+                _billingPeriodRealTimeServiceMock.Object);
             _viewModel.Alert = _alertServiceMock.Object;
             _viewModel.BillingCreateDialog = _billingCreateDialogMock.Object;
         }
@@ -128,7 +141,7 @@ namespace HomeAccountant.Core.ViewModels.Tests
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ServiceResponse(true));
 
-            _registerService.Setup(x => x.GetRegister(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            _registerServiceMock.Setup(x => x.GetRegister(It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ServiceResponse<RegisterModel?>()
                 {
                     Result = true,
@@ -234,7 +247,7 @@ namespace HomeAccountant.Core.ViewModels.Tests
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ServiceResponse(true));
 
-            _registerService.Setup(x => x.GetRegister(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            _registerServiceMock.Setup(x => x.GetRegister(It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ServiceResponse<RegisterModel?>()
                 {
                     Result = true,
@@ -315,7 +328,7 @@ namespace HomeAccountant.Core.ViewModels.Tests
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ServiceResponse(false));
 
-            _registerService.Setup(x => x.GetRegister(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            _registerServiceMock.Setup(x => x.GetRegister(It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ServiceResponse<RegisterModel?>()
                 {
                     Result = true,
@@ -402,7 +415,7 @@ namespace HomeAccountant.Core.ViewModels.Tests
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ServiceResponse(false));
 
-            _registerService.Setup(x => x.GetRegister(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            _registerServiceMock.Setup(x => x.GetRegister(It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ServiceResponse<RegisterModel?>()
                 {
                     Result = true,
@@ -480,7 +493,7 @@ namespace HomeAccountant.Core.ViewModels.Tests
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(
                 new ServiceResponse<IEnumerable<BillingPeriodModel>?>(billingPeriods));
-            _registerService.Setup(x => x.GetRegister(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            _registerServiceMock.Setup(x => x.GetRegister(It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ServiceResponse<RegisterModel?>()
                 {
                     Result = true,
@@ -566,7 +579,7 @@ namespace HomeAccountant.Core.ViewModels.Tests
                             CreationDate = It.IsAny<DateTime>()
                         }
                     }));
-            _registerService.Setup(x => x.GetRegister(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            _registerServiceMock.Setup(x => x.GetRegister(It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ServiceResponse<RegisterModel?>()
                 {
                     Result = true,
@@ -597,7 +610,7 @@ namespace HomeAccountant.Core.ViewModels.Tests
                 .ReturnsAsync(
                 new ServiceResponse<IEnumerable<BillingPeriodModel>?>(false));
 
-            _registerService.Setup(x => x.GetRegister(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            _registerServiceMock.Setup(x => x.GetRegister(It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ServiceResponse<RegisterModel?>()
                 {
                     Result = true,
@@ -654,7 +667,7 @@ namespace HomeAccountant.Core.ViewModels.Tests
                     It.IsAny<int>(),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ServiceResponse<IEnumerable<BillingPeriodModel>?>(billingPeriods));
-            _registerService.Setup(x => x.GetRegister(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            _registerServiceMock.Setup(x => x.GetRegister(It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ServiceResponse<RegisterModel?>()
                 {
                     Result = true,
@@ -669,7 +682,7 @@ namespace HomeAccountant.Core.ViewModels.Tests
 
             await _viewModel.PageParameterSetAsync(parameters);
 
-            _viewModel.PreviousPeriod();
+            await _viewModel.PreviousPeriodAsync();
 
             Assert.NotNull(_viewModel.AvailableBillingPeriods);
             Assert.NotNull(_viewModel.SelectedBillingPeriod);
@@ -685,7 +698,7 @@ namespace HomeAccountant.Core.ViewModels.Tests
                     It.IsAny<int>(),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ServiceResponse<IEnumerable<BillingPeriodModel>?>(false));
-            _registerService.Setup(x => x.GetRegister(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            _registerServiceMock.Setup(x => x.GetRegister(It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ServiceResponse<RegisterModel?>()
                 {
                     Result = true,
@@ -700,7 +713,7 @@ namespace HomeAccountant.Core.ViewModels.Tests
 
             await _viewModel.PageParameterSetAsync(parameters);
 
-            _viewModel.PreviousPeriod();
+            await _viewModel.PreviousPeriodAsync();
 
             Assert.Null(_viewModel.SelectedBillingPeriod);
             Assert.Null(_viewModel.AvailableBillingPeriods);
@@ -737,7 +750,7 @@ namespace HomeAccountant.Core.ViewModels.Tests
                    It.IsAny<int>(),
                    It.IsAny<CancellationToken>()))
                .ReturnsAsync(new ServiceResponse<IEnumerable<BillingPeriodModel>?>(billingPeriods));
-            _registerService.Setup(x => x.GetRegister(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            _registerServiceMock.Setup(x => x.GetRegister(It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ServiceResponse<RegisterModel?>()
                 {
                     Result = true,
@@ -752,8 +765,8 @@ namespace HomeAccountant.Core.ViewModels.Tests
 
             await _viewModel.PageParameterSetAsync(parameters);
 
-            _viewModel.PreviousPeriod();
-            _viewModel.NextPeriod();
+            await _viewModel.PreviousPeriodAsync();
+            await _viewModel.NextPeriodAsync();
 
             Assert.NotNull(_viewModel.AvailableBillingPeriods);
             Assert.NotNull(_viewModel.SelectedBillingPeriod);
@@ -764,12 +777,13 @@ namespace HomeAccountant.Core.ViewModels.Tests
         public async Task NextPeriod_ShouldNotSwitchPeriodIfBillingPeriodsCollectionIsEmptyOrNull()
         {
             var parameters = new Dictionary<string, object?>() { { "RegisterId", 1 } };
+
             _billingPeriodServiceMock.Setup(
                 x => x.GetBiilingPeriodsAsync(
                     It.IsAny<int>(),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ServiceResponse<IEnumerable<BillingPeriodModel>?>(false));
-            _registerService.Setup(x => x.GetRegister(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            _registerServiceMock.Setup(x => x.GetRegister(It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ServiceResponse<RegisterModel?>()
                 {
                     Result = true,
@@ -784,10 +798,42 @@ namespace HomeAccountant.Core.ViewModels.Tests
 
             await _viewModel.PageParameterSetAsync(parameters);
 
-            _viewModel.NextPeriod();
+            await _viewModel.NextPeriodAsync();
 
             Assert.Null(_viewModel.SelectedBillingPeriod);
             Assert.Null(_viewModel.AvailableBillingPeriods);
+        }
+
+        private void SetupEntryViewModelMocks()
+        {
+            _entryServiceMock.Setup(
+                            x => x.GetEntriesAsync(
+                                It.IsAny<int>(),
+                                It.IsAny<int>(),
+                                It.IsAny<int>(),
+                                It.IsAny<int>(),
+                                It.IsAny<CancellationToken>()))
+                            .ReturnsAsync(
+                            new ServiceResponse<PaggedResult<EntryModel>?>(
+                                new PaggedResult<EntryModel>(
+                                    Array.Empty<EntryModel>(),
+                                    1,
+                                    10)));
+            _categoriesServiceMock.Setup(
+                x => x.GetRegisterCategories(
+                    It.IsAny<int>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(
+                new ServiceResponse<IEnumerable<CategoryModel>?>(
+                    Array.Empty<CategoryModel>()));
+            _billingPeriodServiceMock.Setup(
+                x => x.GetBillingPeriodStatisticAsync(
+                    It.IsAny<int>(),
+                    It.IsAny<int>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(
+                new ServiceResponse<BillingPeriodStatisticModel?>(
+                    new BillingPeriodStatisticModel()));
         }
     }
 }

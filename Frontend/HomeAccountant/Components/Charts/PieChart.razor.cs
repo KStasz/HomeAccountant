@@ -1,7 +1,8 @@
-﻿using HomeAccountant.Core.Model;
+﻿using HomeAccountant.Core.Interfaces;
+using HomeAccountant.Core.Model;
 using HomeAccountant.Core.Services;
 using Microsoft.AspNetCore.Components;
-using System.Data;
+using System.ComponentModel;
 using System.Text.Json;
 
 namespace HomeAccountant.Components.Charts
@@ -16,13 +17,33 @@ namespace HomeAccountant.Components.Charts
         [Parameter]
         public IEnumerable<ChartDataset>? Dataset { get; set; }
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
+        [Parameter]
+        public INotifyPropertyChangedAsync? PropertyChangedAsync { get; set; }
+
+        protected override void OnInitialized()
         {
-            if (Dataset is null)
+            if (PropertyChangedAsync is null)
                 return;
 
-            var config = GetJsonConfiguration(Dataset);
-            await JsCodeExecutor.ExecuteFunctionAsync("CreateChart", cancellationToken: default, _chartIdentifier, config);
+            PropertyChangedAsync.PropertyChangedAsync += PropertyChanged;
+            base.OnInitialized();
+        }
+
+        private async Task PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            await UpdateChart();
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                if (Dataset is null)
+                    return;
+
+                var config = GetJsonConfiguration(Dataset);
+                await JsCodeExecutor.ExecuteFunctionAsync("CreateChart", cancellationToken: default, _chartIdentifier, config);
+            }
 
             await base.OnAfterRenderAsync(firstRender);
         }
@@ -31,6 +52,15 @@ namespace HomeAccountant.Components.Charts
         {
             PieChartConfiguration config = new PieChartConfiguration(dataset);
             return JsonSerializer.Serialize(config);
+        }
+
+        private async Task UpdateChart()
+        {
+            if (Dataset is null)
+                return;
+
+            var config = GetJsonConfiguration(Dataset);
+            await JsCodeExecutor.ExecuteFunctionAsync("UpdateData", cancellationToken: default, config);
         }
 
         public async Task DestroyChart()

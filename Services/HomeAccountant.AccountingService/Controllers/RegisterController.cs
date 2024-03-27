@@ -127,7 +127,7 @@ namespace HomeAccountant.AccountingService.Controllers
             if (UserId is null)
                 return BadRequest(new ServiceResponse("Missing UserId"));
 
-            if (registerModel.CreatorId != UserId 
+            if (registerModel.CreatorId != UserId
                 && !(registerModel.Sharings?.Select(x => x.OwnerId).Contains(UserId) ?? false))
                 return Unauthorized(new ServiceResponse("You don't have access to this register"));
 
@@ -178,7 +178,7 @@ namespace HomeAccountant.AccountingService.Controllers
         {
             try
             {
-                if (UserId is null|| string.IsNullOrWhiteSpace(shareRegisterCreateDto.UserId))
+                if (UserId is null || string.IsNullOrWhiteSpace(shareRegisterCreateDto.UserId))
                     return BadRequest(new ServiceResponse(new string[] { "Invalid payload" }));
 
                 var register = _registerRepository.Get(x => x.Id == shareRegisterCreateDto.RegisterId);
@@ -212,7 +212,7 @@ namespace HomeAccountant.AccountingService.Controllers
             if (UserId is null)
                 return BadRequest(new ServiceResponse("Missing UserId"));
 
-            var registers = _registerRepository.GetAll(x => x.CreatorId == UserId).OrderByDescending(x => x.CreatedDate);
+            var registers = _registerRepository.GetAll(x => x.CreatorId == UserId, x => x.Sharings!).OrderByDescending(x => x.CreatedDate);
 
             return Ok(
                 new ServiceResponse<IEnumerable<RegisterReadDto>>(

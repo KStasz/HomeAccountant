@@ -8,7 +8,8 @@ namespace HomeAccountant.AccountingService.Profiles
     {
         public MapperProfiles()
         {
-            CreateMap<Register, RegisterReadDto>();
+            CreateMap<Register, RegisterReadDto>()
+                .ForMember(x => x.UserIds, x => x.MapFrom(GetUserIdFromSharing));
             CreateMap<RegisterCreateDto, Register>();
             CreateMap<RegisterUpdateDto, Register>();
 
@@ -23,5 +24,9 @@ namespace HomeAccountant.AccountingService.Profiles
             CreateMap<BillingPeriodCreateDto, BillingPeriod>();
             CreateMap<BillingPeriodUpdateDto, BillingPeriod>();
         }
+
+        private string[] GetUserIdFromSharing(Register reg, RegisterReadDto req) => 
+            reg.Sharings?.Select(x => x.OwnerId).ToArray() ?? Array.Empty<string>();
+        
     }
 }

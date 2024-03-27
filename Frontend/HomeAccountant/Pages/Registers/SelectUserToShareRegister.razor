@@ -2,44 +2,42 @@
     <ModalContent>
         <ModalHeader ModalTitle="Wybierz użytkownika" />
         <ModalBody>
-            @if (!_isLoading)
+            @if (_model?.Any() ?? false)
             {
-                <NullableTable Collection="_model" T="UserModel">
-                    <div class="table-responsive" style="max-height:250px;">
-                        <table class="table responsiveTable">
-                            <thead>
+                <div class="table-responsive" style="max-height:250px;">
+                    <table class="table responsiveTable">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Nazwa użytkwonika</th>
+                                <th scope="col"></th>
+                            </tr>
+                        </thead>
+                        @{
+                            int counter = 1;
+                        }
+                        <tbody>
+                            @foreach (var item in _model)
+                            {
                                 <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Email</th>
-                                    <th scope="col">UserName</th>
-                                    <th scope="col"></th>
+                                    <td data-label="#" scope="row">@(counter++)</td>
+                                    <td data-label="Email">@item.Email</td>
+                                    <td data-label="Nazwa użytkownika">@item.UserName</td>
+                                    <td>
+                                        <button type="button" class="btn btn-success" @onclick="() => SelectUser(item)">
+                                            Wybierz
+                                        </button>
+                                    </td>
                                 </tr>
-                            </thead>
-                            @{
-                                int counter = 1;
                             }
-                            <tbody>
-                                @foreach (var item in context.Value!)
-                                {
-                                    <tr>
-                                        <td data-label="#" scope="row">@(counter++)</td>
-                                        <td data-label="Email">@item.Email</td>
-                                        <td data-label="UserName">@item.UserName</td>
-                                        <td>
-                                            <button type="button" class="btn btn-success" @onclick="() => SelectUser(item)">
-                                                Wybierz
-                                            </button>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                </NullableTable>
+                        </tbody>
+                    </table>
+                </div>
             }
             else
             {
-                <Placeholder />
+                <p>Brak danych do wyświetlenia</p>
             }
         </ModalBody>
         <ModalFooter>

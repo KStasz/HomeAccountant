@@ -38,12 +38,12 @@
         </div>
         <div class="col-12 col-sm-4 col-md-3 my-auto">
             <div class="btn-group col-12" role="group" aria-label="Button group with nested dropdown">
-                <button type="button" class="btn btn-secondary" @onclick="ViewModel.PreviousPeriod" @attributes="ViewModel.IsPreviousPeriodButtonEnabled">
+                <button type="button" class="btn btn-secondary" @onclick="ViewModel.PreviousPeriodAsync" @attributes="ViewModel.IsPreviousPeriodButtonEnabled">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
                         <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8" />
                     </svg>
                 </button>
-                <button type="button" class="btn btn-secondary" @onclick="ViewModel.NextPeriod" @attributes="ViewModel.IsNextPeriodButtonEnabled">
+                <button type="button" class="btn btn-secondary" @onclick="ViewModel.NextPeriodAsync" @attributes="ViewModel.IsNextPeriodButtonEnabled">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
                         <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8" />
                     </svg>
@@ -61,14 +61,10 @@
     {
         <div class="row">
             <div class="col-md-8 col-12 order-md-0 order-1 mt-5 mt-md-0">
-                <EntriesPage RegisterId="RegisterId"
-                             BillingPeriodId="ViewModel.SelectedBillingPeriod.Id"
-                             IsPeriodOpen="ViewModel.SelectedBillingPeriod.IsOpen" />
+                <EntriesPage ViewModel="ViewModel.EntriesPageViewModel" />
             </div>
             <div class="col order-md-1 order-0 align-self-start sticky-md-top" style="height: 400px; top: 15px;">
-                <BillingPeriodChart BillingPeriodId="ViewModel.SelectedBillingPeriod.Id"
-                                    Registerid="RegisterId"
-                                    BillingPeriodName="@ViewModel.SelectedBillingPeriod.Name" />
+                <BillingPeriodChart ViewModel="ViewModel.BillingPeriodChartViewModel" />
             </div>
         </div>
     }

@@ -19,6 +19,12 @@ function CreateChart(chartId, config) {
     });
 }
 
+function UpdateData(config) {
+    let newData = JSON.parse(config);
+    chart.data = newData;
+    chart.update();
+}
+
 function DestroyChart() {
     if (chart !== undefined && chart !== null) {
         chart.destroy();

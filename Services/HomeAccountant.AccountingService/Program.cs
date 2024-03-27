@@ -85,6 +85,6 @@ app.MapControllers();
 if (builder.Environment.IsProduction())
     app.PrepareDatabase<ApplicationDbContext>();
 
-app.MapHub<EntriesHub>("/api/entrieshub/entries");
+app.MapHub<BillingPeriodHub>("/api/entrieshub/entries");
 
 app.Run();

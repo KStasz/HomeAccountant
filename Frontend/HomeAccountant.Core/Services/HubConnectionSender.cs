@@ -17,5 +17,12 @@ namespace HomeAccountant.Core.Services
 
             return _hubConnection.SendAsync(methodName, cancellationToken);
         }
+
+        public Task SendAsync(string? methodName, object? arg1, CancellationToken cancellationToken = default)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(methodName);
+
+            return _hubConnection.SendAsync(methodName, arg1, cancellationToken);
+        }
     }
 }
